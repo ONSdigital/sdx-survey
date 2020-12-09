@@ -21,6 +21,3 @@ def upload_file(data, filename):
     # blob.upload_from_filename(source_file_name)
 
     print('Successfully uploaded: ', filename)
-
-
-upload_file("hello world", "cool_data")
