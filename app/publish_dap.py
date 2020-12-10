@@ -9,15 +9,15 @@ def send_dap_message(survey_dict):
     publish_data(message)
 
 
-def publish_data(data):
+def publish_data(data_str):
     # Data must be a bytestring
-    data = data.encode("utf-8")
+    data = data_str.encode("utf-8")
     # When you publish a message, the client returns a future.
     future = dap_publisher.publish(dap_topic_path, data)
     return future.result()
 
 
-def create_dap_message(survey_dict):
+def create_dap_message(survey_dict: dict) -> str:
     survey_json = json.dumps(survey_dict)
     survey_bytes = survey_json.encode("utf-8")
     md5_hash = hashlib.md5(survey_bytes).hexdigest()
@@ -49,7 +49,7 @@ def create_dap_message(survey_dict):
         print("failed to produce dap message!")
 
     print("Created dap data")
-    return dap_message
+    return json.dumps(dap_message)
 
 
 def get_formatted_current_utc():
