@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 
-def send_dap_message(survey_dict):
+def send_dap_message(survey_dict: dict):
     message = create_dap_message(survey_dict)
     publish_data(message)
 
