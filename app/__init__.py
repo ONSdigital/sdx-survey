@@ -3,7 +3,7 @@ from google.cloud import pubsub_v1
 
 project_id = "ons-sdx-sandbox"
 dap_topic_id = "dap-topic"
-receipt_topic_id = "receipt_topic"
+receipt_topic_id = "receipt-topic"
 
 dap_publisher = pubsub_v1.PublisherClient()
 # The `topic_path` method creates a fully qualified identifier
