@@ -11,6 +11,7 @@ def send_dap_message(survey_dict):
 
 def publish_data(data_str):
     # Data must be a bytestring
+    data_str = json.dumps(data_str)
     data = data_str.encode("utf-8")
     # When you publish a message, the client returns a future.
     future = dap_publisher.publish(dap_topic_path, data)
@@ -49,7 +50,9 @@ def create_dap_message(survey_dict: dict) -> str:
         print("failed to produce dap message!")
 
     print("Created dap data")
-    return json.dumps(dap_message)
+    str_dap_message = json.dumps(dap_message)
+    print(type(str_dap_message))
+    return str_dap_message
 
 
 def get_formatted_current_utc():
