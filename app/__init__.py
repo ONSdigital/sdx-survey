@@ -18,7 +18,7 @@ receipt_topic_path = receipt_publisher.topic_path(project_id, receipt_topic_id)
 # Subscriber setup
 subscription_id = "survey-subscription"
 
-subscriber = pubsub_v1.SubscriberClient()
+survey_subscriber = pubsub_v1.SubscriberClient()
 # The `subscription_path` method creates a fully qualified identifier
 # in the form `projects/{project_id}/subscriptions/{subscription_id}`
-subscription_path = subscriber.subscription_path(project_id, subscription_id)
+subscription_path = survey_subscriber.subscription_path(project_id, subscription_id)

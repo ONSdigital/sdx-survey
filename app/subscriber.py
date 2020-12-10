@@ -1,5 +1,5 @@
 from concurrent.futures import TimeoutError
-from app import subscriber, subscription_path
+from app import survey_subscriber, subscription_path
 
 from app.collect import process
 
@@ -11,11 +11,11 @@ def callback(message):
 
 def start():
 
-    streaming_pull_future = subscriber.subscribe(subscription_path, callback=callback)
+    streaming_pull_future = survey_subscriber.subscribe(subscription_path, callback=callback)
     print(f"Listening for messages on {subscription_path}..\n")
 
     # Wrap subscriber in a 'with' block to automatically call close() when done.
-    with subscriber:
+    with survey_subscriber:
         try:
             # When `timeout` is not set, result() will block indefinitely,
             # unless an exception is encountered first.
