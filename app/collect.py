@@ -20,7 +20,7 @@ def process(message):
     upload_file(message.data, extract_tx_id(message))
 
     print("receipting...")
-    send_receipt(survey_dict)
+    # send_receipt(survey_dict)
 
     print("send dap notification")
     send_dap_message(survey_dict)
