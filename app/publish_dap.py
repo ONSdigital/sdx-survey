@@ -5,19 +5,19 @@ from datetime import datetime
 
 
 def send_dap_message(survey_dict: dict):
-    message_str = create_dap_message(survey_dict)
-    publish_data(message_str)
+    message_str, tx_id = create_dap_message(survey_dict)
+    publish_data(message_str, tx_id)
 
 
-def publish_data(data_str: str):
+def publish_data(data_str: str, tx_id: str):
     # Data must be a bytestring
     data = data_str.encode("utf-8")
     # When you publish a message, the client returns a future.
-    future = dap_publisher.publish(dap_topic_path, data)
+    future = dap_publisher.publish(dap_topic_path, data, tx_id=tx_id)
     return future.result()
 
 
-def create_dap_message(survey_dict: dict) -> str:
+def create_dap_message(survey_dict: dict) -> tuple:
     survey_json = json.dumps(survey_dict)
     survey_bytes = survey_json.encode("utf-8")
     md5_hash = hashlib.md5(survey_bytes).hexdigest()
@@ -50,7 +50,7 @@ def create_dap_message(survey_dict: dict) -> str:
 
     print("Created dap data")
     str_dap_message = json.dumps(dap_message)
-    return str_dap_message
+    return str_dap_message, survey_dict['tx_id']
 
 
 def get_formatted_current_utc():
