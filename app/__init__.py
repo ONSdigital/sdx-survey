@@ -2,6 +2,9 @@ from google.cloud import pubsub_v1
 
 
 project_id = "ons-sdx-sandbox"
+
+# publish config
+
 dap_topic_id = "dap-topic"
 receipt_topic_id = "receipt-topic"
 
@@ -10,12 +13,11 @@ dap_publisher = pubsub_v1.PublisherClient()
 # in the form `projects/{project_id}/topics/{topic_id}`
 dap_topic_path = dap_publisher.topic_path(project_id, dap_topic_id)
 
-
 receipt_publisher = pubsub_v1.PublisherClient()
 receipt_topic_path = receipt_publisher.topic_path(project_id, receipt_topic_id)
 
 
-# Subscriber setup
+# Subscriber config
 subscription_id = "survey-subscription"
 
 survey_subscriber = pubsub_v1.SubscriberClient()
