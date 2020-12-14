@@ -7,12 +7,10 @@ from app.store import upload_file
 
 
 def process(message):
-    print(message.data)
 
     print("decrypting...")
 
     message_data_str = message.data.decode('utf-8')
-    print(type(message_data_str))
     survey_dict = decrypt_survey(message_data_str)
 
     print("validating...")
@@ -23,7 +21,9 @@ def process(message):
     encrypted_survey = encrypt_survey(survey_dict)
 
     print("write to bucket")
-    upload_file(encrypted_survey, extract_tx_id(message))
+
+    tx_id = extract_tx_id(survey_dict)
+    upload_file(encrypted_survey, tx_id)
 
     print("receipting...")
     send_receipt(survey_dict)
@@ -32,6 +32,5 @@ def process(message):
     send_dap_message(survey_dict)
 
 
-def extract_tx_id(message):
-    message_dict = json.loads(message.data)
+def extract_tx_id(message_dict: dict) -> str:
     return message_dict['tx_id']
