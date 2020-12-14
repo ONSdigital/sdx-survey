@@ -11,7 +11,9 @@ def process(message):
 
     print("decrypting...")
 
-    survey_dict = decrypt_survey(message.data)
+    message_data_str = message.data.decode('utf-8')
+    print(type(message_data_str))
+    survey_dict = decrypt_survey(message_data_str)
 
     print("validating...")
 
