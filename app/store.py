@@ -10,7 +10,7 @@ directory = "surveys"
 # path = "storage-object-name"
 
 
-def upload_file(data, filename):
+def upload_file(data: str, filename: str):
     """Uploads a string to the bucket."""
     path = f"{directory}/{filename}"
     storage_client = storage.Client("ons-sdx-sandbox")
