@@ -11,6 +11,7 @@ def encrypt_survey(submission: dict) -> str:
         secrets_from_file = yaml.safe_load(file)
     key_store = KeyStore(secrets_from_file)
     payload = encrypt(submission, key_store, 'submission')
+    print(payload)
     return payload
 
 
