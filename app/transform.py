@@ -12,13 +12,14 @@ session = requests.Session()
 
 def transform(survey: dict):
     """ call the transform endpoint and raise quarantinable error if bad response"""
-    endpoint = f"{TRANSFORM_SERVICE_URL}/transform"
+    endpoint = f"http://{TRANSFORM_SERVICE_URL}/transform"
     logger.info("Calling transform", request_url=endpoint)
 
-    response = call_transform_endpoint(endpoint, survey)
+    response = call_transform_endpoint(survey, endpoint)
 
     if response_ok(response) and response.content is not None:
         logger.info("Successfully transformed")
+        print(type(response.content))
         return response.content
 
     raise requests.ConnectionError("Response missing content")

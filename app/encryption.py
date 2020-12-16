@@ -15,6 +15,17 @@ def encrypt_survey(submission: dict) -> str:
     return payload
 
 
+def encrypt_zip(zip: bytes) -> str:
+    with open("./keys.yml") as file:
+        secrets_from_file = yaml.safe_load(file)
+    key_store = KeyStore(secrets_from_file)
+    zip_str = str(zip)
+    byte_str = zip_str.encode('utf-8')
+    payload = encrypt(byte_str, key_store, 'submission')
+    print(type(payload))
+    return payload
+
+
 def decrypt_survey(payload: str) -> dict:
     with open("./keys2.yml") as file2:
         secrets_from_file2 = yaml.safe_load(file2)
