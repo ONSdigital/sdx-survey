@@ -3,31 +3,30 @@ import logging
 
 import requests
 from structlog import wrap_logger
+
 from app import TRANSFORM_SERVICE_URL
 
 logger = wrap_logger(logging.getLogger(__name__))
 session = requests.Session()
 
 
-def transform(self):
+def transform(survey: dict):
     """ call the transform endpoint and raise quarantinable error if bad response"""
-    endpoint = self._get_url()
-    self.logger.info("Calling transform", request_url=endpoint)
+    endpoint = f"{TRANSFORM_SERVICE_URL}/transform"
+    logger.info("Calling transform", request_url=endpoint)
 
-    response = call_transform_endpoint(endpoint, json=self.survey)
+    response = call_transform_endpoint(endpoint, survey)
 
     if response_ok(response) and response.content is not None:
-        self.logger.info(f"{self.__class__.__name__}:Successfully transformed")
+        logger.info("Successfully transformed")
         return response.content
 
     raise requests.ConnectionError("Response missing content")
 
 
-def call_transform_endpoint(survey_dict):
+def call_transform_endpoint(survey_dict, url):
     # logger trying
     survey_json = json.dumps(survey_dict)
-    url = f"{TRANSFORM_SERVICE_URL}/transform"
-
     response = session.post(url, survey_json)
 
     try:
