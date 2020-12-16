@@ -3,6 +3,7 @@ from app.publish_receipt import send_receipt
 from app.encryption import decrypt_survey, encrypt_survey
 from app.quarantine import quarantine_submission
 from app.store import upload_file
+from app.transform import transform
 from app.validate import validate, ClientError
 
 
@@ -22,9 +23,11 @@ def process(message):
         print("validation successful")
 
         print("transforming...")
+        transformed_survey = transform(survey_dict)
+        print(transformed_survey)
 
         print("encrypting...")
-        encrypted_survey = encrypt_survey(survey_dict)
+        encrypted_survey = encrypt_survey(transformed_survey)
 
         print("write to bucket")
 

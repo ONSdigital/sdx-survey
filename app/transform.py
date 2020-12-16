@@ -9,7 +9,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 session = requests.Session()
 
 
-def _transform(self):
+def transform(self):
     """ call the transform endpoint and raise quarantinable error if bad response"""
     endpoint = self._get_url()
     self.logger.info("Calling transform", request_url=endpoint)
