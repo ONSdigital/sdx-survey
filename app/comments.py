@@ -68,14 +68,14 @@ def create_comments_excel_file(survey_id, period, submissions):
     print(f"Excel file {filename} generated")
 
 
-def get_comment_text(submission):
+def get_comment_text(submission: dict):
     """Returns the respondent typed text from a submission.  The qcode for this text will be different depending
     on the survey
     """
-    if submission.data['survey_id'] == '009':
-        return submission.data['data'].get('146')
-    if submission.data['survey_id'] == '187':
-        return submission.data['data'].get('500')
-    if submission.data['survey_id'] == '134':
-        return submission.data['data'].get('300')
-    return submission.data['data'].get('146')
+    if submission['survey_id'] == '009':
+        return submission['data'].get('146')
+    if submission['survey_id'] == '187':
+        return submission['data'].get('500')
+    if submission['survey_id'] == '134':
+        return submission['data'].get('300')
+    return submission['data'].get('146')
