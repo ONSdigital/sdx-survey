@@ -16,10 +16,9 @@ Data
 
 "{
   "ru_ref": "123456",
+  "boxes_selected" = "146f 146h"
   "comments":[
-    {
-      "qcode":"92w",
-      "comment": "I hate covid!"
-    }
+    "I hate covid!",
+    "I really hate covid!"
   ]
 }"
