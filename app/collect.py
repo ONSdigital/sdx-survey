@@ -34,7 +34,11 @@ def process(message):
 
         print("write to bucket")
 
-        upload_file(encrypted_survey, tx_id)
+        response_type = str(survey_dict.get("type"))
+        if response_type.find("feedback"):
+            upload_file(encrypted_survey, tx_id, "feedback")
+        else:
+            upload_file(encrypted_survey, tx_id, "surveys")
 
         print("receipting...")
         send_receipt(survey_dict)

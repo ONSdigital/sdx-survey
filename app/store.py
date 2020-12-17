@@ -2,7 +2,7 @@ from google.cloud import storage
 
 bucket_name = "sdx-outputs"
 # source_file_name = "/Users/tomholroyd/sdx-gcp/sdx-worker/app/test-data.txt"
-directory = "surveys"
+# directory = "surveys"
 
 
 # bucket_name = "your-bucket-name"
@@ -10,7 +10,7 @@ directory = "surveys"
 # path = "storage-object-name"
 
 
-def upload_file(data: str, filename: str):
+def upload_file(data: str, filename: str, directory: str):
     """Uploads a string to the bucket."""
     path = f"{directory}/{filename}"
     storage_client = storage.Client("ons-sdx-sandbox")
