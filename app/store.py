@@ -21,3 +21,8 @@ def upload_file(data: str, filename: str, directory: str):
     # blob.upload_from_filename(source_file_name)
 
     print('Successfully uploaded: ', filename)
+
+
+def is_feedback(data: dict) -> bool:
+    submission_type = data["type"]
+    return "feedback" in submission_type

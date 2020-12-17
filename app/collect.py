@@ -2,7 +2,7 @@ from app.publish_dap import send_dap_message
 from app.publish_receipt import send_receipt
 from app.encryption import decrypt_survey, encrypt_survey, encrypt_zip
 from app.quarantine import quarantine_submission
-from app.store import upload_file
+from app.store import upload_file, is_feedback
 from app.transform import transform
 from app.validate import validate, ClientError
 
@@ -34,17 +34,21 @@ def process(message):
 
         print("write to bucket")
 
-        response_type = str(survey_dict.get("type"))
-        if response_type.find("feedback"):
+        if is_feedback(survey_dict):
+            print("sending to feedback")
             upload_file(encrypted_survey, tx_id, "feedback")
+
+            print("send dap notification")
+            send_dap_message(survey_dict, "EDCFeedback")
         else:
+            print("sending to surveys")
             upload_file(encrypted_survey, tx_id, "surveys")
 
-        print("receipting...")
-        send_receipt(survey_dict)
+            print("receipting...")
+            send_receipt(survey_dict)
 
-        print("send dap notification")
-        send_dap_message(survey_dict)
+            print("send dap notification")
+            send_dap_message(survey_dict, "EDCSurveys")
 
     except ClientError as e:
         print(e)

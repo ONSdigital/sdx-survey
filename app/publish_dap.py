@@ -4,8 +4,8 @@ import json
 from datetime import datetime
 
 
-def send_dap_message(survey_dict: dict):
-    message_str, tx_id = create_dap_message(survey_dict)
+def send_dap_message(survey_dict: dict, dataset: str):
+    message_str, tx_id = create_dap_message(survey_dict, dataset)
     publish_data(message_str, tx_id)
 
 
@@ -17,7 +17,7 @@ def publish_data(data_str: str, tx_id: str):
     return future.result()
 
 
-def create_dap_message(survey_dict: dict) -> tuple:
+def create_dap_message(survey_dict: dict, dataset: str) -> tuple:
     survey_json = json.dumps(survey_dict)
     survey_bytes = survey_json.encode("utf-8")
     md5_hash = hashlib.md5(survey_bytes).hexdigest()
@@ -40,7 +40,7 @@ def create_dap_message(survey_dict: dict) -> tuple:
             'manifestCreated': get_formatted_current_utc(),
             'description': description,
             'iterationL1': survey_dict['collection']['period'],
-            'dataset': survey_dict['survey_id'],
+            'dataset': dataset,
             'schemaversion': '1'
         }
     except KeyError:
