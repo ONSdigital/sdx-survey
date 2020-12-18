@@ -10,7 +10,7 @@ sys.path.append(parent_dir_path)
 
 from openpyxl import Workbook
 
-datastore_client = datastore.Client()
+datastore_client = datastore.Client(project='ons-sdx-sandbox')
 
 
 # def create_comments_excel_file(survey_id, period, submissions):
@@ -74,24 +74,24 @@ datastore_client = datastore.Client()
 #     print(f"Excel file {filename} generated")
 
 
-def store_comments(survey_dict: dict) -> str:
+def store_comments(survey_dict: dict):
     transaction_id = survey_dict["tx_id"]
     period = survey_dict["collection"]["period"]
     survey_id = survey_dict["survey_id"]
     data = {"ru_ref": survey_dict["metadata"]["ru_ref"],
-            "boxes_selected": get_boxes_selected(survey_id),
-            "comments": get_comments_list()}
-    encrypted_data = encrypt_survey(data)
+            "boxes_selected": get_boxes_selected(survey_dict),
+            "comments": get_comments_list(survey_dict)}
+    # encrypted_data = encrypt_survey(data)
 
     comment = Comment(transaction_id=transaction_id,
                       period=period,
                       survey_id=survey_id,
-                      encrypted_data=encrypted_data)
+                      encrypted_data=data)
 
     commit_to_datastore(comment)
 
 
-def get_comments_list(submission: dict):
+def get_comments_list(submission: dict) -> list:
     """Returns the respondent typed text from a submission.  The qcode for this text will be different depending
     on the survey
     """
@@ -153,6 +153,9 @@ class Comment:
 
 
 def commit_to_datastore(comment):
+    # try:
+    #     current_os.environ['GOOGLE_APPLICATION_CREDENTIALS']
+
     try:
         entity_key = datastore_client.key('Comment', comment.transaction_id)
         entity = datastore.Entity(key=entity_key)

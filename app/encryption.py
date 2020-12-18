@@ -1,3 +1,5 @@
+import os
+
 import yaml
 from sdc.crypto.key_store import KeyStore
 from sdc.crypto.encrypter import encrypt
@@ -7,6 +9,8 @@ KEY_PURPOSE_SUBMISSION = 'submission'
 
 
 def encrypt_survey(submission: dict) -> str:
+    os.chdir('..')
+    print(os.getcwd())
     with open("./keys.yml") as file:
         secrets_from_file = yaml.safe_load(file)
     key_store = KeyStore(secrets_from_file)

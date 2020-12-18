@@ -1,11 +1,11 @@
 import json
 import unittest
-from app.comments import get_comments_list
+from app.comments import store_comments
 
 
 class TestGetComments(unittest.TestCase):
 
-    def test_get_comment_test(self):
+    def test_comments(self):
         data = '''{
         "collection": {
             "exercise_sid": "XxsteeWv",
@@ -37,9 +37,10 @@ class TestGetComments(unittest.TestCase):
         "type": "uk.gov.ons.edc.eq:surveyresponse",
         "version": "0.0.1",
         "survey_id": "009",
+        "tx_id": "c37a3efa-593c-4bab-b49c-bee0613c4fb4",
         "case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3"
     }'''
         submission = json.loads(data)
-        actual = get_comments_list(submission)[0]
+        actual = store_comments(submission)
         expected = "This is a comment on how this survey service went."
         self.assertEqual(expected, actual)
