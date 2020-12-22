@@ -12,7 +12,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def callback(message):
     try:
-        process(message)
+        encrypted_message_str = message.data.decode('utf-8')
+        process(encrypted_message_str)
         message.ack()
     except RetryableError:
         logger.info("retryable error, nacking message")

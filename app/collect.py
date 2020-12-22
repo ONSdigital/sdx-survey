@@ -15,10 +15,9 @@ logger = wrap_logger(logging.getLogger(__name__))
 DAP_SURVEYS = ["023", "134", "147", "281", "283", "lms", "census"]
 
 
-def process(message):
+def process(encrypted_message_str):
 
     logger.info("processing message")
-    encrypted_message_str = message.data.decode('utf-8')
     survey_dict = decrypt_survey(encrypted_message_str)
     tx_id = extract_tx_id(survey_dict)
 

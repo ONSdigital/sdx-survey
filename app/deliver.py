@@ -20,7 +20,7 @@ retries = Retry(total=5, backoff_factor=0.1)
 session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
-def deliver_dap(survey_dict: dict, file_bytes: bytes):
+def deliver_dap(survey_dict: dict):
     file_bytes = json.dumps(survey_dict).encode("utf-8")
     deliver(survey_dict, file_bytes, 'dap')
 
@@ -52,6 +52,7 @@ def deliver(survey_dict: dict, file_bytes: bytes, file_type: str):
 
 def create_survey_metadata(survey_dict: dict) -> dict:
     metadata = {
+        'tx_id': survey_dict['tx_id'],
         'survey_id': survey_dict['survey_id'],
         'description': get_description(survey_dict),
         'iteration': get_iteration(survey_dict)
