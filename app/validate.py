@@ -6,6 +6,7 @@ from structlog import wrap_logger
 from dateutil import parser
 from uuid import UUID
 
+from app.errors import ClientError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -45,15 +46,8 @@ KNOWN_SURVEYS = {
     },
 }
 
-
-class ClientError(Exception):
-    pass
-
-
 # Parses a timestamp, throwing a value error
 # if unrecognised
-
-
 def Timestamp(value):
     return parser.parse(value)
 

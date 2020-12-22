@@ -7,3 +7,4 @@ voluptuous==0.11.7
 structlog==20.1.0
 python-dateutil
 pydantic
+requests==2.23.0
