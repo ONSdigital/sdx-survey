@@ -1,3 +1,4 @@
+import json
 import logging
 
 import requests
@@ -20,14 +21,16 @@ session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
 def deliver_dap(survey_dict: dict, file_bytes: bytes):
+    file_bytes = json.dumps(survey_dict).encode("utf-8")
     deliver(survey_dict, file_bytes, 'dap')
 
 
-def deliver_survey(survey_dict: dict, file_bytes: bytes):
-    deliver(survey_dict, file_bytes, 'survey')
+def deliver_survey(survey_dict: dict, zip_file: bytes):
+    deliver(survey_dict, zip_file, 'survey')
 
 
-def deliver_feedback(survey_dict: dict, file_bytes: bytes):
+def deliver_feedback(survey_dict: dict):
+    file_bytes = json.dumps(survey_dict).encode("utf-8")
     deliver(survey_dict, file_bytes, 'feedback')
 
 
@@ -38,9 +41,13 @@ def deliver(survey_dict: dict, file_bytes: bytes, file_type: str):
     if response.status_code == 200:
         return True
     elif 400 <= response.status_code < 500:
-        raise QuarantinableError("Bad Request response from sdx-deliver")
+        msg = "Bad Request response from sdx-deliver"
+        logger.info(msg)
+        raise QuarantinableError(msg)
     else:
-        raise RetryableError("Bad response from sdx-deliver")
+        msg = "Bad response from sdx-deliver"
+        logger.info(msg)
+        raise RetryableError(msg)
 
 
 def create_survey_metadata(survey_dict: dict) -> dict:

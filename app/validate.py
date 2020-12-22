@@ -82,6 +82,7 @@ def ValidateListSurveyData(data):
 
 
 def validate(survey_dict: dict) -> bool:
+    logger.info("Validating survey")
     try:
         json_data = survey_dict
 
@@ -131,6 +132,7 @@ def validate(survey_dict: dict) -> bool:
         logger.error("Server error", error=e)
         raise ClientError(e)
 
+    logger.info("Validation successful")
     return True
 
 

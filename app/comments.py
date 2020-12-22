@@ -2,8 +2,10 @@ import json
 from string import ascii_lowercase
 from google.cloud import datastore
 
+from app import PROJECT_ID
+from app.encryption import encrypt_comment
 
-datastore_client = datastore.Client(project='ons-sdx-sandbox')
+datastore_client = datastore.Client(project=PROJECT_ID)
 
 
 def store_comments(survey_dict: dict):
@@ -14,7 +16,7 @@ def store_comments(survey_dict: dict):
             "boxes_selected": get_boxes_selected(survey_dict),
             "comment": get_comment(survey_dict),
             "additional": get_additional_comments(survey_dict)}
-    # encrypted_data = encrypt_survey(data)
+    encrypted_data = encrypt_comment(data)
     encrypted_data = json.dumps(data)
 
     comment = Comment(transaction_id=transaction_id,

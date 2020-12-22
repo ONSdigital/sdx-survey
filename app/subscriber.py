@@ -1,12 +1,25 @@
+import logging
 from concurrent.futures import TimeoutError
-from app import survey_subscriber, subscription_path
 
+from structlog import wrap_logger
+
+from app import survey_subscriber, subscription_path
 from app.collect import process
+from app.errors import RetryableError
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 def callback(message):
-    process(message)
-    message.ack()
+    try:
+        process(message)
+        message.ack()
+    except RetryableError:
+        logger.info("retryable error, nacking message")
+        message.nack()
+    except Exception as e:
+        logger.error(f"error {str(e)}, nacking message")
+        message.nack()
 
 
 def start():
@@ -17,8 +30,7 @@ def start():
     # Wrap subscriber in a 'with' block to automatically call close() when done.
     with survey_subscriber:
         try:
-            # When `timeout` is not set, result() will block indefinitely,
-            # unless an exception is encountered first.
+            # Result() will block indefinitely, unless an exception is encountered first.
             streaming_pull_future.result()
         except TimeoutError:
             streaming_pull_future.cancel()

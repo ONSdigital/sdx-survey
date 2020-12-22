@@ -1,59 +1,54 @@
-from app.publish_dap import send_dap_message
-from app.publish_receipt import send_receipt
-from app.encryption import decrypt_survey, encrypt_survey, encrypt_zip
-from app.quarantine import quarantine_submission
-from app.store import upload_file, is_feedback
-from app.transform import transform
-from app.validate import validate, ClientError
+import logging
 
-dap_surveys = ["023", "134", "147", "281", "283", "lms", "census"]
+from structlog import wrap_logger
+
+from app.deliver import deliver_feedback, deliver_survey, deliver_dap
+from app.errors import QuarantinableError
+from app.receipt import send_receipt
+from app.encryption import decrypt_survey
+from app.quarantine import quarantine_submission
+from app.transform import transform
+from app.validate import validate
+
+logger = wrap_logger(logging.getLogger(__name__))
+
+DAP_SURVEYS = ["023", "134", "147", "281", "283", "lms", "census"]
 
 
 def process(message):
-    print("decrypting...")
 
-    message_data_str = message.data.decode('utf-8')
-    survey_dict = decrypt_survey(message_data_str)
-
+    logger.info("processing message")
+    encrypted_message_str = message.data.decode('utf-8')
+    survey_dict = decrypt_survey(encrypted_message_str)
     tx_id = extract_tx_id(survey_dict)
 
     try:
 
-        print("validating...")
         validate(survey_dict)
-        print("validation successful")
-
-        if survey_dict['survey_id'] not in dap_surveys:
-            print("transforming...")
-            transformed_survey = transform(survey_dict)
-            print('encrypting zip....')
-            encrypted_survey = encrypt_zip(transformed_survey)
-        else:
-            print("encrypting...")
-            encrypted_survey = encrypt_survey(survey_dict)
-
-        print("write to bucket")
 
         if is_feedback(survey_dict):
-            print("sending to feedback")
-            upload_file(encrypted_survey, tx_id, "feedback")
+            deliver_feedback(survey_dict)
 
-            print("send dap notification")
-            send_dap_message(survey_dict, "EDCFeedback")
         else:
-            print("sending to surveys")
-            upload_file(encrypted_survey, tx_id, "surveys")
 
-            print("receipting...")
+            if survey_dict['survey_id'] not in DAP_SURVEYS:
+                zip_file = transform(survey_dict)
+                deliver_survey(survey_dict, zip_file)
+            else:
+                deliver_dap(survey_dict)
+
             send_receipt(survey_dict)
 
-            print("send dap notification")
-            send_dap_message(survey_dict, "EDCSurveys")
-
-    except ClientError as e:
-        print(e)
-        quarantine_submission(message_data_str, tx_id)
+    except QuarantinableError as e:
+        logger.info("quarantining message")
+        logger.error(str(e))
+        quarantine_submission(encrypted_message_str, tx_id)
 
 
 def extract_tx_id(message_dict: dict) -> str:
     return message_dict['tx_id']
+
+
+def is_feedback(data: dict) -> bool:
+    submission_type = data["type"]
+    return "feedback" in submission_type

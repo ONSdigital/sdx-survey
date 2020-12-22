@@ -1,16 +1,22 @@
 import json
+import logging
+
+from structlog import wrap_logger
+
 from app import receipt_publisher, receipt_topic_path
+from app.errors import ClientError
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 
-def send_receipt(survey_dict: dict):
+def send_receipt(survey_dict: dict) -> str:
+    logger.info("receipting...")
     receipt_str = make_receipt(survey_dict)
     publish_data(receipt_str)
 
 
-def publish_data(data):
-    # Data must be a bytestring
-    data = data.encode("utf-8")
-    # When you publish a message, the client returns a future.
+def publish_data(receipt_str: str) -> str:
+    data = receipt_str.encode("utf-8")
     future = receipt_publisher.publish(receipt_topic_path, data)
     return future.result()
 
@@ -29,8 +35,8 @@ def make_receipt(survey_dict: dict) -> str:
                 'user_id': survey_dict['metadata']['user_id']
             }
         }
-    except KeyError:
-        print('failed to receipt')
+    except KeyError as e:
+        raise ClientError(str(e))
 
     receipt_str = json.dumps(receipt_json)
     return receipt_str
