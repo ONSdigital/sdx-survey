@@ -1,9 +1,11 @@
 import json
+from datetime import datetime
 from string import ascii_lowercase
 from google.cloud import datastore
 
 from app import PROJECT_ID
 from app.encryption import encrypt_comment
+
 
 datastore_client = datastore.Client(project=PROJECT_ID)
 
@@ -89,7 +91,7 @@ class Comment:
         self.survey_id = survey_id
         self.period = period
         self.encrypted_data = encrypted_data
-        self.zip_name = None
+        self.created = datetime.now()
 
 
 def commit_to_datastore(comment):
@@ -100,7 +102,7 @@ def commit_to_datastore(comment):
             {
                 "survey_id": comment.survey_id,
                 "period": comment.period,
-                "zip_name": comment.zip_name,
+                "created": comment.created,
                 "encrypted_data": comment.encrypted_data
             }
         )
