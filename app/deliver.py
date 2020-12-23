@@ -52,6 +52,7 @@ def deliver(survey_dict: dict, file_bytes: bytes, file_type: str):
 
 def create_survey_metadata(survey_dict: dict) -> dict:
     metadata = {
+        'filename': survey_dict['tx_id'],
         'tx_id': survey_dict['tx_id'],
         'survey_id': survey_dict['survey_id'],
         'description': get_description(survey_dict),
