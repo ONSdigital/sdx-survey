@@ -5,8 +5,8 @@ from google.cloud import datastore
 from app import PROJECT_ID
 from app.encryption import encrypt_comment
 
-
 datastore_client = datastore.Client(project=PROJECT_ID)
+exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
 def store_comments(survey_dict: dict):
@@ -95,7 +95,7 @@ class Comment:
 def commit_to_datastore(comment):
     try:
         entity_key = datastore_client.key('Comment', comment.transaction_id)
-        entity = datastore.Entity(key=entity_key, exclude_from_indexes=["encrypted_data"])
+        entity = datastore.Entity(key=entity_key, exclude_from_indexes=exclude_from_index)
         entity.update(
             {
                 "survey_id": comment.survey_id,
