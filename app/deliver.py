@@ -52,6 +52,7 @@ def deliver(survey_dict: dict, file_bytes: bytes, file_type: str):
 
 def create_survey_metadata(survey_dict: dict) -> dict:
     metadata = {
+        'filename': survey_dict['tx_id'],
         'tx_id': survey_dict['tx_id'],
         'survey_id': survey_dict['survey_id'],
         'description': get_description(survey_dict),
@@ -76,7 +77,7 @@ def post(file_bytes, file_type, metadata):
     url = f"http://{DELIVER_SERVICE_URL}/deliver/{file_type}"
     logger.info(f"calling {url}")
     try:
-        response = session.post(url, data=metadata, files={DELIVER_NAME: file_bytes})
+        response = session.post(url, params=metadata, files={DELIVER_NAME: file_bytes})
     except MaxRetryError:
         logger.error("Max retries exceeded", request_url=url)
         raise RetryableError("Max retries exceeded")
