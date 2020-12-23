@@ -94,7 +94,7 @@ class Comment:
 
 def commit_to_datastore(comment):
     try:
-        entity_key = datastore_client.key('Comment', comment.transaction_id)
+        entity_key = datastore_client.key('Comment', comment.transaction_id, exclude_from_indexes=["encrypted_data"])
         entity = datastore.Entity(key=entity_key)
         entity.update(
             {
