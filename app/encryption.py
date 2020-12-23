@@ -2,6 +2,7 @@ import json
 import logging
 
 import yaml
+from sdc.crypto.encrypter import encrypt
 from sdc.crypto.key_store import KeyStore
 from sdc.crypto.decrypter import decrypt as sdc_decrypt
 from structlog import wrap_logger
@@ -23,4 +24,9 @@ def decrypt_survey(payload: str) -> dict:
 
 def encrypt_comment(comment: dict) -> str:
     logger.info("encrypting comments")
-    return json.dumps(comment)
+    with open("keys.yaml") as file:
+        secrets_from_file = yaml.safe_load(file)
+    key_store = KeyStore(secrets_from_file)
+    encrypted_zip = encrypt(comment, key_store, 'submission')
+    logger.info("comment successfully encrypted")
+    return encrypted_zip

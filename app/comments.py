@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from string import ascii_lowercase
 from google.cloud import datastore
@@ -19,7 +18,6 @@ def store_comments(survey_dict: dict):
             "comment": get_comment(survey_dict),
             "additional": get_additional_comments(survey_dict)}
     encrypted_data = encrypt_comment(data)
-    encrypted_data = json.dumps(data)
 
     comment = Comment(transaction_id=transaction_id,
                       period=period,

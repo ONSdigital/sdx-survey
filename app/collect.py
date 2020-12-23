@@ -2,6 +2,7 @@ import logging
 
 from structlog import wrap_logger
 
+from app.comments import store_comments
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap
 from app.errors import QuarantinableError
 from app.receipt import send_receipt
@@ -15,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 DAP_SURVEYS = ["023", "134", "147", "281", "283", "lms", "census"]
 
 
-def process(encrypted_message_str):
+def process(encrypted_message_str: str):
 
     logger.info("processing message")
     survey_dict = decrypt_survey(encrypted_message_str)
@@ -35,6 +36,8 @@ def process(encrypted_message_str):
                 deliver_survey(survey_dict, zip_file)
             else:
                 deliver_dap(survey_dict)
+
+            store_comments(survey_dict)
 
             send_receipt(survey_dict)
 
