@@ -76,7 +76,7 @@ def post(file_bytes, file_type, metadata):
     url = f"http://{DELIVER_SERVICE_URL}/deliver/{file_type}"
     logger.info(f"calling {url}")
     try:
-        response = session.post(url, data=metadata, files={DELIVER_NAME: file_bytes})
+        response = session.post(url, params=metadata, files={DELIVER_NAME: file_bytes})
     except MaxRetryError:
         logger.error("Max retries exceeded", request_url=url)
         raise RetryableError("Max retries exceeded")
