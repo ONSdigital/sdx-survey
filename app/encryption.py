@@ -14,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def decrypt_survey(payload: str) -> dict:
     logger.info("decrypting survey")
-    with open("./keys2.yml") as file2:
+    with open("./keys2.yaml") as file2:
         secrets_from_file2 = yaml.safe_load(file2)
     key_store2 = KeyStore(secrets_from_file2)
     decrypted_json = sdc_decrypt(payload, key_store2, KEY_PURPOSE_SUBMISSION)

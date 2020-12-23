@@ -39,8 +39,8 @@ survey_subscriber = pubsub_v1.SubscriberClient()
 subscription_path = survey_subscriber.subscription_path(PROJECT_ID, subscription_id)
 
 # Config connecting to transform service
-TRANSFORM_SERVICE_HOST = os.getenv('SDX_TRANSFORM_SERVICE_HOST', 'localhost')
-TRANSFORM_SERVICE_PORT = os.getenv('SDX_TRANSFORM_SERVICE_PORT', 8080)
+TRANSFORM_SERVICE_HOST = os.getenv('SDX_TRANSFORM_SERVICE_HOST')
+TRANSFORM_SERVICE_PORT = os.getenv('SDX_TRANSFORM_SERVICE_PORT')
 TRANSFORM_SERVICE_URL = f'{TRANSFORM_SERVICE_HOST}:{TRANSFORM_SERVICE_PORT}'
 
 DELIVER_SERVICE_HOST = os.getenv('SDX_DELIVER_SERVICE_HOST', 'localhost')
