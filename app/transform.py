@@ -23,7 +23,7 @@ def transform(survey_dict: dict):
     response = post(survey_json)
 
     if response.status_code == 200:
-        return True
+        return response.content
     elif 400 <= response.status_code < 500:
         msg = "Bad Request response from sdx-transform"
         logger.info(msg)
@@ -32,8 +32,6 @@ def transform(survey_dict: dict):
         msg = "Bad response from sdx-transform"
         logger.info(msg)
         raise RetryableError(msg)
-
-    return response.content
 
 
 def post(survey_json):
