@@ -33,7 +33,7 @@ def transform(survey_dict: dict):
         logger.info(msg)
         raise RetryableError(msg)
 
-    return response
+    return response.content
 
 
 def post(survey_json):
