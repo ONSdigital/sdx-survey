@@ -1,0 +1,24 @@
+Kind: Comments
+
+Name/id
+name=<transaction_id>
+
+Survey_id
+<survey_id>
+
+period
+2019
+
+zip_name
+" "
+
+Data
+
+"{
+  "ru_ref": "123456",
+  "boxes_selected" = "146f 146h"
+  "comments":[
+    "I hate covid!",
+    "I really hate covid!"
+  ]
+}"
