@@ -6,7 +6,7 @@ from app.comments import store_comments
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap
 from app.errors import QuarantinableError
 from app.receipt import send_receipt
-from app.encryption import decrypt_survey
+from app.decrypt import decrypt_survey
 from app.quarantine import quarantine_submission
 from app.transform import transform
 from app.validate import validate

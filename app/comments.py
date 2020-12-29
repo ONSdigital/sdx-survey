@@ -1,9 +1,12 @@
+import json
 from datetime import datetime
+from pathlib import Path
 from string import ascii_lowercase
+
+from cryptography.fernet import Fernet
 from google.cloud import datastore
 
 from app import PROJECT_ID
-from app.encryption import encrypt_comment
 
 datastore_client = datastore.Client(project=PROJECT_ID)
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
@@ -25,6 +28,14 @@ def store_comments(survey_dict: dict):
                       encrypted_data=encrypted_data)
 
     commit_to_datastore(comment)
+
+
+def encrypt_comment(data: dict) -> str:
+    comment_str = json.dumps(data)
+    key = Path('comment_key.txt').read_text()
+    f = Fernet(key)
+    token = f.encrypt(comment_str)
+    return token.decode()
 
 
 def get_comment(submission: dict) -> list:
