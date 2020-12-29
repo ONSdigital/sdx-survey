@@ -1,18 +1,23 @@
 import json
+import logging
 from datetime import datetime
 from pathlib import Path
 from string import ascii_lowercase
 
 from cryptography.fernet import Fernet
 from google.cloud import datastore
+from structlog import wrap_logger
 
 from app import PROJECT_ID
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 datastore_client = datastore.Client(project=PROJECT_ID)
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
 def store_comments(survey_dict: dict):
+    logger.info("storing comments")
     transaction_id = survey_dict["tx_id"]
     period = survey_dict["collection"]["period"]
     survey_id = survey_dict["survey_id"]
@@ -34,7 +39,7 @@ def encrypt_comment(data: dict) -> str:
     comment_str = json.dumps(data)
     key = Path('comment_key.txt').read_text()
     f = Fernet(key)
-    token = f.encrypt(comment_str)
+    token = f.encrypt(comment_str.encode())
     return token.decode()
 
 
