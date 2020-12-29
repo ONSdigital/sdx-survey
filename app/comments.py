@@ -37,7 +37,7 @@ def store_comments(survey_dict: dict):
 
 def encrypt_comment(data: dict) -> str:
     comment_str = json.dumps(data)
-    key = Path('comment_key.txt').read_text()
+    key = Path('comment_key.txt').read_bytes()
     f = Fernet(key)
     token = f.encrypt(comment_str.encode())
     return token.decode()
@@ -121,5 +121,5 @@ def commit_to_datastore(comment):
             }
         )
         return datastore.Client().put(entity)
-    except ValueError as error:
-        print(error)
+    except ValueError as e:
+        logger.error(e)
