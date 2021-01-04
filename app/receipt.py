@@ -11,15 +11,16 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def send_receipt(survey_dict: dict) -> str:
     logger.info("receipting...")
+    tx_id = survey_dict['tx_id']
     receipt_str = make_receipt(survey_dict)
-    publish_data(receipt_str)
+    publish_data(receipt_str, tx_id)
     print('Successfully Receipted')
 
 
-def publish_data(receipt_str: str) -> str:
+def publish_data(receipt_str: str, tx_id: str) -> str:
     print('publishing receipt')
     data = receipt_str.encode("utf-8")
-    future = receipt_publisher.publish(receipt_topic_path, data)
+    future = receipt_publisher.publish(receipt_topic_path, data, tx_id=tx_id)
     return future.result()
 
 
