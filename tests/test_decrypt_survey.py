@@ -1,12 +1,23 @@
 import unittest
 import json
+import yaml
+from sdc.crypto.key_store import KeyStore
+from sdc.crypto.encrypter import encrypt
+
 from app.decrypt import decrypt_survey
 
 
-class TestDecrypt(unittest.TestCase):
+def encrypt_survey(submission: dict) -> str:
+    with open("./tests/keys.yml") as file:
+        secrets_from_file = yaml.safe_load(file)
+    key_store = KeyStore(secrets_from_file)
+    payload = encrypt(submission, key_store, 'submission')
+    return payload
 
+
+class TestDecrypt(unittest.TestCase):
     def test_decrypt_survey(self):
-        message_str = '''{
+        message_dict = json.loads('''{
             "collection": {
                 "exercise_sid": "XxsteeWv",
                 "instrument_id": "0167",
@@ -39,10 +50,7 @@ class TestDecrypt(unittest.TestCase):
             "survey_id": "009",
             "tx_id": "c37a3efa-593c-4bab-b49c-bee0613c4fb2",
             "case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3"
-        }'''
-        message_json = json.loads(message_str)
-        message_dict = json.dumps(message_json)
-        encrypted_message = message_json.decode('utf-8')
-        decrypt_message = decrypt_survey(encrypted_message)
-        self.assertEqual(decrypt_message, message_dict)
-
+        }''')
+        encrypted_message = encrypt_survey(message_dict)
+        decrypted_message = decrypt_survey(encrypted_message)
+        self.assertEqual(decrypted_message, message_dict)
