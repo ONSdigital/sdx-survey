@@ -113,8 +113,7 @@ dap_data = '''{
       "exercise_sid":"82R1VDWN74",
       "instrument_id":"0005"
    }
-}
-'''
+}'''
 survey_data = '''{
     "case_id": "d7ef5c5e-efa9-48b2-847e-ec41e925f7dc",
     "collection": {
@@ -169,9 +168,25 @@ feedback_data = '''{
     "submitted_at": "2018-10-27T10:12:14.257090"
 }'''
 
+dap_metadata = '''{"filename": "40e659ec-013f-4993-9a31-ec1e0ad37888", "tx_id": "40e659ec-013f-4993-9a31-ec1e0ad37888", "survey_id": "134", "description": "134 survey response for period 201605 sample unit 12346789012A", "iteration": "201605"}'''
+survey_metadata = '''{"filename": "76de5870-8ec7-4750-b523-2142e9154c47", "tx_id": "76de5870-8ec7-4750-b523-2142e9154c47", "survey_id": "017", "description": "017 survey response for period 201904 sample unit 25462342626B", "iteration": "201904"}'''
+feedback_metadata = '''{"filename": "7c3dda82-a274-40dd-84f1-7ed08b7a917e", "tx_id": "7c3dda82-a274-40dd-84f1-7ed08b7a917e", "survey_id": "lms", "description": "lms survey response for period 2 sample unit ABC123456", "iteration": "2"}'''
+
+dap_desc = '134 survey response for period 201605 sample unit 12346789012A'
+survey_desc = '017 survey response for period 201904 sample unit 25462342626B'
+feedback_desc = 'lms survey response for period 2 sample unit ABC123456'
+
+dap_iter = '201605'
+survey_iter = '201904'
+feedback_iter = '2'
+
 
 def status_code_success(file_bytes, file_type, metadata):
     return ResponseCodes(200)
+
+
+def status_code_none(file_bytes, file_type, metadata):
+    return ResponseCodes(300)
 
 
 def status_code_fail(file_bytes, file_type, metadata):
@@ -184,46 +199,65 @@ class ResponseCodes:
 
 
 class TestDeliver(unittest.TestCase):
+    @staticmethod
+    def delivery_actual(name, data):
+        submission_dict = json.loads(data)
+        submission_bytes = json.dumps(submission_dict).encode("utf-8")
+        return deliver.deliver(submission_dict, submission_bytes, f'{name}')
+
+    def delivery_bad_response(self, name, data, exception):
+        with self.assertRaises(exception) as submission_exception:
+            self.delivery_actual(f'{name}', data)
+        return str(submission_exception.exception)
+
+    @staticmethod
+    def create_metadata_actual(data):
+        data_dict = json.loads(data)
+        return deliver.create_survey_metadata(data_dict)
+
     @mock.patch('app.deliver.post', side_effect=status_code_success)
     def test_deliver_submission_success(self, mock_post):
-        dap_dict = json.loads(dap_data)
-        dap_bytes = json.dumps(dap_dict).encode("utf-8")
-        deliver_dap = deliver.deliver(dap_dict, dap_bytes, 'dap')
-
-        survey_dict = json.loads(survey_data)
-        survey_bytes = json.dumps(survey_dict).encode("utf-8")
-        deliver_survey = deliver.deliver(survey_dict, survey_bytes, 'survey')
-
-        feedback_dict = json.loads(feedback_data)
-        feedback_bytes = json.dumps(feedback_dict).encode("utf-8")
-        deliver_feedback = deliver.deliver(feedback_dict, feedback_bytes, 'feedback')
+        deliver_dap = self.delivery_actual("dap", dap_data)
+        deliver_survey = self.delivery_actual("survey", survey_data)
+        deliver_feedback = self.delivery_actual("feedback", feedback_data)
         self.assertTrue(deliver_dap)
         self.assertTrue(deliver_survey)
         self.assertTrue(deliver_feedback)
 
     @mock.patch('app.deliver.post', side_effect=status_code_fail)
-    def test_deliver_submission_failure(self, mock_post):
-        with self.assertRaises(QuarantinableError) as dap_exception:
-            dap_dict = json.loads(dap_data)
-            dap_bytes = json.dumps(dap_dict).encode("utf-8")
-            deliver.deliver(dap_dict, dap_bytes, 'dap')
-        dap_exception_str = str(dap_exception.exception)
-        self.assertEqual(dap_exception_str, "Bad Request response from sdx-deliver")
+    def test_deliver_bad_request_response(self, mock_post):
+        bad_response = "Bad Request response from sdx-deliver"
+        dap_exception_str = self.delivery_bad_response('dap', dap_data, QuarantinableError)
+        survey_exception_str = self.delivery_bad_response('survey', survey_data, QuarantinableError)
+        feedback_exception_str = self.delivery_bad_response('feedback', feedback_data, QuarantinableError)
+        self.assertEqual(dap_exception_str, bad_response)
+        self.assertEqual(survey_exception_str, bad_response)
+        self.assertEqual(feedback_exception_str, bad_response)
 
-        with self.assertRaises(QuarantinableError) as survey_exception:
-            survey_dict = json.loads(survey_data)
-            survey_bytes = json.dumps(survey_dict).encode("utf-8")
-            deliver.deliver(survey_dict, survey_bytes, 'survey')
-        survey_exception_str = str(survey_exception.exception)
-        self.assertEqual(survey_exception_str, "Bad Request response from sdx-deliver")
+    @mock.patch('app.deliver.post', side_effect=status_code_none)
+    def test_deliver_bad_deliver_response(self, mock_post):
+        bad_response = "Bad response from sdx-deliver"
+        dap_exception_str = self.delivery_bad_response('dap', dap_data, RetryableError)
+        survey_exception_str = self.delivery_bad_response('survey', survey_data, RetryableError)
+        feedback_exception_str = self.delivery_bad_response('feedback', feedback_data, RetryableError)
+        self.assertEqual(dap_exception_str, bad_response)
+        self.assertEqual(survey_exception_str, bad_response)
+        self.assertEqual(feedback_exception_str, bad_response)
 
-        with self.assertRaises(QuarantinableError) as feedback_exception:
-            feedback_dict = json.loads(feedback_data)
-            feedback_bytes = json.dumps(feedback_dict).encode("utf-8")
-            deliver.deliver(feedback_dict, feedback_bytes, 'feedback')
-        feedback_exception_str = str(feedback_exception.exception)
-        self.assertEqual(feedback_exception_str, "Bad Request response from sdx-deliver")
+    def test_create_survey_metadata(self):
+        dap_test_meta = json.dumps(self.create_metadata_actual(dap_data))
+        survey_test_meta = json.dumps(self.create_metadata_actual(survey_data))
+        feedback_test_meta = json.dumps(self.create_metadata_actual(feedback_data))
+        self.assertEqual(dap_test_meta, dap_metadata)
+        self.assertEqual(survey_test_meta, survey_metadata)
+        self.assertEqual(feedback_test_meta, feedback_metadata)
 
+    def test_get_desc(self):
+        self.assertEqual(dap_desc, deliver.get_description(json.loads(dap_data)))
+        self.assertEqual(survey_desc, deliver.get_description(json.loads(survey_data)))
+        self.assertEqual(feedback_desc, deliver.get_description(json.loads(feedback_data)))
 
-
-
+    def test_get_iter(self):
+        self.assertEqual(dap_iter, deliver.get_iteration(json.loads(dap_data)))
+        self.assertEqual(survey_iter, deliver.get_iteration(json.loads(survey_data)))
+        self.assertEqual(feedback_iter, deliver.get_iteration(json.loads(feedback_data)))
