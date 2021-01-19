@@ -41,10 +41,10 @@ def encrypt_comment(data: dict) -> str:
     print()
 
     key = Path('keys/comment_key').read_bytes()
-    key_string = base64.b64decode(key)
     logger.info(f'Key for encrypt comments {key}')
-    logger.info(f'Key for encrypt comments {key_string}')
-    key_encoded = key_string.encode('utf-8')
+    # key_string = base64.b64decode(key)
+    # logger.info(f'Key for encrypt comments {key_string}')
+    key_encoded = key.decode('utf-8')
     logger.info(f'Key for encrypt comments {key_encoded}')
     f = Fernet(key_encoded)
     token = f.encrypt(comment_str.encode())
