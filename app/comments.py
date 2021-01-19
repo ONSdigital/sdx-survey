@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 from datetime import datetime
@@ -38,11 +39,9 @@ def store_comments(survey_dict: dict):
 def encrypt_comment(data: dict) -> str:
     comment_str = json.dumps(data)
     print()
-    key2 = Path('keys/comment_key')
-    logger.info(f'Key for encrypt comments {key2}')
 
     key = Path('keys/comment_key').read_bytes()
-    key_string = key.decode('base64')
+    key_string = base64.b64decode(key)
     logger.info(f'Key for encrypt comments {key}')
     logger.info(f'Key for encrypt comments {key_string}')
     key_encoded = key_string.encode('utf-8')
