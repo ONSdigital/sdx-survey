@@ -45,6 +45,7 @@ def encrypt_comment(data: dict) -> str:
 
     with open('keys/comment_key', 'r') as secret_file:
         key = secret_file.read()
+        logger.info(key)
 
     f = Fernet(key)
     token = f.encrypt(comment_str.encode())
