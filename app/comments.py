@@ -38,10 +38,12 @@ def store_comments(survey_dict: dict):
 
 def encrypt_comment(data: dict) -> str:
     comment_str = json.dumps(data)
-    print()
 
-    # key = Path('keys/comment_key').read_bytes()
-    # logger.info(f'Key for encrypt comments {key}')
+    key_byte = Path('keys/comment_key').read_bytes()
+    logger.info(f'Key for encrypt comments {key_byte}')
+
+    with open('keys/comment_key', 'r') as hello:
+        logger.info(hello)
 
     with open('keys/comment_key', 'r') as secret_file:
         key = secret_file.read()
