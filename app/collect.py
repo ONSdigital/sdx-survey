@@ -31,13 +31,13 @@ def process(encrypted_message_str: str):
 
         else:
 
+            store_comments(survey_dict)
+
             if survey_dict['survey_id'] not in DAP_SURVEYS:
                 zip_file = transform(survey_dict)
                 deliver_survey(survey_dict, zip_file)
             else:
                 deliver_dap(survey_dict)
-
-            store_comments(survey_dict)
 
             send_receipt(survey_dict)
 
