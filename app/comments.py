@@ -37,14 +37,15 @@ def store_comments(survey_dict: dict):
 
 def encrypt_comment(data: dict) -> str:
     comment_str = json.dumps(data)
-    key = Path('comment_key.txt').read_bytes()
+    key = Path('keys/comment_key').read_bytes()
+    print(key)
     f = Fernet(key)
     token = f.encrypt(comment_str.encode())
     return token.decode()
 
 
 def get_comment(submission: dict) -> list:
-    """Returns the respondent typed text from a submission.  The qcode for this text will be different depending
+    """Returns the responde:qqnt typed text from a submission.  The qcode for this text will be different depending
     on the survey
     """
     if submission['survey_id'] == '187':

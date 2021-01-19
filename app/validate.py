@@ -78,7 +78,7 @@ def ValidSurveyData(data):
 
 def ValidateListSurveyData(data):
     if not isinstance(data, list):
-        raise ValueError("Invalid surey data")
+        raise ValueError("Invalid survey data")
 
 
 def validate(survey_dict: dict) -> bool:
