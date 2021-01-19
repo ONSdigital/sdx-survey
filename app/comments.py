@@ -38,13 +38,16 @@ def store_comments(survey_dict: dict):
 def encrypt_comment(data: dict) -> str:
     comment_str = json.dumps(data)
     print()
-    key3 = Path('keys/comment_key').decode('base64')
-    logger.info(f'Key for encrypt comments {key3}')
     key2 = Path('keys/comment_key')
     logger.info(f'Key for encrypt comments {key2}')
+
     key = Path('keys/comment_key').read_bytes()
+    key_string = key.decode('base64')
     logger.info(f'Key for encrypt comments {key}')
-    f = Fernet(key)
+    logger.info(f'Key for encrypt comments {key_string}')
+    key_encoded = key_string.encode('utf-8')
+    logger.info(f'Key for encrypt comments {key_encoded}')
+    f = Fernet(key_encoded)
     token = f.encrypt(comment_str.encode())
     return token.decode()
 
