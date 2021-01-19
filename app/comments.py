@@ -40,13 +40,13 @@ def encrypt_comment(data: dict) -> str:
     comment_str = json.dumps(data)
     print()
 
-    key = Path('keys/comment_key').read_bytes()
-    logger.info(f'Key for encrypt comments {key}')
-    # key_string = base64.b64decode(key)
-    # logger.info(f'Key for encrypt comments {key_string}')
-    key_encoded = key.decode('utf-8')
-    logger.info(f'Key for encrypt comments {key_encoded}')
-    f = Fernet(key_encoded)
+    # key = Path('keys/comment_key').read_bytes()
+    # logger.info(f'Key for encrypt comments {key}')
+
+    with open('keys/comment_key', 'r') as secret_file:
+        key = secret_file.read()
+
+    f = Fernet(key)
     token = f.encrypt(comment_str.encode())
     return token.decode()
 
