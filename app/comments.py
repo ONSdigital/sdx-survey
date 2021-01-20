@@ -40,16 +40,16 @@ def encrypt_comment(data: dict) -> str:
     comment_str = json.dumps(data)
 
     key_byte = Path('keys/comment_key').read_bytes()
-    logger.info(f'Key for encrypt comments {key_byte}')
+    comment_key = base64.b64encode(key_byte)
 
-    with open('keys/comment_key', 'r') as hello:
-        logger.info(hello)
+    # with open('keys/comment_key', 'r') as hello:
+    #     logger.info(hello)
+    #
+    # with open('keys/comment_key', 'r') as secret_file:
+    #     key = secret_file.read()
+    #     logger.info(key)
 
-    with open('keys/comment_key', 'r') as secret_file:
-        key = secret_file.read()
-        logger.info(key)
-
-    f = Fernet(key)
+    f = Fernet(comment_key)
     token = f.encrypt(comment_str.encode())
     return token.decode()
 
