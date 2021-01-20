@@ -18,7 +18,7 @@ exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
 def store_comments(survey_dict: dict):
-    logger.info("storing comments")
+    logger.info("Starting comment process")
     transaction_id = survey_dict["tx_id"]
     period = survey_dict["collection"]["period"]
     survey_id = survey_dict["survey_id"]
@@ -37,17 +37,11 @@ def store_comments(survey_dict: dict):
 
 
 def encrypt_comment(data: dict) -> str:
+    logger.info('Encrypting comments')
     comment_str = json.dumps(data)
 
     key_byte = Path('keys/comment_key').read_bytes()
     comment_key = base64.b64encode(key_byte)
-
-    # with open('keys/comment_key', 'r') as hello:
-    #     logger.info(hello)
-    #
-    # with open('keys/comment_key', 'r') as secret_file:
-    #     key = secret_file.read()
-    #     logger.info(key)
 
     f = Fernet(comment_key)
     token = f.encrypt(comment_str.encode())
@@ -55,6 +49,7 @@ def encrypt_comment(data: dict) -> str:
 
 
 def get_comment(submission: dict) -> list:
+    logger.info('getting comments (get_comment)')
     """Returns the responde:qqnt typed text from a submission.  The qcode for this text will be different depending
     on the survey
     """
@@ -67,10 +62,12 @@ def get_comment(submission: dict) -> list:
 
 
 def extract_comment(submission, qcode):
+    logger.info('extracting comments')
     return submission['data'].get(qcode)
 
 
 def get_additional_comments(submission):
+    logger.info('getting additional comments')
     comments_list = []
     if submission['survey_id'] == '134':
         if '300w' in submission['data']:
@@ -87,10 +84,12 @@ def get_additional_comments(submission):
 
 
 def get_additional(submission, qcode):
+    logger.info('getting additional')
     return {'qcode': qcode, "comment": submission['data'].get(qcode)}
 
 
 def get_boxes_selected(submission):
+    logger.info('getting all the selected boxes')
     boxes_selected = ''
     if submission['survey_id'] == '134':
         checkboxes = ['91w', '92w1', '92w2', '94w1', '94w2', '95w', '96w', '97w',
@@ -121,6 +120,7 @@ class Comment:
 
 def commit_to_datastore(comment):
     try:
+        logger.info('storing comments in')
         entity_key = datastore_client.key('Comment', comment.transaction_id)
         entity = datastore.Entity(key=entity_key, exclude_from_indexes=exclude_from_index)
         entity.update(
