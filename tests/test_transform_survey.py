@@ -1,6 +1,7 @@
 import unittest
 import os
 import json
+import requests
 from zipfile import ZipFile
 from unittest import mock
 from app.errors import QuarantinableError, RetryableError
@@ -8,21 +9,8 @@ from app.errors import QuarantinableError, RetryableError
 from app import transform
 
 
-def status_code_success(survey_json):
-    return ResponseCodes(200)
-
-
-def status_code_none(survey_json):
-    return ResponseCodes(300)
-
-
-def status_code_fail(survey_json):
-    return ResponseCodes(400)
-
-
-class ResponseCodes:
+class ResponseContent:
     def __init__(self, number):
-        self.status_code = number
         with open('sample_file.txt', 'w') as file:
             file.write('This is some dummy text')
             file.close()
@@ -151,26 +139,41 @@ def remove_file(file):
 
 
 class TestTransform(unittest.TestCase):
-    @mock.patch('app.transform.post', side_effect=status_code_success)
-    def test_deliver_submission_success(self, mock_post):
-        dap_dict = json.loads(dap_data)
-        transform_dap = transform.transform(dap_dict)
-        self.assertTrue(transform_dap)
+    def test_deliver_submission_success(self):
+        r = requests.Response()
+        with mock.patch('app.transform.post') as mock_post:
+            mock_post.return_value = r
+            r.status_code = 200
+            with mock.patch('requests.models.Response.content') as mock_content:
+                mock_content.return_value = ResponseContent
+                dap_dict = json.loads(dap_data)
+                transform_dap = transform.transform(dap_dict)
+                self.assertTrue(transform_dap)
         remove_file('sample_file.txt')
         remove_file('sample.zip')
 
-    @mock.patch('app.transform.post', side_effect=status_code_none)
-    def test_transform_bad_response(self, mock_post):
+    def test_transform_bad_response(self):
         bad_response = "Bad response from sdx-transform"
-        dap_dict = json.loads(dap_data)
-        with self.assertRaises(RetryableError) as submission_exception:
-            transform.transform(dap_dict)
-        self.assertEqual(str(submission_exception.exception), bad_response)
+        r = requests.Response()
+        with mock.patch('app.transform.post') as mock_post:
+            mock_post.return_value = r
+            r.status_code = 300
+            with mock.patch('requests.models.Response.content') as mock_content:
+                mock_content.return_value = ResponseContent
+                dap_dict = json.loads(dap_data)
+                with self.assertRaises(RetryableError) as submission_exception:
+                    transform.transform(dap_dict)
+                self.assertEqual(str(submission_exception.exception), bad_response)
 
-    @mock.patch('app.transform.post', side_effect=status_code_fail)
-    def test_transform_bad_request_response(self, mock_post):
+    def test_transform_bad_request_response(self):
         bad_response = "Bad Request response from sdx-transform"
-        dap_dict = json.loads(dap_data)
-        with self.assertRaises(QuarantinableError) as submission_exception:
-            transform.transform(dap_dict)
-        self.assertEqual(str(submission_exception.exception), bad_response)
+        r = requests.Response()
+        with mock.patch('app.transform.post') as mock_post:
+            mock_post.return_value = r
+            r.status_code = 400
+            with mock.patch('requests.models.Response.content') as mock_content:
+                mock_content.return_value = ResponseContent
+                dap_dict = json.loads(dap_data)
+                with self.assertRaises(QuarantinableError) as submission_exception:
+                    transform.transform(dap_dict)
+                self.assertEqual(str(submission_exception.exception), bad_response)
