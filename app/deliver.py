@@ -38,7 +38,7 @@ def deliver_feedback(survey_dict: dict):
     deliver(survey_dict, FEEDBACK)
 
 
-def deliver(survey_dict: dict, output_type: str, files: {}):
+def deliver(survey_dict: dict, output_type: str, files: dict = {}):
     files[SUBMISSION_FILE] = json.dumps(survey_dict).encode(UTF8)
     response = post(survey_dict['tx_id'], files, output_type)
 
