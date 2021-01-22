@@ -120,7 +120,7 @@ class Comment:
 
 def commit_to_datastore(comment):
     try:
-        logger.info('storing comments in')
+        logger.info('storing comments in Datastore')
         entity_key = datastore_client.key('Comment', comment.transaction_id)
         entity = datastore.Entity(key=entity_key, exclude_from_indexes=exclude_from_index)
         entity.update(
