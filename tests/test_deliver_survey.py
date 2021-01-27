@@ -1,5 +1,6 @@
 import unittest
 import json
+import requests
 from unittest import mock
 from app.errors import QuarantinableError, RetryableError
 
@@ -181,23 +182,6 @@ survey_iter = '201904'
 feedback_iter = '2'
 
 
-def status_code_success(file_bytes, file_type, metadata):
-    return ResponseCodes(200)
-
-
-def status_code_none(file_bytes, file_type, metadata):
-    return ResponseCodes(300)
-
-
-def status_code_fail(file_bytes, file_type, metadata):
-    return ResponseCodes(400)
-
-
-class ResponseCodes:
-    def __init__(self, number):
-        self.status_code = number
-
-
 class TestDeliver(unittest.TestCase):
     @staticmethod
     def delivery_actual(name, data):
@@ -215,34 +199,44 @@ class TestDeliver(unittest.TestCase):
         data_dict = json.loads(data)
         return deliver.create_survey_metadata(data_dict)
 
-    @mock.patch('app.deliver.post', side_effect=status_code_success)
-    def test_deliver_submission_success(self, mock_post):
-        deliver_dap = self.delivery_actual("dap", dap_data)
-        deliver_survey = self.delivery_actual("survey", survey_data)
-        deliver_feedback = self.delivery_actual("feedback", feedback_data)
-        self.assertTrue(deliver_dap)
-        self.assertTrue(deliver_survey)
-        self.assertTrue(deliver_feedback)
+    # @mock.patch('app.deliver.post', side_effect=status_code_success)
+    def test_deliver_submission_success(self):
+        r = requests.Response()
+        with mock.patch('app.deliver.post') as mock_post:
+            mock_post.return_value = r
+            r.status_code = 200
+            deliver_dap = self.delivery_actual("dap", dap_data)
+            deliver_survey = self.delivery_actual("survey", survey_data)
+            deliver_feedback = self.delivery_actual("feedback", feedback_data)
+            self.assertTrue(deliver_dap)
+            self.assertTrue(deliver_survey)
+            self.assertTrue(deliver_feedback)
 
-    @mock.patch('app.deliver.post', side_effect=status_code_fail)
-    def test_deliver_bad_request_response(self, mock_post):
+    def test_deliver_bad_request_response(self):
         bad_response = "Bad Request response from sdx-deliver"
-        dap_exception_str = self.delivery_bad_response('dap', dap_data, QuarantinableError)
-        survey_exception_str = self.delivery_bad_response('survey', survey_data, QuarantinableError)
-        feedback_exception_str = self.delivery_bad_response('feedback', feedback_data, QuarantinableError)
-        self.assertEqual(dap_exception_str, bad_response)
-        self.assertEqual(survey_exception_str, bad_response)
-        self.assertEqual(feedback_exception_str, bad_response)
+        r = requests.Response()
+        with mock.patch('app.deliver.post') as mock_post:
+            mock_post.return_value = r
+            r.status_code = 400
+            dap_exception_str = self.delivery_bad_response('dap', dap_data, QuarantinableError)
+            survey_exception_str = self.delivery_bad_response('survey', survey_data, QuarantinableError)
+            feedback_exception_str = self.delivery_bad_response('feedback', feedback_data, QuarantinableError)
+            self.assertEqual(dap_exception_str, bad_response)
+            self.assertEqual(survey_exception_str, bad_response)
+            self.assertEqual(feedback_exception_str, bad_response)
 
-    @mock.patch('app.deliver.post', side_effect=status_code_none)
-    def test_deliver_bad_deliver_response(self, mock_post):
+    def test_deliver_bad_deliver_response(self):
         bad_response = "Bad response from sdx-deliver"
-        dap_exception_str = self.delivery_bad_response('dap', dap_data, RetryableError)
-        survey_exception_str = self.delivery_bad_response('survey', survey_data, RetryableError)
-        feedback_exception_str = self.delivery_bad_response('feedback', feedback_data, RetryableError)
-        self.assertEqual(dap_exception_str, bad_response)
-        self.assertEqual(survey_exception_str, bad_response)
-        self.assertEqual(feedback_exception_str, bad_response)
+        r = requests.Response()
+        with mock.patch('app.deliver.post') as mock_post:
+            mock_post.return_value = r
+            r.status_code = 300
+            dap_exception_str = self.delivery_bad_response('dap', dap_data, RetryableError)
+            survey_exception_str = self.delivery_bad_response('survey', survey_data, RetryableError)
+            feedback_exception_str = self.delivery_bad_response('feedback', feedback_data, RetryableError)
+            self.assertEqual(dap_exception_str, bad_response)
+            self.assertEqual(survey_exception_str, bad_response)
+            self.assertEqual(feedback_exception_str, bad_response)
 
     def test_create_survey_metadata(self):
         dap_test_meta = json.dumps(self.create_metadata_actual(dap_data))
@@ -261,3 +255,4 @@ class TestDeliver(unittest.TestCase):
         self.assertEqual(dap_iter, deliver.get_iteration(json.loads(dap_data)))
         self.assertEqual(survey_iter, deliver.get_iteration(json.loads(survey_data)))
         self.assertEqual(feedback_iter, deliver.get_iteration(json.loads(feedback_data)))
+
