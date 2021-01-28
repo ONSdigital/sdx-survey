@@ -39,7 +39,9 @@ def deliver_feedback(survey_dict: dict):
 
 
 def deliver(survey_dict: dict, output_type: str, files: dict = {}):
+    print(f"survey dict: {survey_dict}")
     files[SUBMISSION_FILE] = json.dumps(survey_dict).encode(UTF8)
+    print(files)
     response = post(survey_dict['tx_id'], files, output_type)
 
     if response.status_code == 200:
