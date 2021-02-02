@@ -45,5 +45,5 @@ TRANSFORM_SERVICE_URL = "sdx-transform:80"
 
 DELIVER_SERVICE_URL = "sdx-deliver:80"
 
-DECRYPT_KEY = get_secret(PROJECT_ID, 'sdx-worker-decrypt')
-print(DECRYPT_KEY)
+DECRYPT_SURVEY_KEY = get_secret(PROJECT_ID, 'sdx-worker-decrypt')
+ENCRYPT_COMMENT_KEY = get_secret(PROJECT_ID, 'sdx-comment-key')
