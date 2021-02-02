@@ -1,7 +1,7 @@
 import os
 import logging
 from google.cloud import pubsub_v1
-from app.secrets import get_secret
+from app.secret_manager import get_secret
 
 LOGGING_LEVEL = logging.getLevelName(os.getenv('LOGGING_LEVEL', 'DEBUG'))
 LOGGING_FORMAT = "%(asctime)s.%(msecs)06dZ|%(levelname)s: sdx-worker: %(message)s"
