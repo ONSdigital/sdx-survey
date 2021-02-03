@@ -1,15 +1,13 @@
-import base64
 import json
 import logging
 from datetime import datetime
-from pathlib import Path
 from string import ascii_lowercase
 
 from cryptography.fernet import Fernet
 from google.cloud import datastore
 from structlog import wrap_logger
 
-from app import PROJECT_ID
+from app import PROJECT_ID, ENCRYPT_COMMENT_KEY
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -39,11 +37,7 @@ def store_comments(survey_dict: dict):
 def encrypt_comment(data: dict) -> str:
     logger.info('Encrypting comments')
     comment_str = json.dumps(data)
-
-    key_byte = Path('keys/comment_key').read_bytes()
-    comment_key = base64.b64encode(key_byte)
-
-    f = Fernet(comment_key)
+    f = Fernet(ENCRYPT_COMMENT_KEY)
     token = f.encrypt(comment_str.encode())
     return token.decode()
 

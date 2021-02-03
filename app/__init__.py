@@ -1,6 +1,7 @@
 import os
 import logging
 from google.cloud import pubsub_v1
+from app.secret_manager import get_secret
 
 LOGGING_LEVEL = logging.getLevelName(os.getenv('LOGGING_LEVEL', 'DEBUG'))
 LOGGING_FORMAT = "%(asctime)s.%(msecs)06dZ|%(levelname)s: sdx-worker: %(message)s"
@@ -14,6 +15,7 @@ logging.basicConfig(
 PROJECT_ID = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
 
 # publish config
+
 
 dap_topic_id = "dap-topic"
 receipt_topic_id = "receipt-topic"
@@ -43,3 +45,5 @@ TRANSFORM_SERVICE_URL = "sdx-transform:80"
 
 DELIVER_SERVICE_URL = "sdx-deliver:80"
 
+DECRYPT_SURVEY_KEY = get_secret(PROJECT_ID, 'sdx-worker-decrypt')
+ENCRYPT_COMMENT_KEY = get_secret(PROJECT_ID, 'sdx-comment-key')
