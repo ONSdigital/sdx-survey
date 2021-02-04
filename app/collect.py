@@ -6,7 +6,7 @@ from app.comments import store_comments
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap
 from app.errors import QuarantinableError
 from app.receipt import send_receipt
-from app.encryption import decrypt_survey
+from app.decrypt import decrypt_survey
 from app.quarantine import quarantine_submission
 from app.transform import transform
 from app.validate import validate
@@ -31,13 +31,13 @@ def process(encrypted_message_str: str):
 
         else:
 
+            store_comments(survey_dict)
+
             if survey_dict['survey_id'] not in DAP_SURVEYS:
                 zip_file = transform(survey_dict)
                 deliver_survey(survey_dict, zip_file)
             else:
                 deliver_dap(survey_dict)
-
-            store_comments(survey_dict)
 
             send_receipt(survey_dict)
 

@@ -1,15 +1,22 @@
+import json
+import logging
 from datetime import datetime
 from string import ascii_lowercase
-from google.cloud import datastore
 
-from app import PROJECT_ID
-from app.encryption import encrypt_comment
+from cryptography.fernet import Fernet
+from google.cloud import datastore
+from structlog import wrap_logger
+
+from app import PROJECT_ID, ENCRYPT_COMMENT_KEY
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 datastore_client = datastore.Client(project=PROJECT_ID)
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
 def store_comments(survey_dict: dict):
+    logger.info("Starting comment process")
     transaction_id = survey_dict["tx_id"]
     period = survey_dict["collection"]["period"]
     survey_id = survey_dict["survey_id"]
@@ -27,8 +34,17 @@ def store_comments(survey_dict: dict):
     commit_to_datastore(comment)
 
 
+def encrypt_comment(data: dict) -> str:
+    logger.info('Encrypting comments')
+    comment_str = json.dumps(data)
+    f = Fernet(ENCRYPT_COMMENT_KEY)
+    token = f.encrypt(comment_str.encode())
+    return token.decode()
+
+
 def get_comment(submission: dict) -> list:
-    """Returns the respondent typed text from a submission.  The qcode for this text will be different depending
+    logger.info('getting comments (get_comment)')
+    """Returns the responde:qqnt typed text from a submission.  The qcode for this text will be different depending
     on the survey
     """
     if submission['survey_id'] == '187':
@@ -40,10 +56,12 @@ def get_comment(submission: dict) -> list:
 
 
 def extract_comment(submission, qcode):
+    logger.info('extracting comments')
     return submission['data'].get(qcode)
 
 
 def get_additional_comments(submission):
+    logger.info('getting additional comments')
     comments_list = []
     if submission['survey_id'] == '134':
         if '300w' in submission['data']:
@@ -60,10 +78,12 @@ def get_additional_comments(submission):
 
 
 def get_additional(submission, qcode):
+    logger.info('getting additional')
     return {'qcode': qcode, "comment": submission['data'].get(qcode)}
 
 
 def get_boxes_selected(submission):
+    logger.info('getting all the selected boxes')
     boxes_selected = ''
     if submission['survey_id'] == '134':
         checkboxes = ['91w', '92w1', '92w2', '94w1', '94w2', '95w', '96w', '97w',
@@ -94,6 +114,7 @@ class Comment:
 
 def commit_to_datastore(comment):
     try:
+        logger.info('storing comments in Datastore')
         entity_key = datastore_client.key('Comment', comment.transaction_id)
         entity = datastore.Entity(key=entity_key, exclude_from_indexes=exclude_from_index)
         entity.update(
@@ -105,5 +126,5 @@ def commit_to_datastore(comment):
             }
         )
         return datastore.Client().put(entity)
-    except ValueError as error:
-        print(error)
+    except ValueError as e:
+        logger.error(e)

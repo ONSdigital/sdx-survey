@@ -1,8 +1,9 @@
 import os
 import logging
 from google.cloud import pubsub_v1
+from app.secret_manager import get_secret
 
-LOGGING_LEVEL = logging.getLevelName(os.getenv('LOGGING_LEVEL', 'INFO'))
+LOGGING_LEVEL = logging.getLevelName(os.getenv('LOGGING_LEVEL', 'DEBUG'))
 LOGGING_FORMAT = "%(asctime)s.%(msecs)06dZ|%(levelname)s: sdx-worker: %(message)s"
 
 logging.basicConfig(
@@ -11,9 +12,10 @@ logging.basicConfig(
     level=LOGGING_LEVEL,
 )
 
-PROJECT_ID = "ons-sdx-sandbox"
+PROJECT_ID = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
 
 # publish config
+
 
 dap_topic_id = "dap-topic"
 receipt_topic_id = "receipt-topic"
@@ -39,10 +41,9 @@ survey_subscriber = pubsub_v1.SubscriberClient()
 subscription_path = survey_subscriber.subscription_path(PROJECT_ID, subscription_id)
 
 # Config connecting to transform service
-TRANSFORM_SERVICE_HOST = os.getenv('SDX_TRANSFORM_SERVICE_HOST', 'localhost')
-TRANSFORM_SERVICE_PORT = os.getenv('SDX_TRANSFORM_SERVICE_PORT', 8080)
-TRANSFORM_SERVICE_URL = f'{TRANSFORM_SERVICE_HOST}:{TRANSFORM_SERVICE_PORT}'
+TRANSFORM_SERVICE_URL = "sdx-transform:80"
 
-DELIVER_SERVICE_HOST = os.getenv('SDX_DELIVER_SERVICE_HOST', 'localhost')
-DELIVER_SERVICE_PORT = os.getenv('SDX_DELIVER_SERVICE_PORT', 8080)
-DELIVER_SERVICE_URL = f'{DELIVER_SERVICE_HOST}:{DELIVER_SERVICE_PORT}'
+DELIVER_SERVICE_URL = "sdx-deliver:80"
+
+DECRYPT_SURVEY_KEY = get_secret(PROJECT_ID, 'sdx-worker-decrypt')
+ENCRYPT_COMMENT_KEY = get_secret(PROJECT_ID, 'sdx-comment-key')

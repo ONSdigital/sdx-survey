@@ -12,6 +12,9 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 KNOWN_SURVEYS = {
     "0.0.1": {
+        "007": [
+            "0010", "0009"
+        ],
         "009": [
             "0106", "0111", "0117", "0123", "0158", "0161", "0167", "0173", "0201", "0202",
             "0203", "0204", "0205", "0216", "0251", "0253", "0255", "0817", "0823", "0867",
@@ -78,7 +81,7 @@ def ValidSurveyData(data):
 
 def ValidateListSurveyData(data):
     if not isinstance(data, list):
-        raise ValueError("Invalid surey data")
+        raise ValueError("Invalid survey data")
 
 
 def validate(survey_dict: dict) -> bool:
