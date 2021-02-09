@@ -5,7 +5,7 @@ from structlog import wrap_logger
 
 from app import survey_subscriber, subscription_path
 from app.collect import process
-from app.errors import RetryableError, QuarantinableError
+from app.errors import RetryableError
 from app.quarantine import quarantine_submission, quarantine_message
 
 logger = wrap_logger(logging.getLogger(__name__))

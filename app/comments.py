@@ -7,11 +7,10 @@ from cryptography.fernet import Fernet
 from google.cloud import datastore
 from structlog import wrap_logger
 
-from app import PROJECT_ID, ENCRYPT_COMMENT_KEY
+from app import datastore_client, ENCRYPT_COMMENT_KEY
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-datastore_client = datastore.Client(project=PROJECT_ID)
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
