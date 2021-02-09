@@ -5,7 +5,3 @@ class QuarantinableError(Exception):
 
 class RetryableError(Exception):
     pass
-
-
-class ClientError(QuarantinableError):
-    pass

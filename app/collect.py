@@ -7,7 +7,6 @@ from app.deliver import deliver_feedback, deliver_survey, deliver_dap
 from app.errors import QuarantinableError
 from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
-from app.quarantine import quarantine_submission
 from app.transform import transform
 from app.validate import validate
 
@@ -20,35 +19,25 @@ def process(encrypted_message_str: str):
 
     logger.info("processing message")
     survey_dict = decrypt_survey(encrypted_message_str)
-    tx_id = extract_tx_id(survey_dict)
 
-    try:
+    valid = validate(survey_dict)
+    if not valid:
+        raise QuarantinableError("invalid survey")
 
-        validate(survey_dict)
+    if is_feedback(survey_dict):
+        deliver_feedback(survey_dict)
 
-        if is_feedback(survey_dict):
-            deliver_feedback(survey_dict)
+    else:
 
+        store_comments(survey_dict)
+
+        if survey_dict['survey_id'] not in DAP_SURVEYS:
+            zip_file = transform(survey_dict)
+            deliver_survey(survey_dict, zip_file)
         else:
+            deliver_dap(survey_dict)
 
-            store_comments(survey_dict)
-
-            if survey_dict['survey_id'] not in DAP_SURVEYS:
-                zip_file = transform(survey_dict)
-                deliver_survey(survey_dict, zip_file)
-            else:
-                deliver_dap(survey_dict)
-
-            send_receipt(survey_dict)
-
-    except QuarantinableError as e:
-        logger.info("quarantining message")
-        logger.error(str(e))
-        quarantine_submission(encrypted_message_str, tx_id)
-
-
-def extract_tx_id(message_dict: dict) -> str:
-    return message_dict['tx_id']
+        send_receipt(survey_dict)
 
 
 def is_feedback(data: dict) -> bool:

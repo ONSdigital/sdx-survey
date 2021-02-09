@@ -5,22 +5,36 @@ from structlog import wrap_logger
 
 from app import survey_subscriber, subscription_path
 from app.collect import process
-from app.errors import RetryableError
+from app.errors import RetryableError, QuarantinableError
+from app.quarantine import quarantine_submission, quarantine_message
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 def callback(message):
+    tx_id = None
+    encrypted_message_str = None
+
     try:
+        tx_id = message.attributes.get('tx_id')
         encrypted_message_str = message.data.decode('utf-8')
         process(encrypted_message_str)
         message.ack()
-    except RetryableError:
+
+    except RetryableError as r:
         logger.info("retryable error, nacking message")
+        logger.error(str(r))
         message.nack()
+
     except Exception as e:
-        logger.error(f"error {str(e)}, nacking message")
-        message.nack()
+        logger.info("quarantining message")
+        logger.error(str(e))
+        message.ack()
+        if encrypted_message_str is None:
+            logger.info("encrypted_message_str is none, quarantining message instead!")
+            quarantine_message(message, tx_id)
+        else:
+            quarantine_submission(encrypted_message_str, tx_id)
 
 
 def start():

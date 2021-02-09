@@ -16,6 +16,7 @@ def encrypt_survey(submission: dict) -> str:
 
 
 class TestDecrypt(unittest.TestCase):
+
     def test_decrypt_survey(self):
         message_dict = json.loads('''{
             "collection": {

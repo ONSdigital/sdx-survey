@@ -4,7 +4,7 @@ import logging
 from structlog import wrap_logger
 
 from app import receipt_publisher, receipt_topic_path
-from app.errors import ClientError
+from app.errors import QuarantinableError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -39,7 +39,7 @@ def make_receipt(survey_dict: dict) -> str:
             }
         }
     except KeyError as e:
-        raise ClientError(str(e))
+        raise QuarantinableError(str(e))
 
     receipt_str = json.dumps(receipt_json)
     return receipt_str

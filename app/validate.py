@@ -6,7 +6,7 @@ from structlog import wrap_logger
 from dateutil import parser
 from uuid import UUID
 
-from app.errors import ClientError
+from app.errors import QuarantinableError
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -97,7 +97,7 @@ def validate(survey_dict: dict) -> bool:
             schema = get_schema(version)
 
             if schema is None:
-                raise ClientError("Unsupported schema version '%s'" % version)
+                raise QuarantinableError("Unsupported schema version '%s'" % version)
 
             metadata = json_data.get("metadata")
             bound_logger = logger.bind(survey_id=json_data.get("survey_id"),
@@ -111,12 +111,12 @@ def validate(survey_dict: dict) -> bool:
             survey_id = json_data.get("survey_id")
             if survey_id not in KNOWN_SURVEYS.get(version, {}):
                 bound_logger.debug("Survey id is not known", survey_id=survey_id)
-                raise ClientError(f"Unsupported survey '{survey_id}'")
+                raise QuarantinableError(f"Unsupported survey '{survey_id}'")
 
             instrument_id = json_data.get("collection", {}).get("instrument_id")
             if instrument_id not in KNOWN_SURVEYS.get(version, {}).get(survey_id, []):
                 bound_logger.debug("Instrument ID is not known", survey_id=survey_id)
-                raise ClientError(f"Unsupported instrument '{instrument_id}'")
+                raise QuarantinableError(f"Unsupported instrument '{instrument_id}'")
 
         else:
             schema = get_schema("feedback")
@@ -129,11 +129,11 @@ def validate(survey_dict: dict) -> bool:
 
     except (MultipleInvalid, KeyError, TypeError, ValueError) as e:
         logger.error("Client error", error=e)
-        raise ClientError(str(e))
+        raise QuarantinableError(str(e))
 
     except Exception as e:
         logger.error("Server error", error=e)
-        raise ClientError(e)
+        raise QuarantinableError(e)
 
     logger.info("Validation successful")
     return True

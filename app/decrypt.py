@@ -8,7 +8,7 @@ from sdc.crypto.decrypter import decrypt as sdc_decrypt
 from structlog import wrap_logger
 from app import DECRYPT_SURVEY_KEY
 
-from app.errors import ClientError
+from app.errors import QuarantinableError
 
 KEY_PURPOSE_SUBMISSION = 'submission'
 
@@ -33,10 +33,10 @@ def decrypt_survey(payload: str) -> dict:
             exceptions.NotYetFinalized,
             exceptions.AlreadyUpdated):
 
-        raise ClientError("Decryption Failure")
+        raise QuarantinableError("Decryption Failure")
     except binascii.Error as e:
         logger.exception(e)
-        raise ClientError("Request payload was not base64 encoded")
+        raise QuarantinableError("Request payload was not base64 encoded")
     except InvalidTokenException as e:
         logger.exception(repr(e))
-        raise ClientError(e)
+        raise QuarantinableError(e)
