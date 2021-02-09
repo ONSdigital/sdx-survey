@@ -1,7 +1,6 @@
 import logging
 
 from structlog import wrap_logger
-
 from app.comments import store_comments
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap
 from app.errors import QuarantinableError

@@ -7,7 +7,6 @@ from sdc.crypto.key_store import KeyStore
 from sdc.crypto.decrypter import decrypt as sdc_decrypt
 from structlog import wrap_logger
 from app import DECRYPT_SURVEY_KEY
-
 from app.errors import QuarantinableError
 
 KEY_PURPOSE_SUBMISSION = 'submission'

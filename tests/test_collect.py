@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import patch
-
 from app.collect import process, is_feedback
 from app.errors import QuarantinableError
 
@@ -17,8 +16,8 @@ class TestCollect(unittest.TestCase):
     @patch('app.collect.decrypt_survey')
     @patch('app.collect.validate')
     @patch('app.collect.deliver_feedback')
-    def test_process_feedback(self, deliver_feedback, validate, decrypt):
-
+    @patch('app.collect.send_receipt')
+    def test_process_feedback(self, send_receipt, deliver_feedback, validate, decrypt):
         feedback_response = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
             'survey_id': '023',
@@ -29,21 +28,7 @@ class TestCollect(unittest.TestCase):
         validate.return_value = True
         process('encrypted feedback')
         deliver_feedback.assert_called_with(feedback_response)
-
-    @patch('app.collect.decrypt_survey')
-    @patch('app.collect.validate')
-    @patch('app.collect.deliver_feedback')
-    def test_process_feedback(self, deliver_feedback, validate, decrypt):
-        feedback_response = {
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
-            'survey_id': '023',
-            'type': 'uk.gov.ons.edc.eq:feedback'
-        }
-
-        decrypt.return_value = feedback_response
-        validate.return_value = True
-        process('encrypted feedback')
-        deliver_feedback.assert_called_with(feedback_response)
+        send_receipt.assert_not_called()
 
     @patch('app.collect.decrypt_survey')
     @patch('app.collect.validate')

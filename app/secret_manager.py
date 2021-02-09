@@ -14,3 +14,4 @@ def get_secret(project_id, secret_id):
 
     payload = response.payload.data.decode("UTF-8")
     return payload
+
