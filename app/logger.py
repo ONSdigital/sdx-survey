@@ -28,7 +28,7 @@ def logging_setup():
     error_handler.setLevel(logging.ERROR)
 
     # create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s.%(msecs)06dZ | %(levelname)s | %(name)s: %(message)s')
+    formatter = logging.Formatter('%(levelname)s | SDX-Worker | thread: %(thread)d | %(name)s: %(message)s')
     error_handler.setFormatter(formatter)
     info_handler.setFormatter(formatter)
 

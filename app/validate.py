@@ -85,10 +85,9 @@ def ValidateListSurveyData(data):
 
 
 def validate(survey_dict: dict) -> bool:
-    logger.info("Validating survey")
+    logger.info(f"Validating: {survey_dict['tx_id']}")
     try:
         json_data = survey_dict
-
         response_type = str(json_data["type"])
 
         if response_type.find("feedback") == -1:
@@ -135,7 +134,7 @@ def validate(survey_dict: dict) -> bool:
         logger.error("Server error", error=e)
         raise QuarantinableError(e)
 
-    logger.info("Validation successful")
+    logger.info(f"Validation successful: {survey_dict['tx_id']}")
     return True
 
 

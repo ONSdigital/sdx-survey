@@ -21,7 +21,7 @@ def process(encrypted_message_str: str):
 
     valid = validate(survey_dict)
     if not valid:
-        raise QuarantinableError("invalid survey")
+        raise QuarantinableError(f"Invalid survey: {survey_dict['tx_id']}")
 
     if is_feedback(survey_dict):
         deliver_feedback(survey_dict)
@@ -40,5 +40,6 @@ def process(encrypted_message_str: str):
 
 
 def is_feedback(data: dict) -> bool:
+    logger.info(f"Checking for feedback: {data['tx_id']}")
     submission_type = data["type"]
     return "feedback" in submission_type

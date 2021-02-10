@@ -20,9 +20,9 @@ def decrypt_survey(payload: str) -> dict:
     try:
         decrypt_key_yaml = yaml.safe_load(DECRYPT_SURVEY_KEY)
         key_store = KeyStore(decrypt_key_yaml)
-        decrypted_json = sdc_decrypt(payload, key_store, KEY_PURPOSE_SUBMISSION)
-        logger.info("survey successfully decrypted")
-        return decrypted_json
+        decrypted_dict = sdc_decrypt(payload, key_store, KEY_PURPOSE_SUBMISSION)
+        logger.info(f"Successfully decrypted: {decrypted_dict['tx_id']}")
+        return decrypted_dict
 
     except (
             exceptions.UnsupportedAlgorithm,

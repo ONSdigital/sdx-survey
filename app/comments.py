@@ -15,7 +15,7 @@ exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
 def store_comments(survey_dict: dict):
-    logger.info("Starting comment process")
+    logger.info(f"Starting comment process: {survey_dict['tx_id']}")
     transaction_id = survey_dict["tx_id"]
     period = survey_dict["collection"]["period"]
     survey_id = survey_dict["survey_id"]

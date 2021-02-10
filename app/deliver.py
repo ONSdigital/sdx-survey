@@ -35,6 +35,7 @@ def deliver_survey(survey_dict: dict, zip_file: bytes):
 
 
 def deliver_feedback(survey_dict: dict):
+    logger.info(f"Sending feedback: {survey_dict['tx_id']}")
     deliver(survey_dict, FEEDBACK)
 
 
