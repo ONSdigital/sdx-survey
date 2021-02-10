@@ -1,17 +1,10 @@
 import os
-import logging
 from google.cloud import pubsub_v1
 from google.cloud import datastore
 from app.secret_manager import get_secret
+from app.logger import logging_setup
 
-LOGGING_LEVEL = logging.getLevelName(os.getenv('LOGGING_LEVEL', 'DEBUG'))
-LOGGING_FORMAT = "%(asctime)s.%(msecs)06dZ|%(levelname)s: sdx-worker: %(message)s"
-
-logging.basicConfig(
-    format=LOGGING_FORMAT,
-    datefmt="%Y-%m-%dT%H:%M:%S",
-    level=LOGGING_LEVEL,
-)
+logging_setup()
 
 PROJECT_ID = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
 
