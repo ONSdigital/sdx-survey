@@ -74,5 +74,3 @@ def load_config():
 
     global datastore_client
     datastore_client = datastore.Client(project=PROJECT_ID)
-
-    return
