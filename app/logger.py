@@ -4,7 +4,7 @@ import sys
 import structlog
 import logging
 from structlog import configure
-from structlog.contextvars import bind_contextvars, clear_contextvars, merge_contextvars, unbind_contextvars
+from structlog.contextvars import merge_contextvars
 from structlog.stdlib import LoggerFactory
 
 
@@ -30,7 +30,6 @@ def logging_config():
                'message)s',
         level=os.getenv('LOGGING_LEVEL', 'INFO'),
         handlers=[info_handler, error_handler]
-
     )
 
     configure(
