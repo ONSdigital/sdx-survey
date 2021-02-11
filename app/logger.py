@@ -28,7 +28,7 @@ def logging_config():
     logging.basicConfig(
         format='%(levelname)s | SDX-Worker | thread: %(thread)d | %(name)s: %('
                'message)s',
-        level="INFO",
+        level=os.getenv('LOGGING_LEVEL', 'INFO'),
         handlers=[info_handler, error_handler]
 
     )
@@ -38,6 +38,7 @@ def logging_config():
         processors=[
             structlog.stdlib.PositionalArgumentsFormatter(),
             merge_contextvars,
-            structlog.processors.JSONRenderer()
+            # structlog.processors.JSONRenderer()
+            structlog.processors.KeyValueRenderer()
         ],
     )
