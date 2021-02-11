@@ -38,7 +38,6 @@ def logging_config():
         processors=[
             structlog.stdlib.PositionalArgumentsFormatter(),
             merge_contextvars,
-            # structlog.processors.JSONRenderer()
-            structlog.processors.KeyValueRenderer()
+            structlog.processors.JSONRenderer()
         ],
     )
