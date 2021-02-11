@@ -1,12 +1,10 @@
 import json
-import logging
-
-from structlog import wrap_logger
+import structlog
 
 from app import receipt_publisher, receipt_topic_path
 from app.errors import QuarantinableError
 
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger()
 
 
 def send_receipt(survey_dict: dict) -> str:

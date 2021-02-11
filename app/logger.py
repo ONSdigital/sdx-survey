@@ -1,5 +1,11 @@
-import logging
+import os
 import sys
+
+import structlog
+import logging
+from structlog import configure
+from structlog.contextvars import bind_contextvars, clear_contextvars, merge_contextvars, unbind_contextvars
+from structlog.stdlib import LoggerFactory
 
 
 class _MaxLevelFilter(object):
@@ -10,33 +16,28 @@ class _MaxLevelFilter(object):
         return log_record.levelno <= self._highest_log_level
 
 
-def logging_setup():
-    # A handler for low level logs that should be sent to STDOUT
-    info_handler = logging.StreamHandler(sys.stdout)
-    info_handler.setLevel(logging.INFO)
-    info_handler.addFilter(_MaxLevelFilter(logging.WARNING))
-    #
-    # A handler for high level logs that should be sent to STDERR
+def logging_config():
+
     error_handler = logging.StreamHandler(sys.stderr)
     error_handler.setLevel(logging.ERROR)
 
-    # create console handler with a higher log level
     info_handler = logging.StreamHandler(sys.stdout)
     info_handler.setLevel(logging.INFO)
     info_handler.addFilter(_MaxLevelFilter(logging.WARNING))
-    error_handler = logging.StreamHandler(sys.stderr)
-    error_handler.setLevel(logging.ERROR)
 
-    # create formatter and add it to the handlers
-    formatter = logging.Formatter('%(levelname)s | SDX-Worker | thread: %(thread)d | %(name)s: %(message)s')
-    error_handler.setFormatter(formatter)
-    info_handler.setFormatter(formatter)
+    logging.basicConfig(
+        format='%(levelname)s | SDX-Worker | thread: %(thread)d | %(name)s: %('
+               'message)s',
+        level="INFO",
+        handlers=[info_handler, error_handler]
 
-    # create and configure main logger
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    )
 
-    # add the handler to the logger
-    logger.addHandler(info_handler)
-    logger.addHandler(error_handler)
-    logger.propagate = False
+    configure(
+        logger_factory=LoggerFactory(),
+        processors=[
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            merge_contextvars,
+            structlog.processors.JSONRenderer()
+        ],
+    )

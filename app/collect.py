@@ -1,6 +1,5 @@
-import logging
+import structlog
 
-from structlog import wrap_logger
 from app.comments import store_comments
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap
 from app.errors import QuarantinableError
@@ -9,7 +8,7 @@ from app.decrypt import decrypt_survey
 from app.transform import transform
 from app.validate import validate
 
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger()
 
 DAP_SURVEYS = ["023", "134", "147", "281", "283", "lms", "census"]
 
@@ -21,7 +20,7 @@ def process(encrypted_message_str: str):
 
     valid = validate(survey_dict)
     if not valid:
-        raise QuarantinableError(f"Invalid survey: {survey_dict['tx_id']}")
+        raise QuarantinableError(f"Invalid survey")
 
     if is_feedback(survey_dict):
         deliver_feedback(survey_dict)
@@ -40,6 +39,6 @@ def process(encrypted_message_str: str):
 
 
 def is_feedback(data: dict) -> bool:
-    logger.info(f"Checking for feedback: {data['tx_id']}")
+    logger.info(f"Checking for feedback")
     submission_type = data["type"]
     return "feedback" in submission_type

@@ -1,12 +1,13 @@
 import os
 from google.cloud import pubsub_v1
 from google.cloud import datastore
+from app.logger import logging_config
 from app.secret_manager import get_secret
-from app.logger import logging_setup
 
-logging_setup()
 
-PROJECT_ID = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
+logging_config()
+
+PROJECT_ID = os.getenv('PROJECT_ID', 'ons-sdx-tom')
 
 # connections
 TRANSFORM_SERVICE_URL = "sdx-transform:80"

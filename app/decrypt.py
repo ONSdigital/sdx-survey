@@ -1,17 +1,17 @@
 import binascii
-import logging
+import structlog
 import yaml
+
 from cryptography import exceptions
 from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
 from sdc.crypto.decrypter import decrypt as sdc_decrypt
-from structlog import wrap_logger
 from app import DECRYPT_SURVEY_KEY
 from app.errors import QuarantinableError
 
 KEY_PURPOSE_SUBMISSION = 'submission'
 
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger()
 
 
 def decrypt_survey(payload: str) -> dict:
@@ -21,7 +21,7 @@ def decrypt_survey(payload: str) -> dict:
         decrypt_key_yaml = yaml.safe_load(DECRYPT_SURVEY_KEY)
         key_store = KeyStore(decrypt_key_yaml)
         decrypted_dict = sdc_decrypt(payload, key_store, KEY_PURPOSE_SUBMISSION)
-        logger.info(f"Successfully decrypted: {decrypted_dict['tx_id']}")
+        logger.info(f"Successfully decrypted")
         return decrypted_dict
 
     except (

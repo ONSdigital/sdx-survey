@@ -1,21 +1,20 @@
 import json
-import logging
+import structlog
+
 from datetime import datetime
 from string import ascii_lowercase
-
 from cryptography.fernet import Fernet
 from google.cloud import datastore
-from structlog import wrap_logger
 
 from app import datastore_client, ENCRYPT_COMMENT_KEY
 
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger()
 
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
 def store_comments(survey_dict: dict):
-    logger.info(f"Starting comment process: {survey_dict['tx_id']}")
+    logger.info(f"Starting comment process")
     transaction_id = survey_dict["tx_id"]
     period = survey_dict["collection"]["period"]
     survey_id = survey_dict["survey_id"]
@@ -42,7 +41,7 @@ def encrypt_comment(data: dict) -> str:
 
 
 def get_comment(submission: dict) -> list:
-    logger.info('getting comments (get_comment)')
+    logger.info('Checking comment Q Codes')
     """Returns the responde:qqnt typed text from a submission.  The qcode for this text will be different depending
     on the survey
     """

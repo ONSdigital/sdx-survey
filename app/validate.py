@@ -1,14 +1,13 @@
-import logging
+import structlog
 
 from functools import partial
 from voluptuous import Schema, Required, Length, All, MultipleInvalid, Optional
-from structlog import wrap_logger
 from dateutil import parser
 from uuid import UUID
 
 from app.errors import QuarantinableError
 
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger()
 
 KNOWN_SURVEYS = {
     "0.0.1": {
@@ -85,7 +84,7 @@ def ValidateListSurveyData(data):
 
 
 def validate(survey_dict: dict) -> bool:
-    logger.info(f"Validating: {survey_dict['tx_id']}")
+    logger.info(f"Validating")
     try:
         json_data = survey_dict
         response_type = str(json_data["type"])
@@ -134,7 +133,7 @@ def validate(survey_dict: dict) -> bool:
         logger.error("Server error", error=e)
         raise QuarantinableError(e)
 
-    logger.info(f"Validation successful: {survey_dict['tx_id']}")
+    logger.info(f"Validation successful")
     return True
 
 
