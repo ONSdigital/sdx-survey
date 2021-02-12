@@ -1,5 +1,4 @@
 import threading
-
 import structlog
 
 from concurrent.futures import TimeoutError

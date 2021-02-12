@@ -35,11 +35,10 @@ def logging_config():
         processors=[
             structlog.stdlib.add_log_level,
             structlog.stdlib.add_logger_name,
-            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.stdlib.PositionalArgumentsFormatter('tx_id'),
             merge_contextvars,
             structlog.processors.JSONRenderer(),
         ],
-        context_class=dict,
     )
 
 # This is the old format out of JSON
