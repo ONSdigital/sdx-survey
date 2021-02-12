@@ -17,7 +17,6 @@ class _MaxLevelFilter(object):
 
 
 def logging_config():
-
     error_handler = logging.StreamHandler(sys.stderr)
     error_handler.setLevel(logging.ERROR)
 
@@ -26,8 +25,7 @@ def logging_config():
     info_handler.addFilter(_MaxLevelFilter(logging.WARNING))
 
     logging.basicConfig(
-        format='%(levelname)s | SDX-Worker | thread: %(thread)d | %(name)s: %('
-               'message)s',
+        format='{"logs": %(message)s, "thread": "%(thread)d"}',
         level=os.getenv('LOGGING_LEVEL', 'INFO'),
         handlers=[info_handler, error_handler]
     )
@@ -35,8 +33,14 @@ def logging_config():
     configure(
         logger_factory=LoggerFactory(),
         processors=[
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.add_logger_name,
             structlog.stdlib.PositionalArgumentsFormatter(),
             merge_contextvars,
-            structlog.processors.JSONRenderer()
+            structlog.processors.JSONRenderer(),
         ],
+        context_class=dict,
     )
+
+# format = '%(levelname)s | SDX-Worker | thread: %(thread)d | %(name)s: %('
+# 'message)s',
