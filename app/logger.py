@@ -25,7 +25,7 @@ def logging_config():
     info_handler.addFilter(_MaxLevelFilter(logging.WARNING))
 
     logging.basicConfig(
-        format='{"logs": %(message)s, "thread": "%(thread)d"}',
+        format='%(message)s',
         level=os.getenv('LOGGING_LEVEL', 'INFO'),
         handlers=[info_handler, error_handler]
     )
@@ -42,5 +42,6 @@ def logging_config():
         context_class=dict,
     )
 
+# This is the old format out of JSON
 # format = '%(levelname)s | SDX-Worker | thread: %(thread)d | %(name)s: %('
 # 'message)s',

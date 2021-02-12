@@ -12,11 +12,11 @@ def send_receipt(survey_dict: dict) -> str:
     tx_id = survey_dict['tx_id']
     receipt_str = make_receipt(survey_dict)
     publish_data(receipt_str, tx_id)
-    print('Successfully Receipted')
+    logger.info('Successfully Receipted')
 
 
 def publish_data(receipt_str: str, tx_id: str) -> str:
-    print('publishing receipt')
+    logger.info('publishing receipt')
     data = receipt_str.encode("utf-8")
     future = receipt_publisher.publish(receipt_topic_path, data, tx_id=tx_id)
     return future.result()
