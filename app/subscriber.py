@@ -23,13 +23,11 @@ def callback(message):
         encrypted_message_str = message.data.decode('utf-8')
         process(encrypted_message_str)
         message.ack()
-        clear_contextvars()
 
     except RetryableError as r:
         logger.info("retryable error, nacking message")
         logger.error(str(r))
         message.nack()
-        clear_contextvars()
 
     except Exception as e:
         logger.info("quarantining message")
@@ -40,6 +38,8 @@ def callback(message):
             quarantine_message(message, tx_id)
         else:
             quarantine_submission(encrypted_message_str, tx_id)
+
+    finally:
         clear_contextvars()
 
 

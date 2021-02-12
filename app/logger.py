@@ -35,12 +35,8 @@ def logging_config():
         processors=[
             structlog.stdlib.add_log_level,
             structlog.stdlib.add_logger_name,
-            structlog.stdlib.PositionalArgumentsFormatter('tx_id'),
+            structlog.stdlib.PositionalArgumentsFormatter(),
             merge_contextvars,
             structlog.processors.JSONRenderer(),
         ],
     )
-
-# This is the old format out of JSON
-# format = '%(levelname)s | SDX-Worker | thread: %(thread)d | %(name)s: %('
-# 'message)s',
