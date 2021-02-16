@@ -1,30 +1,49 @@
-import logging
+import threading
+import structlog
+
 from concurrent.futures import TimeoutError
-
-from structlog import wrap_logger
-
+from structlog.contextvars import bind_contextvars, clear_contextvars
 from app import survey_subscriber, subscription_path
 from app.collect import process
 from app.errors import RetryableError
+from app.quarantine import quarantine_submission, quarantine_message
 
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger()
 
 
 def callback(message):
+    tx_id = None
+    encrypted_message_str = None
+
     try:
+        tx_id = message.attributes.get('tx_id')
+        bind_contextvars(app="SDX-Worker")
+        bind_contextvars(tx_id=tx_id)
+        bind_contextvars(thread=threading.currentThread().getName()[-1:])
         encrypted_message_str = message.data.decode('utf-8')
         process(encrypted_message_str)
         message.ack()
-    except RetryableError:
+
+    except RetryableError as r:
         logger.info("retryable error, nacking message")
+        logger.error(str(r))
         message.nack()
+
     except Exception as e:
-        logger.error(f"error {str(e)}, nacking message")
-        message.nack()
+        logger.info("quarantining message")
+        logger.error(str(e))
+        message.ack()
+        if encrypted_message_str is None:
+            logger.info("encrypted_message_str is none, quarantining message instead!")
+            quarantine_message(message, tx_id)
+        else:
+            quarantine_submission(encrypted_message_str, tx_id)
+
+    finally:
+        clear_contextvars()
 
 
 def start():
-
     streaming_pull_future = survey_subscriber.subscribe(subscription_path, callback=callback)
     print(f"Listening for messages on {subscription_path}..\n")
 

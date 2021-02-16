@@ -2,6 +2,7 @@ import json
 import logging
 
 import requests
+import structlog
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.exceptions import MaxRetryError
@@ -18,7 +19,7 @@ SUBMISSION_FILE = 'submission'
 TRANSFORMED_FILE = 'transformed'
 UTF8 = "utf-8"
 
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger()
 
 session = requests.Session()
 retries = Retry(total=5, backoff_factor=0.1)
@@ -35,6 +36,7 @@ def deliver_survey(survey_dict: dict, zip_file: bytes):
 
 
 def deliver_feedback(survey_dict: dict):
+    logger.info(f"Sending feedback")
     deliver(survey_dict, FEEDBACK)
 
 
