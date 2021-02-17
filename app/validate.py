@@ -98,7 +98,7 @@ def validate(survey_dict: dict) -> bool:
             if schema is None:
                 raise QuarantinableError("Unsupported schema version '%s'" % version)
             
-            logger.debug("Validating json against schema")
+            logger.info("Validating json against schema")
             schema(json_data)
 
             metadata = json_data.get("metadata")
@@ -109,19 +109,19 @@ def validate(survey_dict: dict) -> bool:
 
             survey_id = json_data.get("survey_id")
             if survey_id not in KNOWN_SURVEYS.get(version, {}):
-                bound_logger.debug("Survey id is not known", survey_id=survey_id)
+                bound_logger.error("Survey id is not known", survey_id=survey_id)
                 raise QuarantinableError(f"Unsupported survey '{survey_id}'")
 
             instrument_id = json_data.get("collection", {}).get("instrument_id")
             if instrument_id not in KNOWN_SURVEYS.get(version, {}).get(survey_id, []):
-                bound_logger.debug("Instrument ID is not known", survey_id=survey_id)
+                bound_logger.error("Instrument ID is not known", survey_id=survey_id)
                 raise QuarantinableError(f"Unsupported instrument '{instrument_id}'")
 
         else:
             schema = get_schema("feedback")
 
             bound_logger = logger.bind(response_type="feedback", tx_id=json_data.get("tx_id"))
-            bound_logger.debug("Validating json against schema")
+            bound_logger.info("Validating json against schema")
             schema(json_data)
 
         bound_logger.debug("Success")
