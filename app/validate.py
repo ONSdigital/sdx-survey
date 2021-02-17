@@ -48,6 +48,7 @@ KNOWN_SURVEYS = {
     },
 }
 
+
 # Parses a timestamp, throwing a value error
 # if unrecognised
 def Timestamp(value):
@@ -97,14 +98,14 @@ def validate(survey_dict: dict) -> bool:
             if schema is None:
                 raise QuarantinableError("Unsupported schema version '%s'" % version)
 
+            schema(json_data)
+
+            logger.debug("Validating json against schema")
             metadata = json_data.get("metadata")
             bound_logger = logger.bind(survey_id=json_data.get("survey_id"),
                                        tx_id=json_data.get("tx_id"),
                                        user_id=metadata.get("user_id"),
                                        ru_ref=metadata.get("ru_ref"))
-
-            bound_logger.debug("Validating json against schema")
-            schema(json_data)
 
             survey_id = json_data.get("survey_id")
             if survey_id not in KNOWN_SURVEYS.get(version, {}):
@@ -138,7 +139,6 @@ def validate(survey_dict: dict) -> bool:
 
 
 def get_schema(version):
-
     if version == "0.0.1":
         valid_survey_id = partial(ValidSurveyId, version="0.0.1")
 
