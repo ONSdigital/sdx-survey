@@ -29,15 +29,15 @@ def callback(message):
         logger.error(str(r))
         message.nack()
 
-    except Exception as e:
+    except Exception as error:
         logger.info("quarantining message")
-        logger.error(str(e))
+        logger.error(str(error))
         message.ack()
         if encrypted_message_str is None:
             logger.info("encrypted_message_str is none, quarantining message instead!")
-            quarantine_message(message, tx_id)
+            quarantine_message(message, tx_id, error)
         else:
-            quarantine_submission(encrypted_message_str, tx_id)
+            quarantine_submission(encrypted_message_str, tx_id, error)
 
     finally:
         clear_contextvars()
