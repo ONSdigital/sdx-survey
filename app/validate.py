@@ -1,13 +1,13 @@
 import structlog
 
 from functools import partial
+from structlog.contextvars import bind_contextvars, unbind_contextvars
 from voluptuous import Schema, Required, Length, All, MultipleInvalid, Optional
 from dateutil import parser
 from uuid import UUID
-
 from app.errors import QuarantinableError
 
-logger = structlog.get_logger()
+logger = structlog.get_logger('app.subscriber')
 
 KNOWN_SURVEYS = {
     "0.0.1": {
@@ -88,6 +88,9 @@ def validate(survey_dict: dict) -> bool:
     logger.info(f"Validating")
     try:
         json_data = survey_dict
+        if json_data.get('type') is None:
+            raise QuarantinableError('Missing type field')
+
         response_type = str(json_data["type"])
 
         if response_type.find("feedback") == -1:
@@ -97,44 +100,49 @@ def validate(survey_dict: dict) -> bool:
 
             if schema is None:
                 raise QuarantinableError("Unsupported schema version '%s'" % version)
-            
+
+            metadata = json_data.get("metadata")
+            if metadata is None:
+                raise QuarantinableError('Missing metadata field')
+            bind_contextvars(survey_id=json_data.get("survey_id"),
+                             user_id=metadata.get("user_id"),
+                             ru_ref=metadata.get("ru_ref"))
+
             logger.info("Validating json against schema")
             schema(json_data)
 
-            metadata = json_data.get("metadata")
-            bound_logger = logger.bind(survey_id=json_data.get("survey_id"),
-                                       tx_id=json_data.get("tx_id"),
-                                       user_id=metadata.get("user_id"),
-                                       ru_ref=metadata.get("ru_ref"))
-
             survey_id = json_data.get("survey_id")
             if survey_id not in KNOWN_SURVEYS.get(version, {}):
-                bound_logger.error("Survey id is not known", survey_id=survey_id)
+                logger.error("Survey id is not known", survey_id=survey_id)
                 raise QuarantinableError(f"Unsupported survey '{survey_id}'")
 
             instrument_id = json_data.get("collection", {}).get("instrument_id")
             if instrument_id not in KNOWN_SURVEYS.get(version, {}).get(survey_id, []):
-                bound_logger.error("Instrument ID is not known", survey_id=survey_id)
+                logger.error("Instrument ID is not known", survey_id=survey_id)
                 raise QuarantinableError(f"Unsupported instrument '{instrument_id}'")
 
         else:
             schema = get_schema("feedback")
 
-            bound_logger = logger.bind(response_type="feedback", tx_id=json_data.get("tx_id"))
-            bound_logger.info("Validating json against schema")
+            bind_contextvars(response_type="feedback")
+            logger.info("Validating json against schema")
             schema(json_data)
 
-        bound_logger.debug("Success")
+        logger.debug("Success")
 
     except (MultipleInvalid, KeyError, TypeError, ValueError) as e:
         logger.error("Client error", error=e)
-        raise QuarantinableError(str(e))
+        raise QuarantinableError(e)
 
     except Exception as e:
         logger.error("Server error", error=e)
         raise QuarantinableError(e)
 
     logger.info(f"Validation successful")
+    unbind_contextvars('survey_id',
+                       'response_type',
+                       'user_id',
+                       'ru_ref')
     return True
 
 

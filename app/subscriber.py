@@ -19,7 +19,7 @@ def callback(message):
         tx_id = message.attributes.get('tx_id')
         bind_contextvars(app="SDX-Worker")
         bind_contextvars(tx_id=tx_id)
-        bind_contextvars(thread=threading.currentThread().getName())
+        bind_contextvars(thread=threading.currentThread().getName().split('_')[1])
         encrypted_message_str = message.data.decode('utf-8')
         process(encrypted_message_str)
         message.ack()
