@@ -97,10 +97,10 @@ def validate(survey_dict: dict) -> bool:
 
             if schema is None:
                 raise QuarantinableError("Unsupported schema version '%s'" % version)
-
+            
+            logger.debug("Validating json against schema")
             schema(json_data)
 
-            logger.debug("Validating json against schema")
             metadata = json_data.get("metadata")
             bound_logger = logger.bind(survey_id=json_data.get("survey_id"),
                                        tx_id=json_data.get("tx_id"),
