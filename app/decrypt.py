@@ -1,18 +1,17 @@
 import binascii
-import logging
+import structlog
 import yaml
+
 from cryptography import exceptions
 from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
 from sdc.crypto.decrypter import decrypt as sdc_decrypt
-from structlog import wrap_logger
 from app import DECRYPT_SURVEY_KEY
-
-from app.errors import ClientError
+from app.errors import QuarantinableError
 
 KEY_PURPOSE_SUBMISSION = 'submission'
 
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger()
 
 
 def decrypt_survey(payload: str) -> dict:
@@ -21,9 +20,9 @@ def decrypt_survey(payload: str) -> dict:
     try:
         decrypt_key_yaml = yaml.safe_load(DECRYPT_SURVEY_KEY)
         key_store = KeyStore(decrypt_key_yaml)
-        decrypted_json = sdc_decrypt(payload, key_store, KEY_PURPOSE_SUBMISSION)
-        logger.info("survey successfully decrypted")
-        return decrypted_json
+        decrypted_dict = sdc_decrypt(payload, key_store, KEY_PURPOSE_SUBMISSION)
+        logger.info(f"Successfully decrypted")
+        return decrypted_dict
 
     except (
             exceptions.UnsupportedAlgorithm,
@@ -33,10 +32,10 @@ def decrypt_survey(payload: str) -> dict:
             exceptions.NotYetFinalized,
             exceptions.AlreadyUpdated):
 
-        raise ClientError("Decryption Failure")
+        raise QuarantinableError("Decryption Failure")
     except binascii.Error as e:
         logger.exception(e)
-        raise ClientError("Request payload was not base64 encoded")
+        raise QuarantinableError("Request payload was not base64 encoded")
     except InvalidTokenException as e:
         logger.exception(repr(e))
-        raise ClientError(e)
+        raise QuarantinableError(e)

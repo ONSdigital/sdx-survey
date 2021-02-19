@@ -1,14 +1,13 @@
-import logging
+import structlog
 
 from functools import partial
+from structlog.contextvars import bind_contextvars, unbind_contextvars
 from voluptuous import Schema, Required, Length, All, MultipleInvalid, Optional
-from structlog import wrap_logger
 from dateutil import parser
 from uuid import UUID
+from app.errors import QuarantinableError
 
-from app.errors import ClientError
-
-logger = wrap_logger(logging.getLogger(__name__))
+logger = structlog.get_logger('app.subscriber')
 
 KNOWN_SURVEYS = {
     "0.0.1": {
@@ -85,9 +84,11 @@ def ValidateListSurveyData(data):
 
 
 def validate(survey_dict: dict) -> bool:
-    logger.info("Validating survey")
+    logger.info(f"Validating")
     try:
         json_data = survey_dict
+        if json_data.get('type') is None:
+            raise QuarantinableError('Missing type field')
 
         response_type = str(json_data["type"])
 
@@ -97,50 +98,54 @@ def validate(survey_dict: dict) -> bool:
             schema = get_schema(version)
 
             if schema is None:
-                raise ClientError("Unsupported schema version '%s'" % version)
+                raise QuarantinableError("Unsupported schema version '%s'" % version)
 
             metadata = json_data.get("metadata")
-            bound_logger = logger.bind(survey_id=json_data.get("survey_id"),
-                                       tx_id=json_data.get("tx_id"),
-                                       user_id=metadata.get("user_id"),
-                                       ru_ref=metadata.get("ru_ref"))
+            if metadata is None:
+                raise QuarantinableError('Missing metadata field')
+            bind_contextvars(survey_id=json_data.get("survey_id"),
+                             user_id=metadata.get("user_id"),
+                             ru_ref=metadata.get("ru_ref"))
 
-            bound_logger.debug("Validating json against schema")
+            logger.info("Validating json against schema")
             schema(json_data)
 
             survey_id = json_data.get("survey_id")
             if survey_id not in KNOWN_SURVEYS.get(version, {}):
-                bound_logger.debug("Survey id is not known", survey_id=survey_id)
-                raise ClientError(f"Unsupported survey '{survey_id}'")
+                logger.error("Survey id is not known", survey_id=survey_id)
+                raise QuarantinableError(f"Unsupported survey '{survey_id}'")
 
             instrument_id = json_data.get("collection", {}).get("instrument_id")
             if instrument_id not in KNOWN_SURVEYS.get(version, {}).get(survey_id, []):
-                bound_logger.debug("Instrument ID is not known", survey_id=survey_id)
-                raise ClientError(f"Unsupported instrument '{instrument_id}'")
+                logger.error("Instrument ID is not known", survey_id=survey_id)
+                raise QuarantinableError(f"Unsupported instrument '{instrument_id}'")
 
         else:
             schema = get_schema("feedback")
 
-            bound_logger = logger.bind(response_type="feedback", tx_id=json_data.get("tx_id"))
-            bound_logger.debug("Validating json against schema")
+            bind_contextvars(response_type="feedback")
+            logger.info("Validating json against schema")
             schema(json_data)
 
-        bound_logger.debug("Success")
+        logger.debug("Success")
 
     except (MultipleInvalid, KeyError, TypeError, ValueError) as e:
         logger.error("Client error", error=e)
-        raise ClientError(str(e))
+        raise QuarantinableError(e)
 
     except Exception as e:
         logger.error("Server error", error=e)
-        raise ClientError(e)
+        raise QuarantinableError(e)
 
-    logger.info("Validation successful")
+    logger.info(f"Validation successful")
+    unbind_contextvars('survey_id',
+                       'response_type',
+                       'user_id',
+                       'ru_ref')
     return True
 
 
 def get_schema(version):
-
     if version == "0.0.1":
         valid_survey_id = partial(ValidSurveyId, version="0.0.1")
 
