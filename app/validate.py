@@ -48,7 +48,6 @@ KNOWN_SURVEYS = {
     },
 }
 
-
 # Parses a timestamp, throwing a value error
 # if unrecognised
 def Timestamp(value):

@@ -10,6 +10,7 @@ from app import datastore_client, ENCRYPT_COMMENT_KEY
 
 logger = structlog.get_logger()
 
+
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
