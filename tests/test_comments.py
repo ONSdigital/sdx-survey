@@ -1,8 +1,7 @@
-import json
 import unittest
 from unittest.mock import patch
 
-from app.comments import store_comments, get_comment, get_additional_comments, get_boxes_selected
+from app.comments import get_comment, get_additional_comments, get_boxes_selected
 
 
 class TestGetComments(unittest.TestCase):

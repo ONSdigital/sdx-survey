@@ -7,64 +7,47 @@ from app.secret_manager import get_secret
 
 logging_config()
 
-PROJECT_ID = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
-
-# connections
-TRANSFORM_SERVICE_URL = "sdx-transform:80"
-DELIVER_SERVICE_URL = "sdx-deliver:80"
-
-# pubsub config
-dap_topic_id = "dap-topic"
+project_id = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
+subscription_id = "survey-subscription"
 receipt_topic_id = "receipt-topic"
 quarantine_topic_id = "quarantine-topic"
-subscription_id = "survey-subscription"
-
-dap_publisher = None
-dap_topic_path = None
-
-receipt_publisher = None
-receipt_topic_path = None
-
-quarantine_publisher = None
-quarantine_topic_path = None
-
-survey_subscriber = None
-subscription_path = None
-
-# keys
-DECRYPT_SURVEY_KEY = None
-ENCRYPT_COMMENT_KEY = None
-
-datastore_client = None
 
 
-def load_config():
+class Config:
 
-    global DECRYPT_SURVEY_KEY
-    DECRYPT_SURVEY_KEY = get_secret(PROJECT_ID, 'sdx-worker-decrypt')
-    global ENCRYPT_COMMENT_KEY
-    ENCRYPT_COMMENT_KEY = get_secret(PROJECT_ID, 'sdx-comment-key')
+    def __init__(self, proj_id) -> None:
+        self.PROJECT_ID = proj_id
+        self.TRANSFORM_SERVICE_URL = "sdx-transform:80"
+        self.DELIVER_SERVICE_URL = "sdx-deliver:80"
+        self.DECRYPT_SURVEY_KEY = None
+        self.ENCRYPT_COMMENT_KEY = None
+        self.SURVEY_SUBSCRIBER = None
+        self.SURVEY_SUBSCRIPTION_PATH = None
+        self.RECEIPT_PUBLISHER = None
+        self.RECEIPT_TOPIC_PATH = None
+        self.QUARANTINE_PUBLISHER = None
+        self.QUARANTINE_TOPIC_PATH = None
+        self.DATASTORE_CLIENT = None
 
-    global dap_publisher
-    dap_publisher = pubsub_v1.PublisherClient()
-    global dap_topic_path
-    dap_topic_path = dap_publisher.topic_path(PROJECT_ID, dap_topic_id)
 
-    global receipt_publisher
-    receipt_publisher = pubsub_v1.PublisherClient()
-    global receipt_topic_path
-    receipt_topic_path = receipt_publisher.topic_path(PROJECT_ID, receipt_topic_id)
+CONFIG = Config(project_id)
 
-    global quarantine_publisher
-    quarantine_publisher = pubsub_v1.PublisherClient()
 
-    global quarantine_topic_path
-    quarantine_topic_path = quarantine_publisher.topic_path(PROJECT_ID, quarantine_topic_id)
+def cloud_config():
 
-    global survey_subscriber
+    CONFIG.DECRYPT_SURVEY_KEY = get_secret(project_id, 'sdx-worker-decrypt')
+    CONFIG.ENCRYPT_COMMENT_KEY = get_secret(project_id, 'sdx-comment-key')
+
     survey_subscriber = pubsub_v1.SubscriberClient()
-    global subscription_path
-    subscription_path = survey_subscriber.subscription_path(PROJECT_ID, subscription_id)
+    CONFIG.SURVEY_SUBSCRIPTION_PATH = survey_subscriber.subscription_path(project_id, subscription_id)
+    CONFIG.SURVEY_SUBSCRIBER = survey_subscriber
 
-    global datastore_client
-    datastore_client = datastore.Client(project=PROJECT_ID)
+    receipt_publisher = pubsub_v1.PublisherClient()
+    CONFIG.RECEIPT_TOPIC_PATH = receipt_publisher.topic_path(project_id, receipt_topic_id)
+    CONFIG.RECEIPT_PUBLISHER = receipt_publisher
+
+    quarantine_publisher = pubsub_v1.PublisherClient()
+    CONFIG.QUARANTINE_TOPIC_PATH = quarantine_publisher.topic_path(project_id, quarantine_topic_id)
+    CONFIG.QUARANTINE_PUBLISHER = quarantine_publisher
+
+    CONFIG.DATASTORE_CLIENT = datastore.Client(project=project_id)

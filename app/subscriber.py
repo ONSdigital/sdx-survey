@@ -3,7 +3,7 @@ import structlog
 
 from concurrent.futures import TimeoutError
 from structlog.contextvars import bind_contextvars, clear_contextvars
-from app import survey_subscriber, subscription_path
+from app import CONFIG
 from app.collect import process
 from app.errors import RetryableError
 from app.quarantine import quarantine_submission, quarantine_message
@@ -44,11 +44,11 @@ def callback(message):
 
 
 def start():
-    streaming_pull_future = survey_subscriber.subscribe(subscription_path, callback=callback)
-    print(f"Listening for messages on {subscription_path}..\n")
+    streaming_pull_future = CONFIG.SURVEY_SUBSCRIBER.subscribe(CONFIG.SURVEY_SUBSCRIPTION_PATH, callback=callback)
+    print(f"Listening for messages on {CONFIG.SURVEY_SUBSCRIPTION_PATH}..\n")
 
     # Wrap subscriber in a 'with' block to automatically call close() when done.
-    with survey_subscriber:
+    with CONFIG.SURVEY_SUBSCRIBER:
         try:
             # Result() will block indefinitely, unless an exception is encountered first.
             streaming_pull_future.result()

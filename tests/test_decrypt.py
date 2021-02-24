@@ -1,5 +1,7 @@
 import unittest
 import json
+from unittest.mock import patch
+
 import yaml
 from sdc.crypto.key_store import KeyStore
 from sdc.crypto.encrypter import encrypt
@@ -8,7 +10,7 @@ from app.decrypt import decrypt_survey
 
 
 def encrypt_survey(submission: dict) -> str:
-    with open("./tests/keys.yml") as file:
+    with open("test_encryption_keys.yaml") as file:
         secrets_from_file = yaml.safe_load(file)
     key_store = KeyStore(secrets_from_file)
     payload = encrypt(submission, key_store, 'submission')
@@ -17,7 +19,12 @@ def encrypt_survey(submission: dict) -> str:
 
 class TestDecrypt(unittest.TestCase):
 
-    def test_decrypt_survey(self):
+    @patch('app.decrypt.CONFIG')
+    def test_decrypt_survey(self, mock_config):
+
+        key_file = open("test_decryption_keys.yaml")
+        mock_config.DECRYPT_SURVEY_KEY = key_file
+
         message_dict = json.loads('''{
             "collection": {
                 "exercise_sid": "XxsteeWv",
@@ -54,4 +61,5 @@ class TestDecrypt(unittest.TestCase):
         }''')
         encrypted_message = encrypt_survey(message_dict)
         decrypted_message = decrypt_survey(encrypted_message)
+        key_file.close()
         self.assertEqual(decrypted_message, message_dict)

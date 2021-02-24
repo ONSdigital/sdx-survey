@@ -6,7 +6,7 @@ from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.exceptions import MaxRetryError
 
-from app import TRANSFORM_SERVICE_URL
+from app import CONFIG
 from app.errors import RetryableError, QuarantinableError
 
 logger = structlog.get_logger()
@@ -34,7 +34,7 @@ def transform(survey_dict: dict):
 
 
 def post(survey_json):
-    url = f"http://{TRANSFORM_SERVICE_URL}/transform"
+    url = f"http://{CONFIG.TRANSFORM_SERVICE_URL}/transform"
     logger.info(f"calling {url}")
     try:
         response = session.post(url, survey_json)
