@@ -18,7 +18,8 @@ jobs:
     - name: run tests
       run: |
         make test
-    - name: get coverage
+    - name: Build coverage file
       run: |
-        pip install codecov
-        codecov
+        pytest --cache-clear --cov=app test/ > pytest-coverage.txt
+    - name: Comment coverage
+      uses: coroo/pytest-coverage-commentator@v1.0.2
