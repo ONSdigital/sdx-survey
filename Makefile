@@ -5,6 +5,6 @@ start:
 	python run.py
 
 test:
-	pip install -r test_requirements.txt ; \
+	pip install -r test_requirements.txt
 	pytest --cov=app tests/
 
