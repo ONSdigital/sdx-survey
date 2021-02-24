@@ -1,5 +1,4 @@
 import json
-import logging
 
 import requests
 import structlog
@@ -8,9 +7,8 @@ from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.exceptions import MaxRetryError
 from requests.exceptions import ConnectionError
-from structlog import wrap_logger
 
-from app import DELIVER_SERVICE_URL
+from app import CONFIG
 from app.errors import QuarantinableError, RetryableError
 
 DAP = "dap"
@@ -58,7 +56,7 @@ def deliver(survey_dict: dict, output_type: str, files: dict = {}):
 
 
 def post(filename: str, files: dict, output_type: str):
-    url = f"http://{DELIVER_SERVICE_URL}/deliver/{output_type}"
+    url = f"http://{CONFIG.DELIVER_SERVICE_URL}/deliver/{output_type}"
     logger.info(f"calling {url}")
     try:
         response = session.post(url, params={"filename": filename}, files=files)

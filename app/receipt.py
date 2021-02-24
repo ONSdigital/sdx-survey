@@ -1,7 +1,7 @@
 import json
 import structlog
 
-from app import receipt_publisher, receipt_topic_path
+from app import CONFIG
 from app.errors import QuarantinableError
 
 logger = structlog.get_logger()
@@ -18,7 +18,7 @@ def send_receipt(survey_dict: dict) -> str:
 def publish_data(receipt_str: str, tx_id: str) -> str:
     logger.info('publishing receipt')
     data = receipt_str.encode("utf-8")
-    future = receipt_publisher.publish(receipt_topic_path, data, tx_id=tx_id)
+    future = CONFIG.RECEIPT_PUBLISHER.publish(CONFIG.RECEIPT_TOPIC_PATH, data, tx_id=tx_id)
     return future.result()
 
 

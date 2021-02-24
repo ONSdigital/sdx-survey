@@ -6,7 +6,7 @@ from string import ascii_lowercase
 from cryptography.fernet import Fernet
 from google.cloud import datastore
 
-from app import datastore_client, ENCRYPT_COMMENT_KEY
+from app import CONFIG
 
 logger = structlog.get_logger()
 
@@ -36,7 +36,7 @@ def store_comments(survey_dict: dict):
 def encrypt_comment(data: dict) -> str:
     logger.info('Encrypting comments')
     comment_str = json.dumps(data)
-    f = Fernet(ENCRYPT_COMMENT_KEY)
+    f = Fernet(CONFIG.ENCRYPT_COMMENT_KEY)
     token = f.encrypt(comment_str.encode())
     return token.decode()
 
@@ -114,7 +114,7 @@ class Comment:
 def commit_to_datastore(comment):
     try:
         logger.info('storing comments in Datastore')
-        entity_key = datastore_client.key('Comment', comment.transaction_id)
+        entity_key = CONFIG.DATASTORE_CLIENT.key('Comment', comment.transaction_id)
         entity = datastore.Entity(key=entity_key, exclude_from_indexes=exclude_from_index)
         entity.update(
             {

@@ -1,6 +1,7 @@
+from app import cloud_config
+
 if __name__ == '__main__':
-    print('Starting SDX Worker')
-    from app import load_config
-    load_config()
+    print('Starting sdx-survey')
+    cloud_config()
     from app import subscriber
     subscriber.start()

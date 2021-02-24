@@ -1,5 +1,5 @@
-from app.errors import ClientError
-from app.validate import validate, ValidSurveyId
+from app.errors import QuarantinableError
+from app.validate import validate, is_valid_survey_id
 
 import unittest
 import json
@@ -109,7 +109,7 @@ class TestValidateService(unittest.TestCase):
         return validate(data)
 
     def assertInvalid(self, data):
-        self.assertRaises(ClientError, self.validate_response, data)
+        self.assertRaises(QuarantinableError, self.validate_response, data)
 
     def assertValid(self, data):
         self.assertTrue(self.validate_response(data))
@@ -175,16 +175,16 @@ class TestValidateService(unittest.TestCase):
     def test_invalid_version(self):
         survey = json.loads(self.message['0.0.1'])
         with self.assertRaises(KeyError):
-            ValidSurveyId(survey['survey_id'], '0.0.3')
+            is_valid_survey_id(survey['survey_id'], '0.0.3')
 
     def test_missing_version(self):
         survey = json.loads(self.message['0.0.1'])
         with self.assertRaises(AttributeError):
-            ValidSurveyId(survey['survey_id'])
+            is_valid_survey_id(survey['survey_id'])
 
     def test_valid_version(self):
         survey = json.loads(self.message['0.0.1'])
-        ValidSurveyId(survey['survey_id'], survey['version'])
+        is_valid_survey_id(survey['survey_id'], survey['version'])
 
     def test_unknown_version_invalid(self):
         unknown_version = json.loads(self.message['0.0.1'])
@@ -289,7 +289,7 @@ class TestValidateService(unittest.TestCase):
     def test_string_data_invalid(self):
         data = "abcd"
 
-        self.assertRaises(ClientError, validate, data)
+        self.assertRaises(QuarantinableError, validate, data)
 
     def test_no_data(self):
         data = None

@@ -48,13 +48,14 @@ KNOWN_SURVEYS = {
     },
 }
 
+
 # Parses a timestamp, throwing a value error
 # if unrecognised
-def Timestamp(value):
+def parse_timestamp(value):
     return parser.parse(value)
 
 
-def ValidSurveyId(value, version=None):
+def is_valid_survey_id(value, version=None):
     if not version:
         raise AttributeError("No version number")
 
@@ -64,11 +65,11 @@ def ValidSurveyId(value, version=None):
 
 # Parses a UUID, throwing a value error
 # if unrecognised
-def ValidSurveyTxId(value):
+def is_valid_survey_txid(value):
     return UUID(value, version=4)
 
 
-def ValidSurveyData(data):
+def is_valid_survey_data(data):
     if isinstance(data, dict):
         for k, v in data.items():
             if not isinstance(k, str) or not isinstance(v, (str, list, int, float)):
@@ -78,7 +79,7 @@ def ValidSurveyData(data):
         raise ValueError("Invalid survey data")
 
 
-def ValidateListSurveyData(data):
+def is_valid_list_survey_data(data):
     if not isinstance(data, list):
         raise ValueError("Invalid survey data")
 
@@ -147,7 +148,7 @@ def validate(survey_dict: dict) -> bool:
 
 def get_schema(version):
     if version == "0.0.1":
-        valid_survey_id = partial(ValidSurveyId, version="0.0.1")
+        valid_survey_id = partial(is_valid_survey_id, version="0.0.1")
 
         collection_s = Schema(
             {
@@ -161,8 +162,8 @@ def get_schema(version):
             {
                 Required("user_id"): str,
                 Required("ru_ref"): All(str, Length(12)),
-                Optional("ref_period_start_date"): Timestamp,
-                Optional("ref_period_end_date"): Timestamp,
+                Optional("ref_period_start_date"): parse_timestamp,
+                Optional("ref_period_end_date"): parse_timestamp,
             }
         )
 
@@ -170,25 +171,25 @@ def get_schema(version):
             {
                 Required("type"): "uk.gov.ons.edc.eq:surveyresponse",
                 Required("version"): "0.0.1",
-                Optional("tx_id"): All(str, ValidSurveyTxId),
+                Optional("tx_id"): All(str, is_valid_survey_txid),
                 Required("origin"): "uk.gov.ons.edc.eq",
                 Required("survey_id"): All(str, valid_survey_id),
                 Optional("case_id"): str,
                 Optional("case_ref"): str,
                 Optional("completed"): bool,
                 Optional("flushed"): bool,
-                Optional("started_at"): Timestamp,
-                Required("submitted_at"): Timestamp,
+                Optional("started_at"): parse_timestamp,
+                Required("submitted_at"): parse_timestamp,
                 Required("collection"): collection_s,
                 Required("metadata"): metadata_s,
-                Required("data"): ValidSurveyData,
+                Required("data"): is_valid_survey_data,
                 Optional("paradata"): object,
             }
         )
         return schema
 
     elif version == "0.0.2":
-        valid_survey_id = partial(ValidSurveyId, version="0.0.2")
+        valid_survey_id = partial(is_valid_survey_id, version="0.0.2")
 
         collection_s = Schema(
             {
@@ -202,8 +203,8 @@ def get_schema(version):
             {
                 Required("user_id"): str,
                 Optional("ru_ref"): str,
-                Optional("ref_period_start_date"): Timestamp,
-                Optional("ref_period_end_date"): Timestamp,
+                Optional("ref_period_start_date"): parse_timestamp,
+                Optional("ref_period_end_date"): parse_timestamp,
             }
         )
 
@@ -211,18 +212,18 @@ def get_schema(version):
             {
                 Required("type"): "uk.gov.ons.edc.eq:surveyresponse",
                 Required("version"): "0.0.2",
-                Optional("tx_id"): All(str, ValidSurveyTxId),
+                Optional("tx_id"): All(str, is_valid_survey_txid),
                 Required("origin"): "uk.gov.ons.edc.eq",
                 Required("survey_id"): All(str, valid_survey_id),
                 Optional("completed"): bool,
                 Optional("flushed"): bool,
-                Optional("started_at"): Timestamp,
-                Required("submitted_at"): Timestamp,
+                Optional("started_at"): parse_timestamp,
+                Required("submitted_at"): parse_timestamp,
                 Required("case_id"): str,
                 Optional("case_ref"): str,
                 Required("collection"): collection_s,
                 Required("metadata"): metadata_s,
-                Required("data"): ValidateListSurveyData,
+                Required("data"): is_valid_list_survey_data,
                 Optional("paradata"): object,
             }
         )
@@ -241,16 +242,16 @@ def get_schema(version):
         schema = Schema(
             {
                 Required("type"): "uk.gov.ons.edc.eq:feedback",
-                Optional("tx_id"): All(str, ValidSurveyTxId),
+                Optional("tx_id"): All(str, is_valid_survey_txid),
                 Required("origin"): "uk.gov.ons.edc.eq",
                 Required("survey_id"): str,
                 Required("version"): str,
                 Optional("completed"): bool,
                 Optional("flushed"): bool,
-                Optional("started_at"): Timestamp,
-                Required("submitted_at"): Timestamp,
+                Optional("started_at"): parse_timestamp,
+                Required("submitted_at"): parse_timestamp,
                 Required("collection"): collection_s,
-                Required("data"): ValidSurveyData,
+                Required("data"): is_valid_survey_data,
                 Optional("metadata"): object,
                 Optional("paradata"): object,
             }
