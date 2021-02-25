@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdx-survey
+  labels:
+    app: sdx-survey
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdx-survey
+  template:
+    metadata:
+      labels:
+        app: sdx-survey
+    spec:
+      containers:
+      - image: eu.gcr.io/{{ .Values.project_id }}/sdx-survey:{{.Chart.appVersion}}
+        imagePullPolicy: Always
+        name: sdx-survey
+        env:
+          - name: PROJECT_ID
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: project_id
+          - name: LOGGING_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: logging_level
+      serviceAccountName: sdx-workload-identity
+
