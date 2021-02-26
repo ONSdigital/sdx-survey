@@ -15,7 +15,7 @@ spec:
         app: sdx-survey
     spec:
       containers:
-      - image: eu.gcr.io/{{ .Values.project_id }}/sdx-survey:{{.Chart.appVersion}}
+      - image: eu.gcr.io/{{ .Values.project_id }}/sdx-survey:{{ .Chart.appVersion }}
         imagePullPolicy: Always
         name: sdx-survey
         env:
