@@ -30,4 +30,3 @@ spec:
                 name: config
                 key: logging_level
       serviceAccountName: sdx-workload-identity
-
