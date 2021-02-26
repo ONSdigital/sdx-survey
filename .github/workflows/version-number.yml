@@ -28,7 +28,7 @@ jobs:
       id: chart-main
       uses: jacobtomlinson/gha-read-helm-chart@master
       with:
-        path: ./_helm/sdx-seft
+        path: ./_helm/sdx-survey
     - name: Print outputs
       run: echo ${{ steps.chart-main.outputs.version }}
     - name: Compare appVersion
