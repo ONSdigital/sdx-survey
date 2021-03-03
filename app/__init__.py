@@ -10,7 +10,7 @@ logging_config()
 project_id = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
 subscription_id = "survey-subscription"
 receipt_topic_id = "receipt-topic"
-quarantine_topic_id = "quarantine-topic"
+quarantine_topic_id = "quarantine-survey-topic"
 
 
 class Config:
