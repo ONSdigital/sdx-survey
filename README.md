@@ -3,17 +3,17 @@
 [![Build Status](https://github.com/ONSdigital/sdx-survey/workflows/Build/badge.svg)](https://github.com/ONSdigital/sdx-survey) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0d8f1899b0054322b9d0ec8f2bd62d86)](https://www.codacy.com/app/ons-sdc/sdx-survey?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ONSdigital/sdx-survey&amp;utm_campaign=Badge_Grade) [![codecov](https://codecov.io/gh/ONSdigital/sdx-survey/branch/main/graph/badge.svg)](https://codecov.io/gh/ONSdigital/sdx-survey)
 
 The SDX-Survey service is used within the Office National of Statistics (ONS) for managing survey submissions in JSON
-format. Surveys coming from EQ require validation and additional processing depending on their destination downstream.
+format. These submissions come from EQ and require validation and additional processing depending on their destination downstream.
 
 ## Process
 
-The sdx-survey microservice receives survey submissions via a PubSub subscription: `survey-subscription`. Once received, 
+The sdx-survey microservice receives JSON submissions via a PubSub subscription: `survey-subscription`. Once received, 
 data is decrypted and validated using PGP and voluptuous respectively. If a survey fails either step it is published to
 the quarantine PubSub topic: `quarantine-survey-topic`. 
 
-Checks are then made on the survey type; if `type: surveyresponse`, comments are extracted and stored via GCP Datastore and 
-surveys requiring transformation are sent to SDX-Transform via HTTP. Once transformed, the data is sent to SDX-Deliver
-via `<HTTP Post>` request and a receipt is published to PubSub: `receipt-topic`, notifying Ras-Rm that the data has been
+Checks are then made on the survey type; if `type: surveyresponse`, comments are extracted and stored via GCP Datastore. Additionally 
+surveys requiring transformation are sent to SDX-Transform via `<HTTP Post>`. Once transformed, the data is sent to SDX-Deliver
+via `<HTTP Post>` and a receipt is published to PubSub: `receipt-topic`. This receipt notifies Ras-Rm that the data has been
 successfully processed. For feedback submissions: `type: feedback`, no additional processing is required and the 
 `deliver/feedback` endpoint on sdx-deliver is called after decryption and validation.
 
@@ -39,7 +39,7 @@ $ make start
 
 ## GCP
 
-#### Pubsub
+### Pubsub
 
 SDX-Survey receives message from `survey-subscription`. This message contains the encrypted JSON and `tx_id`
 
@@ -89,7 +89,21 @@ data : {
 }       
 ```
 
-#### Datastore
+SDX-Survey publishes to `quarantine-survey-submission`. The original message from `survey-submission` 
+is published in addition to the error/validation message 
+
+```code
+Message {
+  data: b'eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJraW...'
+  ordering_key: ''
+  attributes: {
+    "error": "required key not provided @ data['data']",
+    "tx_id": "a79160b5-67de-460c-bda3-cc54b97c7c50"
+  }
+```
+
+
+### Datastore
 Survey writes comments into GCP Datastore under the **'Comments'** entity.
 
 | Attribute       | Description                  | Example
@@ -101,7 +115,7 @@ Survey writes comments into GCP Datastore under the **'Comments'** entity.
 | survey_id       | Survey ID                    | `survey_id: 017`
 
 
-#### Secret Manager
+### Secret Manager
 The `sdx-survey-decrypt` and `sdx-comment-key` are managed by Google Secret Manager. A single API call is made on program startup
 and each are stored in `DECRYPT_SURVEY_KEY` and `ENCRYPT_COMMENT_KEY` respectively.
 
