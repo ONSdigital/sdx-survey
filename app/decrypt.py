@@ -18,8 +18,7 @@ def decrypt_survey(payload: str) -> dict:
     logger.info("Decrypting survey")
 
     try:
-        decrypt_key_yaml = yaml.safe_load(CONFIG.DECRYPT_SURVEY_KEY)
-        key_store = KeyStore(decrypt_key_yaml)
+        key_store = load_keys(CONFIG.DECRYPT_SURVEY_KEY, CONFIG.AUTHENTICATE_SURVEY_KEY)
         decrypted_dict = sdc_decrypt(payload, key_store, KEY_PURPOSE_SUBMISSION)
         logger.info("Successfully decrypted")
         return decrypted_dict
@@ -39,3 +38,11 @@ def decrypt_survey(payload: str) -> dict:
     except InvalidTokenException as e:
         logger.exception(repr(e))
         raise QuarantinableError(e)
+
+
+def load_keys(*keys) -> KeyStore:
+    key_dict = {}
+    for k in keys:
+        key = yaml.safe_load(k)
+        key_dict[key['keyid']] = key
+    return KeyStore({"keys": key_dict})
