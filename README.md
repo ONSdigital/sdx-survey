@@ -8,12 +8,12 @@ format. These submissions come from EQ and require validation and additional pro
 ## Process
 
 The sdx-survey microservice receives JSON submissions via a PubSub subscription: `survey-subscription`. Once received, 
-data is decrypted and validated using PGP and voluptuous respectively. If a survey fails it is published to
+data is decrypted using GPG and validated. If a survey fails it is published to
 the quarantine PubSub topic: `quarantine-survey-topic`. 
 
 Checks are then made on the survey type; if `type: surveyresponse`, comments are extracted and stored via GCP Datastore. Additionally 
 surveys requiring transformation are sent to SDX-Transform via `<HTTP Post>`. Once transformed, the data is sent to SDX-Deliver
-via `<HTTP Post>` and a receipt is published to PubSub: `receipt-topic`. This receipt notifies Ras-Rm that the data has been
+via `<HTTP Post>` and a receipt is published to PubSub: `receipt-topic`. This receipt notifies RASRM that the data has been
 successfully processed. For feedback submissions: `type: feedback`, no additional processing is required and the 
 `deliver/feedback` endpoint on sdx-deliver is called after decryption and validation.
 
