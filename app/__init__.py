@@ -37,6 +37,7 @@ def cloud_config():
 
     CONFIG.DECRYPT_SURVEY_KEY = get_secret(project_id, 'sdx-private-jwt')
     CONFIG.AUTHENTICATE_SURVEY_KEY = get_secret(project_id, 'eq-public-signing')
+    CONFIG.ENCRYPT_COMMENT_KEY = get_secret(project_id, 'sdx-comment-key')
 
     survey_subscriber = pubsub_v1.SubscriberClient()
     CONFIG.SURVEY_SUBSCRIPTION_PATH = survey_subscriber.subscription_path(project_id, subscription_id)
