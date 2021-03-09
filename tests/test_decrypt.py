@@ -2,18 +2,17 @@ import unittest
 import json
 from unittest.mock import patch
 
-import yaml
-from sdc.crypto.key_store import KeyStore
 from sdc.crypto.encrypter import encrypt
-
-from app.decrypt import decrypt_survey
+from app.decrypt import decrypt_survey, load_keys
 
 
 def encrypt_survey(submission: dict) -> str:
-    with open("test_encryption_keys.yaml") as file:
-        secrets_from_file = yaml.safe_load(file)
-    key_store = KeyStore(secrets_from_file)
+    key1 = open("test_sdx-public-jwt.yaml")
+    key2 = open("test_eq-private-signing.yaml")
+    key_store = load_keys(key1, key2)
     payload = encrypt(submission, key_store, 'submission')
+    key1.close()
+    key2.close()
     return payload
 
 
@@ -22,8 +21,11 @@ class TestDecrypt(unittest.TestCase):
     @patch('app.decrypt.CONFIG')
     def test_decrypt_survey(self, mock_config):
 
-        key_file = open("test_decryption_keys.yaml")
-        mock_config.DECRYPT_SURVEY_KEY = key_file
+        key_file1 = open("test_sdx-private-jwt.yaml")
+        mock_config.DECRYPT_SURVEY_KEY = key_file1
+
+        key_file2 = open("test_eq-public-signing.yaml")
+        mock_config.AUTHENTICATE_SURVEY_KEY = key_file2
 
         message_dict = json.loads('''{
             "collection": {
@@ -61,5 +63,6 @@ class TestDecrypt(unittest.TestCase):
         }''')
         encrypted_message = encrypt_survey(message_dict)
         decrypted_message = decrypt_survey(encrypted_message)
-        key_file.close()
+        key_file1.close()
+        key_file2.close()
         self.assertEqual(decrypted_message, message_dict)
