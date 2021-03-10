@@ -15,18 +15,18 @@ DAP_SURVEYS = ["023", "134", "147", "281", "283", "lms", "census"]
 
 def process(encrypted_message_str: str):
 
-    logger.info("processing message")
+    logger.info("Processing message")
     survey_dict = decrypt_survey(encrypted_message_str)
 
     valid = validate(survey_dict)
     if not valid:
-        raise QuarantinableError(f"Invalid survey")
+        logger.error("Validation failed, quarantining survey")
+        raise QuarantinableError("Invalid survey")
 
     if is_feedback(survey_dict):
         deliver_feedback(survey_dict)
 
     else:
-
         store_comments(survey_dict)
 
         if survey_dict['survey_id'] not in DAP_SURVEYS:
@@ -39,6 +39,6 @@ def process(encrypted_message_str: str):
 
 
 def is_feedback(data: dict) -> bool:
-    logger.info(f"Checking for feedback")
+    logger.info("Checking for feedback")
     submission_type = data["type"]
     return "feedback" in submission_type

@@ -15,12 +15,12 @@ logger = structlog.get_logger()
 
 
 def decrypt_survey(payload: str) -> dict:
-    logger.info("decrypting survey")
+    logger.info("Decrypting survey")
 
     try:
         key_store = load_keys(CONFIG.DECRYPT_SURVEY_KEY, CONFIG.AUTHENTICATE_SURVEY_KEY)
         decrypted_dict = sdc_decrypt(payload, key_store, KEY_PURPOSE_SUBMISSION)
-        logger.info(f"Successfully decrypted")
+        logger.info("Successfully decrypted")
         return decrypted_dict
 
     except (

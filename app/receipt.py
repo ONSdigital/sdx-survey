@@ -8,7 +8,7 @@ logger = structlog.get_logger()
 
 
 def send_receipt(survey_dict: dict) -> str:
-    logger.info("receipting...")
+    logger.info("Receipting...")
     tx_id = survey_dict['tx_id']
     receipt_str = make_receipt(survey_dict)
     publish_data(receipt_str, tx_id)
@@ -16,7 +16,7 @@ def send_receipt(survey_dict: dict) -> str:
 
 
 def publish_data(receipt_str: str, tx_id: str) -> str:
-    logger.info('publishing receipt')
+    logger.info('Publishing receipt')
     data = receipt_str.encode("utf-8")
     future = CONFIG.RECEIPT_PUBLISHER.publish(CONFIG.RECEIPT_TOPIC_PATH, data, tx_id=tx_id)
     return future.result()
