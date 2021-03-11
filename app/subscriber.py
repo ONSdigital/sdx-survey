@@ -25,13 +25,10 @@ def callback(message):
         message.ack()
 
     except RetryableError as r:
-        logger.info("retryable error, nacking message")
-        logger.error(str(r))
+        logger.error("Retryable error, nacking message", error=str(r))
         message.nack()
 
     except Exception as error:
-        logger.info("quarantining message")
-        logger.error(str(error))
         message.ack()
         if encrypted_message_str is None:
             logger.info("encrypted_message_str is none, quarantining message instead!")
@@ -45,7 +42,7 @@ def callback(message):
 
 def start():
     streaming_pull_future = CONFIG.SURVEY_SUBSCRIBER.subscribe(CONFIG.SURVEY_SUBSCRIPTION_PATH, callback=callback)
-    print(f"Listening for messages on {CONFIG.SURVEY_SUBSCRIPTION_PATH}..\n")
+    logger.info(f"Listening for messages on {CONFIG.SURVEY_SUBSCRIPTION_PATH}..\n")
 
     # Wrap subscriber in a 'with' block to automatically call close() when done.
     with CONFIG.SURVEY_SUBSCRIBER:

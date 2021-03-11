@@ -26,38 +26,41 @@ session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
 def deliver_dap(survey_dict: dict):
+    logger.info("Sending DAP submission")
     deliver(survey_dict, DAP)
 
 
 def deliver_survey(survey_dict: dict, zip_file: bytes):
+    logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
     deliver(survey_dict, LEGACY, files)
 
 
 def deliver_feedback(survey_dict: dict):
-    logger.info(f"Sending feedback")
+    logger.info(f"Sending feedback submission")
     deliver(survey_dict, FEEDBACK)
 
 
 def deliver(survey_dict: dict, output_type: str, files: dict = {}):
     files[SUBMISSION_FILE] = json.dumps(survey_dict).encode(UTF8)
     response = post(survey_dict['tx_id'], files, output_type)
+    status_code = response.status_code
 
-    if response.status_code == 200:
+    if status_code == 200:
         return True
-    elif 400 <= response.status_code < 500:
+    elif 400 <= status_code < 500:
         msg = "Bad Request response from sdx-deliver"
-        logger.info(msg)
+        logger.error(msg, status_code=status_code)
         raise QuarantinableError(msg)
     else:
         msg = "Bad response from sdx-deliver"
-        logger.info(msg)
+        logger.error(msg, status_code=status_code)
         raise RetryableError(msg)
 
 
 def post(filename: str, files: dict, output_type: str):
     url = f"http://{CONFIG.DELIVER_SERVICE_URL}/deliver/{output_type}"
-    logger.info(f"calling {url}")
+    logger.info(f"Calling {url}")
     try:
         response = session.post(url, params={"filename": filename}, files=files)
     except MaxRetryError:
