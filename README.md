@@ -88,6 +88,7 @@ data : {
     "version": "0.0.1"
 }       
 ```
+
     
 **Quarantine Message**
 
@@ -103,6 +104,7 @@ Message {
     "tx_id": "a79160b5-67de-460c-bda3-cc54b97c7c50"
   }
 ```
+
 
 **RAS-RM Receipt:**
 ```
@@ -128,6 +130,7 @@ Data Field (Converted to JSON):
 	}
 }
 ```
+
 ### Datastore
 Survey writes comments into GCP Datastore under the **'Comments'** entity.
 
@@ -141,8 +144,10 @@ Survey writes comments into GCP Datastore under the **'Comments'** entity.
 
 
 ### Secret Manager
+
 The `sdx-private-jwt`,  `sdx-comment-key` and `eq-public-signing` are managed by Google Secret Manager. A single API call is made on program startup
 and each are stored in `DECRYPT_SURVEY_KEY`, `ENCRYPT_COMMENT_KEY` and `AUTHENTICATE_SURVEY_KEY` respectively.
+
 
 ## License
 
