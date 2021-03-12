@@ -88,6 +88,8 @@ data : {
     "version": "0.0.1"
 }       
 ```
+    
+**Quarantine Message**
 
 SDX-Survey publishes to `quarantine-survey-submission`. The original message from `survey-submission` 
 is published in addition to the error/validation message 
@@ -102,7 +104,30 @@ Message {
   }
 ```
 
-
+**RAS-RM Receipt:**
+```
+receipt: Message {
+  data: b'{"case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3"...'
+  ordering_key: ''
+  attributes: {
+    "tx_id": "62a18c14-5ff8-4047-8f30-7e8292df87ff"
+  }
+}
+```
+Data Field (Converted to JSON):
+```json
+{
+	"case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3",
+	"tx_id": "73d06855-7885-49a1-b13f-5b516bc2b9fd",
+	"collection": {
+		"exercise_sid": "hfjdskf"
+	},
+	"metadata": {
+		"ru_ref": "12345678901A",
+		"user_id": "789473423"
+	}
+}
+```
 ### Datastore
 Survey writes comments into GCP Datastore under the **'Comments'** entity.
 
@@ -116,8 +141,8 @@ Survey writes comments into GCP Datastore under the **'Comments'** entity.
 
 
 ### Secret Manager
-The `sdx-survey-decrypt` and `sdx-comment-key` are managed by Google Secret Manager. A single API call is made on program startup
-and each are stored in `DECRYPT_SURVEY_KEY` and `ENCRYPT_COMMENT_KEY` respectively.
+The `sdx-private-jwt`,  `sdx-comment-key` and `eq-public-signing` are managed by Google Secret Manager. A single API call is made on program startup
+and each are stored in `DECRYPT_SURVEY_KEY`, `ENCRYPT_COMMENT_KEY` and `AUTHENTICATE_SURVEY_KEY` respectively.
 
 ## License
 
