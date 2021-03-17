@@ -15,7 +15,6 @@ exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
 def store_comments(survey_dict: dict):
-    logger.info(f"Starting comment process")
     transaction_id = survey_dict["tx_id"]
     period = survey_dict["collection"]["period"]
     survey_id = survey_dict["survey_id"]
@@ -55,12 +54,12 @@ def get_comment(submission: dict) -> list:
 
 
 def extract_comment(submission, qcode):
-    logger.info('extracting comments')
+    logger.info('Extracting comments')
     return submission['data'].get(qcode)
 
 
 def get_additional_comments(submission):
-    logger.info('getting additional comments')
+    logger.info('Getting additional comments')
     comments_list = []
     if submission['survey_id'] == '134':
         if '300w' in submission['data']:
@@ -77,12 +76,12 @@ def get_additional_comments(submission):
 
 
 def get_additional(submission, qcode):
-    logger.info('getting additional')
+    logger.info('Getting additional')
     return {'qcode': qcode, "comment": submission['data'].get(qcode)}
 
 
 def get_boxes_selected(submission):
-    logger.info('getting all the selected boxes')
+    logger.info('Getting all the selected boxes')
     boxes_selected = ''
     if submission['survey_id'] == '134':
         checkboxes = ['91w', '92w1', '92w2', '94w1', '94w2', '95w', '96w', '97w',
@@ -113,7 +112,7 @@ class Comment:
 
 def commit_to_datastore(comment):
     try:
-        logger.info('storing comments in Datastore')
+        logger.info('Storing comments in Datastore')
         entity_key = CONFIG.DATASTORE_CLIENT.key('Comment', comment.transaction_id)
         entity = datastore.Entity(key=entity_key, exclude_from_indexes=exclude_from_index)
         entity.update(
