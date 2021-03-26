@@ -5,6 +5,7 @@ from datetime import datetime
 from string import ascii_lowercase
 from cryptography.fernet import Fernet
 from google.cloud import datastore
+from structlog.contextvars import bind_contextvars
 
 from app import CONFIG
 
@@ -22,6 +23,7 @@ def store_comments(survey_dict: dict):
             "boxes_selected": get_boxes_selected(survey_dict),
             "comment": get_comment(survey_dict),
             "additional": get_additional_comments(survey_dict)}
+    bind_contextvars(survey_id=survey_id)
     encrypted_data = encrypt_comment(data)
 
     comment = Comment(transaction_id=transaction_id,

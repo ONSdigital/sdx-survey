@@ -53,11 +53,11 @@ def deliver(survey_dict: dict, output_type: str, files: dict = {}):
         return True
     elif 400 <= status_code < 500:
         msg = "Bad Request response from sdx-deliver"
-        logger.error(msg, status_code=status_code)
+        logger.error(msg, status_code=status_code, survey_id=survey_id)
         raise QuarantinableError(msg)
     else:
         msg = "Bad response from sdx-deliver"
-        logger.error(msg, status_code=status_code)
+        logger.error(msg, status_code=status_code, survey_id=survey_id)
         raise RetryableError(msg)
 
 
