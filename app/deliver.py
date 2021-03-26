@@ -7,6 +7,7 @@ from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.exceptions import MaxRetryError
 from requests.exceptions import ConnectionError
+from structlog.contextvars import bind_contextvars
 
 from app import CONFIG
 from app.errors import QuarantinableError, RetryableError
@@ -42,9 +43,11 @@ def deliver_feedback(survey_dict: dict):
 
 
 def deliver(survey_dict: dict, output_type: str, files: dict = {}):
+    survey_id=survey_dict('survey_id')
     files[SUBMISSION_FILE] = json.dumps(survey_dict).encode(UTF8)
     response = post(survey_dict['tx_id'], files, output_type)
     status_code = response.status_code
+    bind_contextvars(survey_id=survey_id)
 
     if status_code == 200:
         return True
