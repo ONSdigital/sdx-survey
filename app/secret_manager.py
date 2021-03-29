@@ -5,6 +5,13 @@ logger = structlog.get_logger()
 
 
 def get_secret(project_id, secret_id):
+    """
+    This
+
+    :param project_id:
+    :param secret_id:
+    :return: Secret stored in GCP
+    """
     version_id = 'latest'
 
     logger.info("Getting secrets from Secret Manager")
