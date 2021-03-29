@@ -10,7 +10,6 @@ from app import CONFIG
 
 logger = structlog.get_logger()
 
-
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
@@ -22,6 +21,7 @@ def store_comments(survey_dict: dict):
             "boxes_selected": get_boxes_selected(survey_dict),
             "comment": get_comment(survey_dict),
             "additional": get_additional_comments(survey_dict)}
+
     encrypted_data = encrypt_comment(data)
 
     comment = Comment(transaction_id=transaction_id,

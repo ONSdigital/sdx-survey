@@ -20,7 +20,7 @@ class Config:
         self.TRANSFORM_SERVICE_URL = "sdx-transform:80"
         self.DELIVER_SERVICE_URL = "sdx-deliver:80"
         self.DECRYPT_SURVEY_KEY = None
-        self.ENCRYPT_COMMENT_KEY = None
+        self.ENCRYPT_COMMENT_KEY = "E3rjFT2i9ALcvc99Pe3YqjIGrzm3LdMsCXc8nUaOEbc="
         self.SURVEY_SUBSCRIBER = None
         self.SURVEY_SUBSCRIPTION_PATH = None
         self.RECEIPT_PUBLISHER = None
@@ -34,6 +34,10 @@ CONFIG = Config(project_id)
 
 
 def cloud_config():
+    """
+    The cloud_config method gives us a way of unit-testing various parts of our code without making GCP Connections.
+    Thus preventing various errors when GitHub actions runs all tests. For example: Permission Denied error
+    """
 
     CONFIG.DECRYPT_SURVEY_KEY = get_secret(project_id, 'sdx-private-jwt')
     CONFIG.AUTHENTICATE_SURVEY_KEY = get_secret(project_id, 'eq-public-signing')

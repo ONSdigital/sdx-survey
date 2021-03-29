@@ -3,6 +3,7 @@ import structlog
 
 logger = structlog.get_logger()
 
+
 def quarantine_submission(data_str: str, tx_id: str, error):
     logger.error("Quarantining submission")
     data = data_str.encode("utf-8")

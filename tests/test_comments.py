@@ -1,7 +1,12 @@
+import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
-from app.comments import get_comment, get_additional_comments, get_boxes_selected
+from cryptography.fernet import Fernet
+
+from app import CONFIG
+from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, Comment, \
+    commit_to_datastore
 
 
 class TestGetComments(unittest.TestCase):
@@ -88,3 +93,24 @@ class TestGetComments(unittest.TestCase):
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
         self.assertEqual(get_boxes_selected(test_data), "")
+
+    def test_store_comments(self):
+        test_data = {'additional': [{'comment': 'Pipe mania', 'qcode': '300w'},
+                                    {'comment': 'Gas leak', 'qcode': '300f'},
+                                    {'comment': 'copper pipe', 'qcode': '300m'},
+                                    {'comment': 'solder joint', 'qcode': '300w4'},
+                                    {'comment': 'drill hole', 'qcode': '300w5'}],
+                     'boxes_selected': '91w, 95w, 96w, 97w, 91f, 95f, 96f, 97f, 191m, 195m, 196m, '
+                                       '197m, 191w4, 195w4, 196w4, 197w4, 191w5, 195w5, 196w5, '
+                                       '197w5, ',
+                     'comment': 'flux clean',
+                     'ru_ref': '12346789012A'
+                     }
+        encrypted_data = encrypt_comment(test_data)
+        self.assertEqual(decrypt_comment(encrypted_data), test_data)
+
+
+def decrypt_comment(comment_token: str) -> dict:
+    f = Fernet(CONFIG.ENCRYPT_COMMENT_KEY)
+    comment_bytes = f.decrypt(comment_token.encode())
+    return json.loads(comment_bytes.decode())
