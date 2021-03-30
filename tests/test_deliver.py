@@ -1,8 +1,8 @@
 import unittest
-from unittest import mock
+from unittest.mock import patch
 
 import pytest
-
+from requests import Session
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver
 from app.errors import QuarantinableError, RetryableError
 
@@ -41,30 +41,35 @@ class TestCollect(unittest.TestCase):
 
     test_bytes = b'bytes'
 
-    @mock.patch('app.deliver.post')
+    @patch.object(Session, 'post')
     def test_post_feedback_200(self, mock_post):
         mock_post.return_value.status_code = 200
         deliver_feedback(self.test_survey)
+        mock_post.assert_called()
 
-    @mock.patch('app.deliver.post')
+    @patch.object(Session, 'post')
     def test_post_survey_200(self, mock_post):
         mock_post.return_value.status_code = 200
         deliver_survey(self.test_survey, self.test_bytes)
+        mock_post.assert_called()
 
-    @mock.patch('app.deliver.post')
+    @patch.object(Session, 'post')
     def test_post_dap_200(self, mock_post):
         mock_post.return_value.status_code = 200
         deliver_dap(self.test_survey)
+        mock_post.assert_called()
 
-    @mock.patch('app.deliver.post')
+    @patch.object(Session, 'post')
     def test_400_response(self, mock_post):
         with pytest.raises(QuarantinableError):
             mock_post.return_value.status_code = 400
             assert deliver(self.test_survey, 'feedback')
+            mock_post.assert_called()
 
-    @mock.patch('app.deliver.post')
+    @patch.object(Session, 'post')
     def test_300_response(self, mock_post):
         with pytest.raises(RetryableError):
             mock_post.return_value.status_code = 300
             assert deliver(self.test_survey, 'feedback')
+            mock_post.assert_called()
 
