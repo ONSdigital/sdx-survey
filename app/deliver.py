@@ -43,7 +43,7 @@ def deliver_feedback(survey_dict: dict):
 
 
 def deliver(survey_dict: dict, output_type: str, files: dict = {}):
-    survey_id = survey_dict('survey_id')
+    survey_id = survey_dict['survey_id']
     files[SUBMISSION_FILE] = json.dumps(survey_dict).encode(UTF8)
     response = post(survey_dict['tx_id'], files, output_type)
     status_code = response.status_code
