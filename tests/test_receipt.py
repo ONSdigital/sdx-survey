@@ -2,6 +2,7 @@ import json
 import unittest
 from unittest import mock
 
+from app.deliver import deliver_feedback
 from app.receipt import make_receipt, send_receipt
 
 
@@ -34,4 +35,3 @@ class TestCollect(unittest.TestCase):
     @mock.patch('app.receipt.publish_data')
     def test_send_receipt_good(self, mock_publish):
         send_receipt(self.test_data)
-
