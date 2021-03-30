@@ -6,11 +6,7 @@ logger = structlog.get_logger()
 
 def get_secret(project_id, secret_id):
     """
-    This
-
-    :param project_id:
-    :param secret_id:
-    :return: Secret stored in GCP
+    SDX's secrets are managed by Google Secret Manager. This method makes a call on program startup to retrieve these.
     """
     version_id = 'latest'
 

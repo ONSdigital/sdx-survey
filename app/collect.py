@@ -15,8 +15,7 @@ DAP_SURVEYS = ["023", "134", "147", "281", "283", "lms", "census"]
 
 def process(encrypted_message_str: str):
     """
-    The process method bring together the main functionality of SDX-Survey. It validates, checks if the submission is
-    of type feedback,
+    The process method brings together the main functionality of SDX-Survey.
     """
     logger.info("Processing message")
     survey_dict = decrypt_survey(encrypted_message_str)
