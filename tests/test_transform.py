@@ -1,11 +1,14 @@
 import unittest
 import os
 import json
+from unittest.mock import patch
+
+import pytest
 import requests
 from zipfile import ZipFile
 from unittest import mock
 from app.errors import QuarantinableError, RetryableError
-
+from requests import Session
 from app import transform
 
 
@@ -177,3 +180,9 @@ class TestTransform(unittest.TestCase):
                 with self.assertRaises(QuarantinableError) as submission_exception:
                     transform.transform(dap_dict)
                 self.assertEqual(str(submission_exception.exception), bad_response)
+
+    @patch.object(Session, 'post')
+    def test_post(self, mock_request):
+        with pytest.raises(QuarantinableError):
+            mock_request.return_value.status_code = 400
+            transform.transform(dap_data)
