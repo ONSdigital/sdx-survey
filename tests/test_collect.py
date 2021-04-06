@@ -9,7 +9,7 @@ class TestCollect(unittest.TestCase):
     @patch('app.collect.decrypt_survey')
     @patch('app.collect.validate')
     def test_failed_validation_raises_exception(self, validate, decrypt):
-        decrypt.return_value = {'value': 'nonsense'}
+        decrypt.return_value = {'value': 'nonsense', 'survey_id': '009'}
         validate.return_value = False
         self.assertRaises(QuarantinableError, process, 'nonsense survey')
 

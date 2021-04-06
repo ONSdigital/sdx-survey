@@ -20,10 +20,11 @@ def process(encrypted_message_str: str):
     """
     logger.info("Processing message")
     survey_dict = decrypt_survey(encrypted_message_str)
+
+    valid = validate(survey_dict)
     survey_id = survey_dict['survey_id']
     bind_contextvars(survey_id=survey_id)
 
-    valid = validate(survey_dict)
     if not valid:
         logger.error("Validation failed, quarantining survey", survey_id=survey_id)
         raise QuarantinableError(f"Invalid survey, {survey_id}")

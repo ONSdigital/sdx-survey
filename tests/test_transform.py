@@ -185,4 +185,5 @@ class TestTransform(unittest.TestCase):
     def test_post(self, mock_request):
         with pytest.raises(QuarantinableError):
             mock_request.return_value.status_code = 400
-            transform.transform(dap_data)
+            dap_dict = json.loads(dap_data)
+            transform.transform(dap_dict)

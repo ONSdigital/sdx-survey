@@ -19,7 +19,7 @@ session.mount('http://', HTTPAdapter(max_retries=retries))
 def transform(survey_dict: dict):
     logger.info("Transforming...")
     survey_json = json.dumps(survey_dict)
-    survey_id= survey_dict['survey_id']
+    survey_id = survey_dict['survey_id']
     response = post(survey_json)
 
     if response.status_code == 200:
