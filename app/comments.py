@@ -11,7 +11,6 @@ from app import CONFIG
 
 logger = structlog.get_logger()
 
-
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
@@ -24,6 +23,7 @@ def store_comments(survey_dict: dict):
             "comment": get_comment(survey_dict),
             "additional": get_additional_comments(survey_dict)}
     bind_contextvars(survey_id=survey_id)
+    
     encrypted_data = encrypt_comment(data)
 
     comment = Comment(transaction_id=transaction_id,
@@ -49,7 +49,7 @@ def get_comment(submission: dict) -> list:
     """
     if submission['survey_id'] == '187':
         return extract_comment(submission, '500')
-    elif submission['survey_id'] == '134':
+    elif submission['survey_id'] == '134':g
         return extract_comment(submission, '300')
     else:
         return extract_comment(submission, '146')

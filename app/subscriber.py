@@ -11,8 +11,11 @@ logger = structlog.get_logger()
 
 
 def callback(message):
-    tx_id = None
     encrypted_message_str = None
+    tx_id = message.attributes.get('tx_id')
+    bind_contextvars(app="SDX-Worker")
+    bind_contextvars(tx_id=tx_id)
+    bind_contextvars(thread=threading.currentThread().getName())
 
     try:
         tx_id = message.attributes.get('tx_id')
@@ -28,12 +31,13 @@ def callback(message):
         message.nack()
 
     except Exception as error:
-        message.ack()
         if encrypted_message_str is None:
             logger.info("encrypted_message_str is none, quarantining message instead!")
             quarantine_message(message, tx_id, str(error))
         else:
             quarantine_submission(encrypted_message_str, tx_id, str(error))
+        message.ack()
+
     finally:
         clear_contextvars()
 
