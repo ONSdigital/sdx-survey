@@ -49,7 +49,7 @@ def get_comment(submission: dict) -> list:
     """
     if submission['survey_id'] == '187':
         return extract_comment(submission, '500')
-    elif submission['survey_id'] == '134':g
+    elif submission['survey_id'] == '134':
         return extract_comment(submission, '300')
     else:
         return extract_comment(submission, '146')
