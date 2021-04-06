@@ -15,7 +15,7 @@ def callback(message):
     tx_id = message.attributes.get('tx_id')
     bind_contextvars(app="SDX-Survey")
     bind_contextvars(tx_id=tx_id)
-    bind_contextvars(thread=threading.currentThread().getName().split('_')[1])
+    bind_contextvars(thread=threading.currentThread().getName())
 
     try:
         encrypted_message_str = message.data.decode('utf-8')
