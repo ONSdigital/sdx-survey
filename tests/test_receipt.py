@@ -2,22 +2,25 @@ import json
 import unittest
 from unittest import mock
 
+from app.errors import QuarantinableError
 from app.receipt import make_receipt, send_receipt, publish_data
 
 
-class TestCollect(unittest.TestCase):
-    test_data = {
-        "case_id": "123",
-        "survey_id": "survey_id",
-        "tx_id": "tx_id",
-        "collection": {
-            "exercise_sid": "exercise_sid"
-        },
-        "metadata": {
-            "ru_ref": "ru_ref",
-            "user_id": "user_id"
+class TestReceipt(unittest.TestCase):
+
+    def setUp(self):
+        self.test_data = {
+            "case_id": "123",
+            "survey_id": "survey_id",
+            "tx_id": "tx_id",
+            "collection": {
+                "exercise_sid": "exercise_sid"
+            },
+            "metadata": {
+                "ru_ref": "ru_ref",
+                "user_id": "user_id"
+            }
         }
-    }
 
     def test_make_receipt_valid(self):
         expected = json.dumps({"case_id": "123", "tx_id": "tx_id", "collection": {"exercise_sid": "exercise_sid"},
@@ -34,6 +37,12 @@ class TestCollect(unittest.TestCase):
     @mock.patch('app.receipt.publish_data')
     def test_send_receipt_good(self, mock_publish):
         send_receipt(self.test_data)
+
+    def test_make_receipt_bad(self):
+        data = self.test_data
+        del data["case_id"]
+        with self.assertRaises(QuarantinableError):
+            make_receipt(data)
 
     @mock.patch('app.receipt.CONFIG')
     def test_publish_data(self, mock_config):
