@@ -2,8 +2,10 @@ import unittest
 from unittest.mock import patch
 
 import pytest
-from requests import Session
-from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver
+from requests import Session, exceptions
+from urllib3.exceptions import MaxRetryError
+
+from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver, post, DAP
 from app.errors import QuarantinableError, RetryableError
 
 
@@ -73,3 +75,14 @@ class TestCollect(unittest.TestCase):
             assert deliver(self.test_survey, 'feedback')
             mock_post.assert_called()
 
+    @patch('app.deliver.session')
+    def test_post_MaxRetryError(self, mock_session):
+        mock_session.post.side_effect = MaxRetryError("pool", "url", "reason")
+        with pytest.raises(RetryableError):
+            post("filename", {}, DAP)
+
+    @patch('app.deliver.session')
+    def test_post_ConnectionError(self, mock_session):
+        mock_session.post.side_effect = exceptions.ConnectionError()
+        with pytest.raises(RetryableError):
+            post("filename", {}, DAP)
