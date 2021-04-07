@@ -19,18 +19,17 @@ session.mount('http://', HTTPAdapter(max_retries=retries))
 def transform(survey_dict: dict):
     logger.info("Transforming...")
     survey_json = json.dumps(survey_dict)
-    survey_id = survey_dict['survey_id']
     response = post(survey_json)
 
     if response.status_code == 200:
         return response.content
     elif 400 <= response.status_code < 500:
         msg = "Bad Request response from sdx-transform"
-        logger.error(msg, status_code=response.status_code,survey_id=survey_id)
+        logger.error(msg, status_code=response.status_code)
         raise QuarantinableError(msg)
     else:
         msg = "Bad response from sdx-transform"
-        logger.error(msg, status_code=response.status_code, survey_id=survey_id)
+        logger.error(msg, status_code=response.status_code)
         raise RetryableError(msg)
 
 
