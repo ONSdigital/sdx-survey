@@ -22,7 +22,7 @@ class TestQuarantine(unittest.TestCase):
             error=error)
 
     @patch('app.quarantine.CONFIG')
-    def test_quarantine_submission(self, mock_config):
+    def test_quarantine_message(self, mock_config):
         mock_config.QUARANTINE_TOPIC_PATH = "quarantine_path"
         message = b"my message"
         tx_id = "123"

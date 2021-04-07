@@ -2,8 +2,7 @@ import json
 import unittest
 from unittest import mock
 
-from app.deliver import deliver_feedback
-from app.receipt import make_receipt, send_receipt
+from app.receipt import make_receipt, send_receipt, publish_data
 
 
 class TestCollect(unittest.TestCase):
@@ -35,3 +34,17 @@ class TestCollect(unittest.TestCase):
     @mock.patch('app.receipt.publish_data')
     def test_send_receipt_good(self, mock_publish):
         send_receipt(self.test_data)
+
+    @mock.patch('app.receipt.CONFIG')
+    def test_publish_data(self, mock_config):
+        receipt_topic = "receipt_topic"
+        receipt = "my_receipt"
+        tx_id = "123"
+
+        mock_config.RECEIPT_TOPIC_PATH = receipt_topic
+        publish_data(receipt, tx_id)
+
+        mock_config.RECEIPT_PUBLISHER.publish.assert_called_with(
+            receipt_topic,
+            receipt.encode("utf-8"),
+            tx_id=tx_id)
