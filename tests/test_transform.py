@@ -7,9 +7,13 @@ import pytest
 import requests
 from zipfile import ZipFile
 from unittest import mock
+
+from urllib3.exceptions import MaxRetryError
+
 from app.errors import QuarantinableError, RetryableError
 from requests import Session
 from app import transform
+from app.transform import post
 
 
 class ResponseContent:
@@ -142,6 +146,7 @@ def remove_file(file):
 
 
 class TestTransform(unittest.TestCase):
+
     def test_deliver_submission_success(self):
         r = requests.Response()
         with mock.patch('app.transform.post') as mock_post:
@@ -186,3 +191,17 @@ class TestTransform(unittest.TestCase):
         with pytest.raises(QuarantinableError):
             mock_request.return_value.status_code = 400
             transform.transform(dap_data)
+
+    @patch('app.transform.session')
+    def test_post_MaxRetryError(self, mock_session):
+        survey_json = '{"tx_id":"123"}'
+        mock_session.post.side_effect = MaxRetryError("pool", "url", "reason")
+        with pytest.raises(RetryableError):
+            post(survey_json)
+
+    @patch('app.transform.session')
+    def test_post_ConnectionError(self, mock_session):
+        survey_json = '{"tx_id":"123"}'
+        mock_session.post.side_effect = ConnectionError()
+        with pytest.raises(RetryableError):
+            post(survey_json)

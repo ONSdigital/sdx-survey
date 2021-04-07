@@ -2,23 +2,25 @@ import json
 import unittest
 from unittest import mock
 
-from app.deliver import deliver_feedback
-from app.receipt import make_receipt, send_receipt
+from app.errors import QuarantinableError
+from app.receipt import make_receipt, send_receipt, publish_data
 
 
-class TestCollect(unittest.TestCase):
-    test_data = {
-        "case_id": "123",
-        "survey_id": "survey_id",
-        "tx_id": "tx_id",
-        "collection": {
-            "exercise_sid": "exercise_sid"
-        },
-        "metadata": {
-            "ru_ref": "ru_ref",
-            "user_id": "user_id"
+class TestReceipt(unittest.TestCase):
+
+    def setUp(self):
+        self.test_data = {
+            "case_id": "123",
+            "survey_id": "survey_id",
+            "tx_id": "tx_id",
+            "collection": {
+                "exercise_sid": "exercise_sid"
+            },
+            "metadata": {
+                "ru_ref": "ru_ref",
+                "user_id": "user_id"
+            }
         }
-    }
 
     def test_make_receipt_valid(self):
         expected = json.dumps({"case_id": "123", "tx_id": "tx_id", "collection": {"exercise_sid": "exercise_sid"},
@@ -35,3 +37,23 @@ class TestCollect(unittest.TestCase):
     @mock.patch('app.receipt.publish_data')
     def test_send_receipt_good(self, mock_publish):
         send_receipt(self.test_data)
+
+    def test_make_receipt_bad(self):
+        data = self.test_data
+        del data["case_id"]
+        with self.assertRaises(QuarantinableError):
+            make_receipt(data)
+
+    @mock.patch('app.receipt.CONFIG')
+    def test_publish_data(self, mock_config):
+        receipt_topic = "receipt_topic"
+        receipt = "my_receipt"
+        tx_id = "123"
+
+        mock_config.RECEIPT_TOPIC_PATH = receipt_topic
+        publish_data(receipt, tx_id)
+
+        mock_config.RECEIPT_PUBLISHER.publish.assert_called_with(
+            receipt_topic,
+            receipt.encode("utf-8"),
+            tx_id=tx_id)

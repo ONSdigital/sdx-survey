@@ -95,7 +95,7 @@ def get_boxes_selected(submission):
 
     else:
         for key in ('146' + letter for letter in ascii_lowercase[0:]):
-            if key in submission.keys():
+            if key in submission['data'].keys():
                 boxes_selected = boxes_selected + key + ' '
 
     return boxes_selected

@@ -1,14 +1,11 @@
 import json
 import unittest
 from unittest import mock
-
-import pytest
-from google.cloud import datastore
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock, Mock
 from cryptography.fernet import Fernet
-from app import CONFIG
-from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments
-from app.errors import QuarantinableError
+from app import CONFIG, comments
+from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
+    Comment
 
 
 class TestGetComments(unittest.TestCase):
@@ -85,6 +82,19 @@ class TestGetComments(unittest.TestCase):
                                                               {'qcode': '300m', "comment": '300m'},
                                                               {'qcode': '300w5', "comment": '300w5'}])
 
+    def test_get_additional_comments_2(self):
+        test_data = {
+            'data': {
+                "300f": "hello",
+                "300w4": "bye"
+            },
+            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'survey_id': '134',
+            'type': 'uk.gov.ons.edc.eq:feedback'
+        }
+        self.assertEqual(get_additional_comments(test_data), [{'qcode': '300f', "comment": 'hello'},
+                                                              {'qcode': '300w4', "comment": 'bye'}])
+
     def test_get_additional_comments_none(self):
         test_data = {
             'data': {
@@ -110,7 +120,18 @@ class TestGetComments(unittest.TestCase):
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_boxes_selected(test_data), "91w, 94w2, 192w42, 197w4, ")
+        self.assertEqual("91w, 94w2, 192w42, 197w4, ", get_boxes_selected(test_data))
+
+    def test_get_boxes_selected_2(self):
+        test_data = {
+            'data': {
+                "146a": "Yes"
+            },
+            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'survey_id': '009',
+            'type': 'uk.gov.ons.edc.eq:feedback'
+        }
+        self.assertEqual("146a ", get_boxes_selected(test_data))
 
     def test_get_boxes_selected_none(self):
         test_data = {
@@ -145,6 +166,32 @@ class TestGetComments(unittest.TestCase):
     def test_store_comments_valid(self, mock_datastore):
         store_comments(self.test_survey)
         mock_datastore.assert_called()
+
+    @mock.patch('app.comments.datastore')
+    @mock.patch('app.comments.CONFIG')
+    def test_commmit_to_datastore(self, mock_config, mock_datastore):
+        comment = Comment("123", "009", "2020", b'my data')
+
+        mock_entity = Mock()
+        mock_client = Mock()
+
+        mock_datastore.Entity = Mock(return_value=mock_entity)
+        mock_datastore.Client = Mock(return_value=mock_client)
+
+        comments.commit_to_datastore(comment)
+
+        mock_entity.update.assert_called()
+        mock_client.put.assert_called()
+
+    @mock.patch('app.comments.datastore')
+    @mock.patch('app.comments.CONFIG')
+    def test_commmit_to_datastore_error(self, mock_config, mock_datastore):
+        comment = Comment("123", "009", "2020", b'my data')
+        mock_datastore.Entity = Mock(side_effect=ValueError())
+
+        ret = comments.commit_to_datastore(comment)
+
+        self.assertIsNone(ret)
 
 
 def decrypt_comment(comment_token: str) -> dict:

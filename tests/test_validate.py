@@ -1,5 +1,7 @@
+from unittest.mock import patch, Mock
+
 from app.errors import QuarantinableError
-from app.validate import validate, is_valid_survey_id
+from app.validate import validate, is_valid_survey_id, is_valid_survey_data
 
 import unittest
 import json
@@ -7,100 +9,102 @@ import json
 
 class TestValidateService(unittest.TestCase):
 
-    message = {
-        '0.0.1': '''{
-           "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
-           "type": "uk.gov.ons.edc.eq:surveyresponse",
-           "origin": "uk.gov.ons.edc.eq",
-           "survey_id": "023",
-           "completed": true,
-           "flushed": false,
-           "version": "0.0.1",
-           "collection": {
-             "exercise_sid": "hfjdskf",
-             "instrument_id": "0203",
-             "period": "0216"
-           },
-           "submitted_at": "2016-03-12T10:39:40Z",
-           "metadata": {
-             "user_id": "789473423",
-             "ru_ref": "12345678901A"
-           },
-           "data": {
-             "11": "01/04/2016",
-             "12": "31/10/2016",
-             "20": "1800000",
-             "51": 84.00,
-             "52": 10,
-             "53": "73",
-             "54": "24",
-             "50": "205",
-             "22": "705000",
-             "23": "900",
-             "24": "74",
-             "25": "50",
-             "26": "100",
-             "21": "60000",
-             "27": "7400",
-             "146": "some comment"
-           },
-           "paradata": {}
-        }''',
+    def setUp(self):
 
-        '0.0.2': '''{
-           "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
-           "case_ref": "1000000000000001",
-           "case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3",
-           "type": "uk.gov.ons.edc.eq:surveyresponse",
-           "origin": "uk.gov.ons.edc.eq",
-           "survey_id": "census",
-           "completed": false,
-           "flushed": true,
-           "version": "0.0.2",
-           "collection": {
-             "exercise_sid": "hfjdskf",
-             "instrument_id": "household",
-             "period": "0216"
-           },
-           "submitted_at": "2016-03-12T10:39:40Z",
-           "metadata": {
-             "user_id": "789473423",
-             "ru_ref": "12345"
-           },
-           "data": [{
-             "value": "Joe Bloggs",
-             "block_id": "household-composition",
-             "answer_id": "household-full-name",
-             "group_id": "multiple-questions-group",
-             "group_instance": 0,
-             "answer_instance": 0
-            }]
-        }''',
-
-        'feedback': '''{
-               "type" : "uk.gov.ons.edc.eq:feedback",
-               "origin" : "uk.gov.ons.edc.eq",
+        self.message = {
+            '0.0.1': '''{
+               "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
+               "type": "uk.gov.ons.edc.eq:surveyresponse",
+               "origin": "uk.gov.ons.edc.eq",
+               "survey_id": "023",
+               "completed": true,
+               "flushed": false,
+               "version": "0.0.1",
+               "collection": {
+                 "exercise_sid": "hfjdskf",
+                 "instrument_id": "0203",
+                 "period": "0216"
+               },
+               "submitted_at": "2016-03-12T10:39:40Z",
                "metadata": {
                  "user_id": "789473423",
-                 "ru_ref": "432423423423"
+                 "ru_ref": "12345678901A"
                },
                "data": {
-                 "url": "https://eq.onsdigital.uk/feedback",
-                 "name": "John Appleseed",
-                 "email": "john.appleseed@ons.gov.uk",
-                 "message": "Feedback message string"
+                 "11": "01/04/2016",
+                 "12": "31/10/2016",
+                 "20": "1800000",
+                 "51": 84.00,
+                 "52": 10,
+                 "53": "73",
+                 "54": "24",
+                 "50": "205",
+                 "22": "705000",
+                 "23": "900",
+                 "24": "74",
+                 "25": "50",
+                 "26": "100",
+                 "21": "60000",
+                 "27": "7400",
+                 "146": "some comment"
                },
-               "submitted_at": "2016-03-07T15:28:05Z",
-               "collection": {
-                 "instrument_id": "0203",
-                 "exercise_sid": "739",
-                 "period": "2016-02-01"
-               },
-               "survey_id": "023",
-               "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
-               "version" : "0.0.1"
+               "paradata": {}
             }''',
-    }
+
+            '0.0.2': '''{
+               "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
+               "case_ref": "1000000000000001",
+               "case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3",
+               "type": "uk.gov.ons.edc.eq:surveyresponse",
+               "origin": "uk.gov.ons.edc.eq",
+               "survey_id": "census",
+               "completed": false,
+               "flushed": true,
+               "version": "0.0.2",
+               "collection": {
+                 "exercise_sid": "hfjdskf",
+                 "instrument_id": "household",
+                 "period": "0216"
+               },
+               "submitted_at": "2016-03-12T10:39:40Z",
+               "metadata": {
+                 "user_id": "789473423",
+                 "ru_ref": "12345"
+               },
+               "data": [{
+                 "value": "Joe Bloggs",
+                 "block_id": "household-composition",
+                 "answer_id": "household-full-name",
+                 "group_id": "multiple-questions-group",
+                 "group_instance": 0,
+                 "answer_instance": 0
+                }]
+            }''',
+
+            'feedback': '''{
+                   "type" : "uk.gov.ons.edc.eq:feedback",
+                   "origin" : "uk.gov.ons.edc.eq",
+                   "metadata": {
+                     "user_id": "789473423",
+                     "ru_ref": "432423423423"
+                   },
+                   "data": {
+                     "url": "https://eq.onsdigital.uk/feedback",
+                     "name": "John Appleseed",
+                     "email": "john.appleseed@ons.gov.uk",
+                     "message": "Feedback message string"
+                   },
+                   "submitted_at": "2016-03-07T15:28:05Z",
+                   "collection": {
+                     "instrument_id": "0203",
+                     "exercise_sid": "739",
+                     "period": "2016-02-01"
+                   },
+                   "survey_id": "023",
+                   "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
+                   "version" : "0.0.1"
+                }''',
+        }
 
     @staticmethod
     def validate_response(data):
@@ -366,3 +370,34 @@ class TestValidateService(unittest.TestCase):
         survey['collection']['instrument_id'] = "1"
 
         self.assertValid(survey)
+
+    def test_is_valid_survey_data_value_error(self):
+        data = {"tx_id": {}}
+        with self.assertRaises(ValueError):
+            is_valid_survey_data(data)
+
+    def test_validate_type_none_is_quarantined(self):
+        survey = json.loads(self.message['0.0.1'])
+        del survey["type"]
+        with self.assertRaises(QuarantinableError):
+            validate(survey)
+
+    def test_validate_meta_none_is_quarantined(self):
+        survey = json.loads(self.message['0.0.1'])
+        del survey["metadata"]
+        with self.assertRaises(QuarantinableError):
+            validate(survey)
+
+    def test_not_known_survey(self):
+        survey = json.loads(self.message['0.0.1'])
+        survey["survey_id"] = "567"
+        with self.assertRaises(QuarantinableError):
+            validate(survey)
+
+    @patch('app.validate.get_schema')
+    def test_not_known_survey_id(self, mock_get_schema):
+        mock_get_schema.return_value = Mock()
+        survey = json.loads(self.message['0.0.1'])
+        survey["survey_id"] = "567"
+        with self.assertRaises(QuarantinableError):
+            validate(survey)

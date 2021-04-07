@@ -1,9 +1,14 @@
+import binascii
 import unittest
 import json
 from unittest.mock import patch
 
+from cryptography import exceptions
 from sdc.crypto.encrypter import encrypt
+from sdc.crypto.exceptions import InvalidTokenException
+
 from app.decrypt import decrypt_survey, load_keys
+from app.errors import QuarantinableError
 
 
 def encrypt_survey(submission: dict) -> str:
@@ -66,3 +71,67 @@ class TestDecrypt(unittest.TestCase):
         key_file1.close()
         key_file2.close()
         self.assertEqual(decrypted_message, message_dict)
+
+    @patch('app.decrypt.load_keys')
+    @patch('app.decrypt.CONFIG')
+    @patch('app.decrypt.sdc_decrypt')
+    def test_decrypt_survey_UnsupportedAlgorithm(self, sdc_decrypt, mock_config, mock_load):
+        sdc_decrypt.side_effect = exceptions.UnsupportedAlgorithm("message")
+        with self.assertRaises(QuarantinableError):
+            decrypt_survey("encrypted survey")
+
+    @patch('app.decrypt.load_keys')
+    @patch('app.decrypt.CONFIG')
+    @patch('app.decrypt.sdc_decrypt')
+    def test_decrypt_survey_InvalidKey(self, sdc_decrypt, mock_config, mock_load):
+        sdc_decrypt.side_effect = exceptions.InvalidKey("message")
+        with self.assertRaises(QuarantinableError):
+            decrypt_survey("encrypted survey")
+
+    @patch('app.decrypt.load_keys')
+    @patch('app.decrypt.CONFIG')
+    @patch('app.decrypt.sdc_decrypt')
+    def test_decrypt_survey_AlreadyFinalized(self, sdc_decrypt, mock_config, mock_load):
+        sdc_decrypt.side_effect = exceptions.AlreadyFinalized("message")
+        with self.assertRaises(QuarantinableError):
+            decrypt_survey("encrypted survey")
+
+    @patch('app.decrypt.load_keys')
+    @patch('app.decrypt.CONFIG')
+    @patch('app.decrypt.sdc_decrypt')
+    def test_decrypt_survey_InvalidSignature(self, sdc_decrypt, mock_config, mock_load):
+        sdc_decrypt.side_effect = exceptions.InvalidSignature("message")
+        with self.assertRaises(QuarantinableError):
+            decrypt_survey("encrypted survey")
+
+    @patch('app.decrypt.load_keys')
+    @patch('app.decrypt.CONFIG')
+    @patch('app.decrypt.sdc_decrypt')
+    def test_decrypt_survey_NotYetFinalized(self, sdc_decrypt, mock_config, mock_load):
+        sdc_decrypt.side_effect = exceptions.NotYetFinalized("message")
+        with self.assertRaises(QuarantinableError):
+            decrypt_survey("encrypted survey")
+
+    @patch('app.decrypt.load_keys')
+    @patch('app.decrypt.CONFIG')
+    @patch('app.decrypt.sdc_decrypt')
+    def test_decrypt_survey_AlreadyUpdated(self, sdc_decrypt, mock_config, mock_load):
+        sdc_decrypt.side_effect = exceptions.AlreadyUpdated("message")
+        with self.assertRaises(QuarantinableError):
+            decrypt_survey("encrypted survey")
+
+    @patch('app.decrypt.load_keys')
+    @patch('app.decrypt.CONFIG')
+    @patch('app.decrypt.sdc_decrypt')
+    def test_decrypt_survey_binascii_Error(self, sdc_decrypt, mock_config, mock_load):
+        sdc_decrypt.side_effect = binascii.Error("message")
+        with self.assertRaises(QuarantinableError):
+            decrypt_survey("encrypted survey")
+
+    @patch('app.decrypt.load_keys')
+    @patch('app.decrypt.CONFIG')
+    @patch('app.decrypt.sdc_decrypt')
+    def test_decrypt_survey_InvalidTokenException(self, sdc_decrypt, mock_config, mock_load):
+        sdc_decrypt.side_effect = InvalidTokenException("message")
+        with self.assertRaises(QuarantinableError):
+            decrypt_survey("encrypted survey")
