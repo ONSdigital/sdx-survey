@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
 
-import pytest
 from requests import Session, exceptions
 from urllib3.exceptions import MaxRetryError
 
@@ -63,14 +62,14 @@ class TestCollect(unittest.TestCase):
 
     @patch.object(Session, 'post')
     def test_400_response(self, mock_post):
-        with pytest.raises(QuarantinableError):
+        with self.assertRaises(QuarantinableError):
             mock_post.return_value.status_code = 400
             assert deliver(self.test_survey, 'feedback')
             mock_post.assert_called()
 
     @patch.object(Session, 'post')
     def test_300_response(self, mock_post):
-        with pytest.raises(RetryableError):
+        with self.assertRaises(RetryableError):
             mock_post.return_value.status_code = 300
             assert deliver(self.test_survey, 'feedback')
             mock_post.assert_called()
@@ -78,11 +77,11 @@ class TestCollect(unittest.TestCase):
     @patch('app.deliver.session')
     def test_post_MaxRetryError(self, mock_session):
         mock_session.post.side_effect = MaxRetryError("pool", "url", "reason")
-        with pytest.raises(RetryableError):
+        with self.assertRaises(RetryableError):
             post("filename", {}, DAP)
 
     @patch('app.deliver.session')
     def test_post_ConnectionError(self, mock_session):
         mock_session.post.side_effect = exceptions.ConnectionError()
-        with pytest.raises(RetryableError):
+        with self.assertRaises(RetryableError):
             post("filename", {}, DAP)

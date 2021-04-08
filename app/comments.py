@@ -10,10 +10,19 @@ from app import CONFIG
 
 logger = structlog.get_logger()
 
+# stop these fields from being indexed
 exclude_from_index = ('encrypted_data', 'period', 'survey_id')
 
 
 def store_comments(survey_dict: dict):
+    """
+    Extracts the comments from a survey submission and
+    writes them to Google Datastore
+
+    The comments are encrypted and stored along with
+    useful metadata required for retrival.
+    """
+
     transaction_id = survey_dict["tx_id"]
     period = survey_dict["collection"]["period"]
     survey_id = survey_dict["survey_id"]
@@ -41,10 +50,12 @@ def encrypt_comment(data: dict) -> str:
 
 
 def get_comment(submission: dict) -> list:
-    logger.info('Checking comment Q Codes')
-    """Returns the responde:qqnt typed text from a submission.  The qcode for this text will be different depending
-    on the survey
     """
+    Returns the respondent typed text from a submission.
+    The qcode for this text will be different depending on the survey.
+    """
+    logger.info('Checking comment Q Codes')
+
     if submission['survey_id'] == '187':
         return extract_comment(submission, '500')
     elif submission['survey_id'] == '134':
@@ -102,6 +113,8 @@ def get_boxes_selected(submission):
 
 
 class Comment:
+    """Class to define a comment entity"""
+
     def __init__(self, transaction_id, survey_id, period, encrypted_data):
         self.transaction_id = transaction_id
         self.survey_id = survey_id
@@ -110,7 +123,9 @@ class Comment:
         self.created = datetime.now()
 
 
-def commit_to_datastore(comment):
+def commit_to_datastore(comment: Comment):
+    """Write an instance of Comment to Google Datastore"""
+
     try:
         logger.info('Storing comments in Datastore')
         entity_key = CONFIG.DATASTORE_CLIENT.key('Comment', comment.transaction_id)
@@ -123,6 +138,6 @@ def commit_to_datastore(comment):
                 "encrypted_data": comment.encrypted_data
             }
         )
-        return datastore.Client().put(entity)
+        datastore.Client().put(entity)
     except ValueError as e:
         logger.error(e)

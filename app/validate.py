@@ -9,6 +9,7 @@ from app.errors import QuarantinableError
 
 logger = structlog.get_logger('app.subscriber')
 
+# A dict of dicts containing lists of formtypes mapped to survey ids
 KNOWN_SURVEYS = {
     "0.0.1": {
         "007": [
@@ -49,13 +50,13 @@ KNOWN_SURVEYS = {
 }
 
 
-# Parses a timestamp, throwing a value error
-# if unrecognised
 def parse_timestamp(value):
+    """Parses a timestamp, throwing a value error if unrecognised"""
     return parser.parse(value)
 
 
 def is_valid_survey_id(value, version=None):
+    """Tests if a survey id is valid"""
     if not version:
         raise AttributeError("No version number")
 
@@ -63,13 +64,13 @@ def is_valid_survey_id(value, version=None):
         raise ValueError("Invalid survey id")
 
 
-# Parses a UUID, throwing a value error
-# if unrecognised
 def is_valid_survey_txid(value):
+    """Parses a UUID, throwing a value error if unrecognised"""
     return UUID(value, version=4)
 
 
 def is_valid_survey_data(data):
+    """Tests if a survey data is of valid types"""
     if isinstance(data, dict):
         for k, v in data.items():
             if not isinstance(k, str) or not isinstance(v, (str, list, int, float)):
@@ -85,6 +86,11 @@ def is_valid_list_survey_data(data):
 
 
 def validate(survey_dict: dict) -> bool:
+    """
+    Validates every aspect of a survey submission in dictionary form.
+    Returns True if valid or raises an appropriate exception if not.
+    """
+
     logger.info(f"Validating")
     try:
         json_data = survey_dict

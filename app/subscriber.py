@@ -12,6 +12,15 @@ logger = structlog.get_logger()
 
 
 def callback(message):
+    """
+    Manages the life cycle of the received message.
+
+    Handles pre processing events such as setting up logging bindings.
+    Extracts the data and passes it on to be processed.
+    Handles post processing events such acking the message and
+    catching exceptions raised during processing.
+    """
+
     encrypted_message_str = None
     tx_id = message.attributes.get('tx_id')
     bind_contextvars(app="SDX-Worker")
@@ -40,6 +49,16 @@ def callback(message):
 
 
 def start():
+    """
+    Begin listening to the survey pubsub subscription.
+
+    This functions spawns new threads that listen to the subscription topic and
+    on receipt of a message invoke the callback function
+
+    The main thread blocks indefinitely unless the connection times out
+
+    """
+
     streaming_pull_future = CONFIG.SURVEY_SUBSCRIBER.subscribe(CONFIG.SURVEY_SUBSCRIPTION_PATH, callback=callback)
     logger.info(f"Listening for messages on {CONFIG.SURVEY_SUBSCRIPTION_PATH}..\n")
 
@@ -48,5 +67,6 @@ def start():
         try:
             # Result() will block indefinitely, unless an exception is encountered first.
             streaming_pull_future.result()
-        except TimeoutError:
+        except TimeoutError as te:
+            logger.error("TimeoutError error, stopping listening", error=str(te))
             streaming_pull_future.cancel()

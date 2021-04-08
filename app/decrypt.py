@@ -15,6 +15,17 @@ logger = structlog.get_logger()
 
 
 def decrypt_survey(payload: str) -> dict:
+    """
+    Decrypts an encrypted json survey submission
+
+    The payload needs to be a JWE encrypted using SDX's public key.
+    The JWE ciphertext should represent a JWS signed by EQ using
+    their private key and with the survey json as the claims set.
+
+    :param payload:  JWE as a string
+    :return:  The survey submission json as a dictionary
+    """
+
     logger.info("Decrypting survey")
 
     try:

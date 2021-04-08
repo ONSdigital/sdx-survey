@@ -1,9 +1,9 @@
 import json
 import unittest
 from unittest import mock
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import patch, Mock
 from cryptography.fernet import Fernet
-from app import CONFIG, comments
+from app import comments
 from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
     Comment
 
@@ -147,7 +147,11 @@ class TestGetComments(unittest.TestCase):
         }
         self.assertEqual(get_boxes_selected(test_data), "")
 
-    def test_encryption_comments(self):
+    @mock.patch('app.comments.CONFIG')
+    def test_encryption_comments(self, mock_config):
+        key = "E3rjFT2i9ALcvc99Pe3YqjIGrzm3LdMsCXc8nUaOEbc="
+        mock_config.ENCRYPT_COMMENT_KEY = key
+
         test_data = {'additional': [{'comment': 'Pipe mania', 'qcode': '300w'},
                                     {'comment': 'Gas leak', 'qcode': '300f'},
                                     {'comment': 'copper pipe', 'qcode': '300m'},
@@ -160,10 +164,13 @@ class TestGetComments(unittest.TestCase):
                      'ru_ref': '12346789012A'
                      }
         encrypted_data = encrypt_comment(test_data)
-        self.assertEqual(decrypt_comment(encrypted_data), test_data)
+        self.assertEqual(decrypt_comment(encrypted_data, key), test_data)
 
+    @mock.patch('app.comments.CONFIG')
     @mock.patch('app.comments.commit_to_datastore')
-    def test_store_comments_valid(self, mock_datastore):
+    def test_store_comments_valid(self, mock_datastore, mock_config):
+        key = "E3rjFT2i9ALcvc99Pe3YqjIGrzm3LdMsCXc8nUaOEbc="
+        mock_config.ENCRYPT_COMMENT_KEY = key
         store_comments(self.test_survey)
         mock_datastore.assert_called()
 
@@ -194,7 +201,7 @@ class TestGetComments(unittest.TestCase):
         self.assertIsNone(ret)
 
 
-def decrypt_comment(comment_token: str) -> dict:
-    f = Fernet(CONFIG.ENCRYPT_COMMENT_KEY)
+def decrypt_comment(comment_token: str, key: str) -> dict:
+    f = Fernet(key)
     comment_bytes = f.decrypt(comment_token.encode())
     return json.loads(comment_bytes.decode())

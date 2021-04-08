@@ -11,16 +11,19 @@ project_id = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
 subscription_id = "survey-subscription"
 receipt_topic_id = "receipt-topic"
 quarantine_topic_id = "quarantine-survey-topic"
+transform_service_url = "sdx-transform:80"
+deliver_service_url = "sdx-deliver:80"
 
 
 class Config:
+    """Class to hold required configuration data"""
 
     def __init__(self, proj_id) -> None:
         self.PROJECT_ID = proj_id
-        self.TRANSFORM_SERVICE_URL = "sdx-transform:80"
-        self.DELIVER_SERVICE_URL = "sdx-deliver:80"
+        self.TRANSFORM_SERVICE_URL = transform_service_url
+        self.DELIVER_SERVICE_URL = deliver_service_url
         self.DECRYPT_SURVEY_KEY = None
-        self.ENCRYPT_COMMENT_KEY = "E3rjFT2i9ALcvc99Pe3YqjIGrzm3LdMsCXc8nUaOEbc="
+        self.ENCRYPT_COMMENT_KEY = None
         self.SURVEY_SUBSCRIBER = None
         self.SURVEY_SUBSCRIPTION_PATH = None
         self.RECEIPT_PUBLISHER = None
@@ -35,8 +38,11 @@ CONFIG = Config(project_id)
 
 def cloud_config():
     """
-    The cloud_config method gives us a way of unit-testing various parts of our code without making GCP Connections.
-    Thus preventing various errors when GitHub actions runs all tests. For example: Permission Denied error
+    Loads configuration required for running against GCP based environments
+
+    This function makes calls to GCP native tools such as Google Secret Manager
+    and therefore should not be called in situations where these connections are
+    not possible, e.g running the unit tests locally.
     """
 
     CONFIG.DECRYPT_SURVEY_KEY = get_secret(project_id, 'sdx-private-jwt')

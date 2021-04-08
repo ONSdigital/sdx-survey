@@ -7,7 +7,9 @@ from app.errors import QuarantinableError
 logger = structlog.get_logger()
 
 
-def send_receipt(survey_dict: dict) -> str:
+def send_receipt(survey_dict: dict):
+    """Creates and publishes a receipt to the receipt topic"""
+
     logger.info("Receipting...")
     tx_id = survey_dict['tx_id']
     receipt_str = make_receipt(survey_dict)
@@ -16,6 +18,8 @@ def send_receipt(survey_dict: dict) -> str:
 
 
 def publish_data(receipt_str: str, tx_id: str) -> str:
+    """Publishes the receipt to the receipt topic"""
+
     logger.info('Publishing receipt')
     data = receipt_str.encode("utf-8")
     future = CONFIG.RECEIPT_PUBLISHER.publish(CONFIG.RECEIPT_TOPIC_PATH, data, tx_id=tx_id)
@@ -23,6 +27,8 @@ def publish_data(receipt_str: str, tx_id: str) -> str:
 
 
 def make_receipt(survey_dict: dict) -> str:
+    """Creates a receipt as String with the required metadata from the survey dict"""
+
     try:
         receipt_json = {
             'case_id': survey_dict['case_id'],
