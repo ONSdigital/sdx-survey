@@ -10,14 +10,26 @@ from app.validate import validate
 
 logger = structlog.get_logger()
 
+# list of survey ids that target DAP
 DAP_SURVEYS = ["023", "134", "147", "281", "283", "lms", "census"]
 
 
 def process(encrypted_message_str: str):
     """
-    The process method brings together the main functionality of SDX-Survey.
+    Orchestrates the required steps to process an encrypted json string.
+    The encrypted json can represent either a survey submission or survey feedback.
+    The steps include:
+        - decryption
+        - validation
+        - transformation
+        - comment persistence
+        - delivery
+        - receipting
+    and are dependent on the survey and type of the submission.
     """
+
     logger.info("Processing message")
+
     survey_dict = decrypt_survey(encrypted_message_str)
 
     valid = validate(survey_dict)
@@ -26,6 +38,7 @@ def process(encrypted_message_str: str):
         raise QuarantinableError("Invalid survey")
 
     if is_feedback(survey_dict):
+        # feedback do not require storing comments, transforming, or receipting.
         deliver_feedback(survey_dict)
 
     else:
@@ -35,6 +48,7 @@ def process(encrypted_message_str: str):
             zip_file = transform(survey_dict)
             deliver_survey(survey_dict, zip_file)
         else:
+            # dap surveys do not require transforming
             deliver_dap(survey_dict)
 
         send_receipt(survey_dict)

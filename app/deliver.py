@@ -11,6 +11,7 @@ from requests.exceptions import ConnectionError
 from app import CONFIG
 from app.errors import QuarantinableError, RetryableError
 
+# Constants used within the http request
 DAP = "dap"
 LEGACY = "legacy"
 FEEDBACK = "feedback"
@@ -26,22 +27,29 @@ session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
 def deliver_dap(survey_dict: dict):
+    """deliver a survey submission intended for DAP"""
     logger.info("Sending DAP submission")
     deliver(survey_dict, DAP)
 
 
 def deliver_survey(survey_dict: dict, zip_file: bytes):
+    """deliver a survey submission intended for the legacy systems"""
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
     deliver(survey_dict, LEGACY, files)
 
 
 def deliver_feedback(survey_dict: dict):
+    """deliver a feedback survey submission"""
     logger.info(f"Sending feedback submission")
     deliver(survey_dict, FEEDBACK)
 
 
 def deliver(survey_dict: dict, output_type: str, files: dict = {}):
+    """
+    Calls the deliver endpoint specified by the output_type parameter.
+    Returns True or raises appropriate error on response.
+    """
     files[SUBMISSION_FILE] = json.dumps(survey_dict).encode(UTF8)
     response = post(survey_dict['tx_id'], files, output_type)
     status_code = response.status_code
@@ -59,6 +67,8 @@ def deliver(survey_dict: dict, output_type: str, files: dict = {}):
 
 
 def post(filename: str, files: dict, output_type: str):
+    """constructs the http call to the deliver service endpoint and posts the request"""
+
     url = f"http://{CONFIG.DELIVER_SERVICE_URL}/deliver/{output_type}"
     logger.info(f"Calling {url}")
     try:
