@@ -16,7 +16,12 @@ retries = Retry(total=5, backoff_factor=0.1)
 session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
-def transform(survey_dict: dict):
+def transform(survey_dict: dict) -> bytes:
+    """
+    Makes a call to the transform service and returns the zip
+    as bytes or raises the appropriate exception.
+    """
+
     logger.info("Transforming...")
     survey_json = json.dumps(survey_dict)
     response = post(survey_json)
@@ -34,6 +39,8 @@ def transform(survey_dict: dict):
 
 
 def post(survey_json):
+    """Constructs the http call to the transform service endpoint and posts the request"""
+
     url = f"http://{CONFIG.TRANSFORM_SERVICE_URL}/transform"
     logger.info(f"Calling {url}")
     try:

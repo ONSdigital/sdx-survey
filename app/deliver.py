@@ -67,7 +67,7 @@ def deliver(survey_dict: dict, output_type: str, files: dict = {}):
 
 
 def post(filename: str, files: dict, output_type: str):
-    """constructs the http call to the deliver service endpoint and posts the request"""
+    """Constructs the http call to the deliver service endpoint and posts the request"""
 
     url = f"http://{CONFIG.DELIVER_SERVICE_URL}/deliver/{output_type}"
     logger.info(f"Calling {url}")

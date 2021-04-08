@@ -5,7 +5,7 @@ google-cloud-datastore==2.1.0
 google-cloud-secret-manager==2.4.0
 sdc-cryptography==1.0.0
 voluptuous==0.12.1
-structlog==20.1.0
+structlog==21.1.0
 python-dateutil==2.8.1
 pydantic==1.8.1
 requests==2.25.1

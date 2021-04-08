@@ -22,5 +22,3 @@ class TestSecret(unittest.TestCase):
         mock_secret_manager.SecretManagerServiceClient = Mock(return_value=client_mock)
 
         self.assertEqual(secret, get_secret(project_id, secret_id))
-
-
