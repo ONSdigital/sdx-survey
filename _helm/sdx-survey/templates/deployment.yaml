@@ -5,7 +5,7 @@ metadata:
   labels:
     app: sdx-survey
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: sdx-survey
