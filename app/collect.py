@@ -1,5 +1,4 @@
 import structlog
-from structlog.contextvars import bind_contextvars
 
 from app.comments import store_comments
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap
@@ -38,17 +37,11 @@ def process(encrypted_message_str: str):
         logger.error("Validation failed, quarantining survey")
         raise QuarantinableError("Invalid survey")
 
-    survey_id = survey_dict['survey_id']
-    bind_contextvars(survey_id=survey_id)
-
     if is_feedback(survey_dict):
-        logger.info("processing feedback")
         # feedback do not require storing comments, transforming, or receipting.
         deliver_feedback(survey_dict)
 
     else:
-        logger.info("processing survey")
-
         store_comments(survey_dict)
 
         if survey_dict['survey_id'] not in DAP_SURVEYS:
