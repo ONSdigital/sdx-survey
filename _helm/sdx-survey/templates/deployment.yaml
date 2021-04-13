@@ -14,7 +14,7 @@ spec:
       labels:
         app: sdx-survey
       annotations:
-        replicas: {{ .Values.replica_count }}
+        replicas: "1"
     spec:
       containers:
       - image: eu.gcr.io/{{ .Values.registry_location }}/sdx-survey:{{ .Chart.AppVersion }}
