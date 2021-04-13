@@ -5,7 +5,7 @@ metadata:
   labels:
     app: sdx-survey
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replica_count }}
   selector:
     matchLabels:
       app: sdx-survey
@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: sdx-survey
+      annotations:
+        replicas: {{ .Values.replica_count }}
     spec:
       containers:
       - image: eu.gcr.io/{{ .Values.registry_location }}/sdx-survey:{{ .Chart.AppVersion }}
