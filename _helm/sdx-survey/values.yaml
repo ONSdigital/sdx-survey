@@ -1,1 +1,3 @@
 registry_location: "ons-sdx-management"
+
+replicaCount: 1
