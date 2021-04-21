@@ -23,7 +23,7 @@ def callback(message):
 
     encrypted_message_str = None
     tx_id = message.attributes.get('tx_id')
-    bind_contextvars(app="SDX-Worker")
+    bind_contextvars(app="SDX-Survey")
     bind_contextvars(tx_id=tx_id)
     bind_contextvars(thread=threading.currentThread().getName())
 
