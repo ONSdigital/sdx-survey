@@ -10,8 +10,10 @@ from app.validate import validate
 
 logger = structlog.get_logger()
 
-# list of survey ids that target DAP
-DAP_SURVEYS = ["023", "134", "147", "281", "283", "lms", "census"]
+# list of survey ids that target only DAP
+DAP_SURVEYS = ["023", "134", "281", "283", "lms", "census"]
+# list of surveys that target DAP and Legacy
+HYBRID_SURVEYS = ["007", "147"]
 
 
 def process(encrypted_message_str: str):
@@ -44,9 +46,13 @@ def process(encrypted_message_str: str):
     else:
         store_comments(survey_dict)
 
-        if survey_dict['survey_id'] not in DAP_SURVEYS:
+        survey_id = survey_dict['survey_id']
+        if survey_id not in DAP_SURVEYS:
             zip_file = transform(survey_dict)
-            deliver_survey(survey_dict, zip_file)
+            if survey_id in HYBRID_SURVEYS:
+                pass
+            else:
+                deliver_survey(survey_dict, zip_file)
         else:
             # dap surveys do not require transforming
             deliver_dap(survey_dict)

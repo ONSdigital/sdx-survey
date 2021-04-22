@@ -14,6 +14,7 @@ from app.errors import QuarantinableError, RetryableError
 # Constants used within the http request
 DAP = "dap"
 LEGACY = "legacy"
+HYBRID = "hybrid"
 FEEDBACK = "feedback"
 SUBMISSION_FILE = 'submission'
 TRANSFORMED_FILE = 'transformed'
@@ -37,6 +38,13 @@ def deliver_survey(survey_dict: dict, zip_file: bytes):
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
     deliver(survey_dict, LEGACY, files)
+
+
+def deliver_hybrid(survey_dict: dict, zip_file: bytes):
+    """deliver a survey submission intended for dap and the legacy systems"""
+    logger.info("Sending hybrid submission")
+    files = {TRANSFORMED_FILE: zip_file}
+    deliver(survey_dict, HYBRID, files)
 
 
 def deliver_feedback(survey_dict: dict):
