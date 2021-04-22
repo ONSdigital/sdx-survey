@@ -1,7 +1,7 @@
 import structlog
 
 from app.comments import store_comments
-from app.deliver import deliver_feedback, deliver_survey, deliver_dap
+from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver_hybrid
 from app.errors import QuarantinableError
 from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
@@ -50,7 +50,7 @@ def process(encrypted_message_str: str):
         if survey_id not in DAP_SURVEYS:
             zip_file = transform(survey_dict)
             if survey_id in HYBRID_SURVEYS:
-                pass
+                deliver_hybrid(survey_dict, zip_file)
             else:
                 deliver_survey(survey_dict, zip_file)
         else:
