@@ -20,13 +20,18 @@ successfully processed. For feedback submissions: `type: feedback`, no additiona
 **Note:** Refer to Collect.py
 
 ## Getting started
-Install requirements:
+Install pipenv:
+```shell
+$ pip install pipenv
+```
+
+Create a virtualenv and install dependencies
 ```shell
 $ make build
 ```
 
 Testing:
-ensure you have installed all requirements with above `make build` command then:
+Install all test requirements and run tests:
 ```shell
 $ make test
 ```
