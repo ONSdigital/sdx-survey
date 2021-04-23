@@ -4,7 +4,7 @@ from unittest.mock import patch
 from requests import Session, exceptions
 from urllib3.exceptions import MaxRetryError
 
-from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver, post, DAP
+from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver, post, DAP, deliver_hybrid
 from app.errors import QuarantinableError, RetryableError
 
 
@@ -52,6 +52,12 @@ class TestCollect(unittest.TestCase):
     def test_post_survey_200(self, mock_post):
         mock_post.return_value.status_code = 200
         deliver_survey(self.test_survey, self.test_bytes)
+        mock_post.assert_called()
+
+    @patch.object(Session, 'post')
+    def test_post_hybrid_200(self, mock_post):
+        mock_post.return_value.status_code = 200
+        deliver_hybrid(self.test_survey, self.test_bytes)
         mock_post.assert_called()
 
     @patch.object(Session, 'post')

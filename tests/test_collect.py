@@ -75,6 +75,30 @@ class TestCollect(unittest.TestCase):
         deliver_survey.assert_called_with(legacy_response, zip_bytes)
         send_receipt.assert_called_with(legacy_response)
 
+    @patch('app.collect.decrypt_survey')
+    @patch('app.collect.validate')
+    @patch('app.collect.store_comments')
+    @patch('app.collect.transform')
+    @patch('app.collect.deliver_hybrid')
+    @patch('app.collect.send_receipt')
+    def test_process_hybrid_survey(self, send_receipt, deliver_hybrid, transform, store_comments, validate, decrypt):
+        hybrid_response = {
+            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'survey_id': '147',
+            'type': 'uk.gov.ons.edc.eq:surveyresponse'
+        }
+
+        decrypt.return_value = hybrid_response
+        validate.return_value = True
+        zip_bytes = b"zip bytes"
+        transform.return_value = zip_bytes
+
+        process('encrypted legacy survey')
+
+        store_comments.assert_called_with(hybrid_response)
+        deliver_hybrid.assert_called_with(hybrid_response, zip_bytes)
+        send_receipt.assert_called_with(hybrid_response)
+
     def test_is_feedback(self):
         feedback_response = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
