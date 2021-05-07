@@ -31,16 +31,8 @@ def make_receipt(survey_dict: dict) -> str:
 
     try:
         receipt_json = {
-            'case_id': survey_dict['case_id'],
-            'tx_id': survey_dict['tx_id'],
-            'collection': {
-                'exercise_sid':
-                    survey_dict['collection']['exercise_sid']
-            },
-            'metadata': {
-                'ru_ref': survey_dict['metadata']['ru_ref'],
-                'user_id': survey_dict['metadata']['user_id']
-            }
+            'caseId': survey_dict['case_id'],
+            'partyId': survey_dict['metadata']['user_id']
         }
     except KeyError as e:
         raise QuarantinableError(f'Failed to make receipt: {str(e)}')
