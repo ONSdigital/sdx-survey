@@ -23,8 +23,7 @@ class TestReceipt(unittest.TestCase):
         }
 
     def test_make_receipt_valid(self):
-        expected = json.dumps({"case_id": "123", "tx_id": "tx_id", "collection": {"exercise_sid": "exercise_sid"},
-                               "metadata": {"ru_ref": "ru_ref", "user_id": "user_id"}})
+        expected = json.dumps({"caseId": "123", "partyId": "user_id"})
         self.assertEqual(make_receipt(self.test_data), expected)
 
     @mock.patch('app.receipt.publish_data')
