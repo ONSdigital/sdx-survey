@@ -8,8 +8,8 @@ from app.secret_manager import get_secret
 logging_config()
 
 project_id = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
+receipt_topic_path = os.getenv('RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/topics/receipt-topic')
 subscription_id = "survey-subscription"
-receipt_topic_id = "receipt-topic"
 quarantine_topic_id = "quarantine-survey-topic"
 transform_service_url = "sdx-transform:80"
 deliver_service_url = "sdx-deliver:80"
@@ -27,7 +27,7 @@ class Config:
         self.SURVEY_SUBSCRIBER = None
         self.SURVEY_SUBSCRIPTION_PATH = None
         self.RECEIPT_PUBLISHER = None
-        self.RECEIPT_TOPIC_PATH = None
+        self.RECEIPT_TOPIC_PATH = receipt_topic_path
         self.QUARANTINE_PUBLISHER = None
         self.QUARANTINE_TOPIC_PATH = None
         self.DATASTORE_CLIENT = None
@@ -53,9 +53,7 @@ def cloud_config():
     CONFIG.SURVEY_SUBSCRIPTION_PATH = survey_subscriber.subscription_path(project_id, subscription_id)
     CONFIG.SURVEY_SUBSCRIBER = survey_subscriber
 
-    receipt_publisher = pubsub_v1.PublisherClient()
-    CONFIG.RECEIPT_TOPIC_PATH = receipt_publisher.topic_path(project_id, receipt_topic_id)
-    CONFIG.RECEIPT_PUBLISHER = receipt_publisher
+    CONFIG.RECEIPT_PUBLISHER = pubsub_v1.PublisherClient()
 
     quarantine_publisher = pubsub_v1.PublisherClient()
     CONFIG.QUARANTINE_TOPIC_PATH = quarantine_publisher.topic_path(project_id, quarantine_topic_id)

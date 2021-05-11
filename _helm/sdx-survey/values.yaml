@@ -1,3 +1,4 @@
 registry_location: "ons-sdx-management"
-
 replicaCount: 1
+receipt_topic_name: "receipt-topic"
+receipt_project_id: "ons-sdx-sandbox"

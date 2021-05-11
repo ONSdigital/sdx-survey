@@ -31,4 +31,6 @@ spec:
               configMapKeyRef:
                 name: sdx-config
                 key: logging_level
+          - name: RECEIPT_TOPIC_PATH
+            value: projects/{{ .Values.receipt_project_id }}/topics/{{ .Values.receipt_topic_name }}
       serviceAccountName: sdx-workload-identity
