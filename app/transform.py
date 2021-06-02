@@ -28,7 +28,7 @@ def transform(survey_dict: dict) -> bytes:
 
     if response.status_code == 200:
         return response.content
-    elif 400 <= response.status_code < 500:
+    elif response.status_code >= 500:
         msg = "Bad Request response from sdx-transform"
         logger.error(msg, status_code=response.status_code)
         raise QuarantinableError(msg)
