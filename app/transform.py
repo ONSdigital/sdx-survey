@@ -5,6 +5,7 @@ import structlog
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.exceptions import MaxRetryError
+from requests.exceptions import ConnectionError
 
 from app import CONFIG
 from app.errors import RetryableError, QuarantinableError
@@ -28,7 +29,7 @@ def transform(survey_dict: dict) -> bytes:
 
     if response.status_code == 200:
         return response.content
-    elif response.status_code >= 500:
+    elif 400 <= response.status_code < 500:
         msg = "Bad Request response from sdx-transform"
         logger.error(msg, status_code=response.status_code)
         raise QuarantinableError(msg)
