@@ -5,6 +5,7 @@ import structlog
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.exceptions import MaxRetryError
+from requests.exceptions import ConnectionError
 
 from app import CONFIG
 from app.errors import RetryableError, QuarantinableError

@@ -9,7 +9,7 @@ from zipfile import ZipFile
 from unittest import mock
 
 from urllib3.exceptions import MaxRetryError
-
+from requests.exceptions import ConnectionError
 from app.errors import QuarantinableError, RetryableError
 from requests import Session
 from app import transform
