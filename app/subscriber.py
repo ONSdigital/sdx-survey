@@ -20,8 +20,7 @@ def callback(message):
     Handles post processing events such acking the message and
     catching exceptions raised during processing.
     """
-    print(message)
-    logger.info(message)
+
     encrypted_message_str = None
     tx_id = message.attributes.get('tx_id')
     bind_contextvars(app="SDX-Survey")
