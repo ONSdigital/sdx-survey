@@ -40,12 +40,13 @@ def decrypt_survey(payload: str) -> dict:
             exceptions.AlreadyFinalized,
             exceptions.InvalidSignature,
             exceptions.NotYetFinalized,
-            exceptions.AlreadyUpdated):
+            exceptions.AlreadyUpdated) as e:
 
-        raise QuarantinableError("Decryption Failure")
+        logger.exception(f"Decryption Failure: {e}")
+        raise QuarantinableError(e)
     except binascii.Error as e:
-        logger.exception(e)
-        raise QuarantinableError("Request payload was not base64 encoded")
+        logger.exception(f"Request payload was not base64 encoded: {e}")
+        raise QuarantinableError(e)
     except InvalidTokenException as e:
         logger.exception(repr(e))
         raise QuarantinableError(e)
