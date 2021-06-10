@@ -22,11 +22,11 @@ spec:
         name: sdx-survey
         resources:
           requests:
-            memory: "250Mi"
-            cpu: "512m"
+            memory: "512Mi"
+            cpu: "250m"
           limits:
-            memory: "250Mi"
-            cpu: "512m"
+            memory: "512Mi"
+            cpu: "250m"
         env:
           - name: PROJECT_ID
             valueFrom:
