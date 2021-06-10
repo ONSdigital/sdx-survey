@@ -20,6 +20,13 @@ spec:
       - image: eu.gcr.io/{{ .Values.registry_location }}/sdx-survey:{{ .Chart.AppVersion }}
         imagePullPolicy: Always
         name: sdx-survey
+        resources:
+          requests:
+            memory: "250Mi"
+            cpu: "512m"
+          limits:
+            memory: "250Mi"
+            cpu: "512m"
         env:
           - name: PROJECT_ID
             valueFrom:
