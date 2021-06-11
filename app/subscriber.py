@@ -38,9 +38,10 @@ def callback(message):
 
     except Exception as error:
         if encrypted_message_str is None:
-            logger.info("encrypted_message_str is none, quarantining message instead!")
+            logger.error("encrypted_message_str is none, quarantining message instead!")
             quarantine_message(message, tx_id, str(error))
         else:
+            logger.error(f"quarantining message: {error}")
             quarantine_submission(encrypted_message_str, tx_id, str(error))
         message.ack()
 
