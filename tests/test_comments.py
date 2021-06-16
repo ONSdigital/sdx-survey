@@ -177,7 +177,7 @@ class TestGetComments(unittest.TestCase):
     @mock.patch('app.comments.datastore')
     @mock.patch('app.comments.CONFIG')
     def test_commmit_to_datastore(self, mock_config, mock_datastore):
-        comment = Comment("123", "009", "2020", b'my data')
+        comment = Comment("123", "009_2020", b'my data')
 
         mock_entity = Mock()
         mock_client = Mock()
@@ -193,7 +193,7 @@ class TestGetComments(unittest.TestCase):
     @mock.patch('app.comments.datastore')
     @mock.patch('app.comments.CONFIG')
     def test_commmit_to_datastore_error(self, mock_config, mock_datastore):
-        comment = Comment("123", "009", "2020", b'my data')
+        comment = Comment("123", "009_2020", b'my data')
         mock_datastore.Entity = Mock(side_effect=ValueError())
 
         ret = comments.commit_to_datastore(comment)
