@@ -8,14 +8,13 @@ format. These submissions come from EQ and require validation and additional pro
 ## Process
 
 The sdx-survey microservice receives JSON submissions via a PubSub subscription: `survey-subscription`. Once received, 
-data is decrypted and validated. If a survey fails it is published to
+data is decrypted and validated. If a survey validation fails it is published to
 the quarantine PubSub topic: `quarantine-survey-topic`. 
 
-Checks are then made on the survey type; if `type: surveyresponse`, comments are extracted and stored via GCP Datastore. Additionally 
-surveys requiring transformation are sent to SDX-Transform via `<HTTP Post>`. Once transformed, the data is sent to SDX-Deliver
-via `<HTTP Post>` and a receipt is published to PubSub: `receipt-topic`. This receipt notifies RASRM that the data has been
-successfully processed. For feedback submissions: `type: feedback`, no additional processing is required and the 
-`deliver/feedback` endpoint on sdx-deliver is called after decryption and validation.
+Checks are then made on the survey type; if `type: surveyresponse`, comments are extracted and stored via GCP Datastore. Additionally surveys requiring transformation are 
+sent to SDX-Transform via `<HTTP Post>`. Once transformed, the data is sent to SDX-Deliver via `<HTTP Post>` and a receipt is published to PubSub 
+topic: `receipt-topic`. This receipt notifies RASRM that the data has been successfully processed. For feedback submissions: `type: feedback`, 
+no additional processing is required and the `/deliver/feedback` endpoint on sdx-deliver is called after decryption and validation.
 
 **Note:** Refer to Collect.py
 
@@ -137,15 +136,13 @@ Data Field (Converted to JSON):
 ```
 
 ### Datastore
-Survey writes comments into GCP Datastore under the **'Comments'** entity.
+Survey writes comments into GCP Datastore under the **'{survey_id}_{period}'** kind.
 
 | Attribute       | Description                  | Example
 |-----------------|------------------------------|----------------
 | key (name/id)   | Transaction ID (tx_id)       | `name=09bd7d53-6f16-4efa-a9c0-ea6c35976062`
-| created         | Date and time comment stored | `yyyy-mm-dd HH:MM:SS.ss`
+| created         | Date and time comment stored | `yyyy-mm-dd, HH:MM:SS.ss`
 | encrypted_data  | Encrypted JSON               | `gAAAAABgOR2_QLs62GL7DFp0Fr_DwRatIQlWK...`
-| period          | Period from survey JSON      | `period: 201904`
-| survey_id       | Survey ID                    | `survey_id: 017`
 
 
 ### Secret Manager
