@@ -11,7 +11,7 @@ from app import CONFIG
 logger = structlog.get_logger()
 
 # stop these fields from being indexed
-exclude_from_index = ('encrypted_data', 'period', 'survey_id')
+exclude_from_index = tuple('encrypted_data')
 
 
 def store_comments(survey_dict: dict):
@@ -32,10 +32,10 @@ def store_comments(survey_dict: dict):
             "additional": get_additional_comments(survey_dict)}
 
     encrypted_data = encrypt_comment(data)
+    kind = f'{survey_id}_{period}'
 
     comment = Comment(transaction_id=transaction_id,
-                      period=period,
-                      survey_id=survey_id,
+                      kind=kind,
                       encrypted_data=encrypted_data)
 
     commit_to_datastore(comment)
@@ -115,10 +115,9 @@ def get_boxes_selected(submission):
 class Comment:
     """Class to define a comment entity"""
 
-    def __init__(self, transaction_id, survey_id, period, encrypted_data):
+    def __init__(self, transaction_id, kind, encrypted_data):
         self.transaction_id = transaction_id
-        self.survey_id = survey_id
-        self.period = period
+        self.kind = kind
         self.encrypted_data = encrypted_data
         self.created = datetime.now()
 
@@ -128,12 +127,10 @@ def commit_to_datastore(comment: Comment):
 
     try:
         logger.info('Storing comments in Datastore')
-        entity_key = CONFIG.DATASTORE_CLIENT.key('Comment', comment.transaction_id)
+        entity_key = CONFIG.DATASTORE_CLIENT.key(comment.kind, comment.transaction_id)
         entity = datastore.Entity(key=entity_key, exclude_from_indexes=exclude_from_index)
         entity.update(
             {
-                "survey_id": comment.survey_id,
-                "period": comment.period,
                 "created": comment.created,
                 "encrypted_data": comment.encrypted_data
             }
