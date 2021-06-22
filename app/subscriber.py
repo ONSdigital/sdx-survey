@@ -29,7 +29,7 @@ def callback(message):
 
     try:
         encrypted_message_str = message.data.decode('utf-8')
-        process(message)
+        process(encrypted_message_str)
         message.ack()
 
     except RetryableError as r:
