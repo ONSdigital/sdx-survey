@@ -28,9 +28,8 @@ def callback(message):
     bind_contextvars(thread=threading.currentThread().getName())
 
     try:
-        raise RuntimeError()
         encrypted_message_str = message.data.decode('utf-8')
-        process(encrypted_message_str)
+        process(message)
         message.ack()
 
     except RetryableError as r:
