@@ -38,7 +38,7 @@ class TestCollect(unittest.TestCase):
     def test_process_dap_survey(self, send_receipt, deliver_dap, store_comments, validate, decrypt):
         dap_response = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
-            'survey_id': '023',
+            'survey_id': '283',
             'type': 'uk.gov.ons.edc.eq:surveyresponse'
         }
 
