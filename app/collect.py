@@ -11,9 +11,9 @@ from app.validate import validate
 logger = structlog.get_logger()
 
 # list of survey ids that target only DAP
-DAP_SURVEYS = ["023", "134", "281", "283", "lms", "census"]
+DAP_SURVEYS = ["283", "lms", "census"]
 # list of surveys that target DAP and Legacy
-HYBRID_SURVEYS = ["007", "147"]
+HYBRID_SURVEYS = ["007", "023", "134", "147"]
 
 
 def process(encrypted_message_str: str):
