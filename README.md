@@ -124,15 +124,8 @@ receipt: Message {
 Data Field (Converted to JSON):
 ```json
 {
-	"case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3",
-	"tx_id": "73d06855-7885-49a1-b13f-5b516bc2b9fd",
-	"collection": {
-		"exercise_sid": "hfjdskf"
-	},
-	"metadata": {
-		"ru_ref": "12345678901A",
-		"user_id": "789473423"
-	}
+    "caseId": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3",
+    "partyId": "123-456"
 }
 ```
 
