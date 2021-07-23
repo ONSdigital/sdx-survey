@@ -37,5 +37,6 @@ def make_receipt(survey_dict: dict) -> str:
     except KeyError as e:
         raise QuarantinableError(f'Failed to make receipt: {str(e)}')
 
+    logger.info('Generated receipt', caseId=receipt_json['caseId'], partyId=receipt_json['partyId'])
     receipt_str = json.dumps(receipt_json)
     return receipt_str
