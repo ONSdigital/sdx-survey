@@ -10,9 +10,6 @@ from app import CONFIG
 
 logger = structlog.get_logger()
 
-# stop these fields from being indexed
-exclude_from_index = tuple('encrypted_data')
-
 
 def store_comments(survey_dict: dict):
     """
@@ -127,8 +124,9 @@ def commit_to_datastore(comment: Comment):
 
     try:
         logger.info('Storing comments in Datastore')
+        logger.info(f'Size of comment encrypted_data: {len(comment.encrypted_data)} bytes')
         entity_key = CONFIG.DATASTORE_CLIENT.key(comment.kind, comment.transaction_id)
-        entity = datastore.Entity(key=entity_key, exclude_from_indexes=exclude_from_index)
+        entity = datastore.Entity(key=entity_key, exclude_from_indexes=("encrypted_data",))
         entity.update(
             {
                 "created": comment.created,
