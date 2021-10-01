@@ -123,7 +123,7 @@ def commit_to_datastore(comment: Comment):
     """Write an instance of Comment to Google Datastore"""
 
     try:
-        logger.info('Storing comments in Datastore')
+        logger.info(f'Storing comments in Datastore', kind=comment.kind)
         logger.info(f'Size of comment encrypted_data: {len(comment.encrypted_data)} bytes')
         entity_key = CONFIG.DATASTORE_CLIENT.key(comment.kind, comment.transaction_id)
         entity = datastore.Entity(key=entity_key, exclude_from_indexes=("encrypted_data",))
