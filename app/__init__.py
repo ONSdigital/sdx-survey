@@ -9,7 +9,7 @@ logging_config()
 
 project_id = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
 receipt_topic_path = os.getenv('RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/topics/receipt-topic')
-subscription_id = "survey-subscription"
+subscription_id = "survey-trigger-subscription"
 quarantine_topic_id = "quarantine-survey-topic"
 transform_service_url = "sdx-transform:80"
 deliver_service_url = "sdx-deliver:80"
