@@ -3,6 +3,7 @@ import structlog
 from app.comments import store_comments
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver_hybrid
 from app.errors import QuarantinableError
+from app.reader import read
 from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
 from app.transform import transform
@@ -16,7 +17,8 @@ DAP_SURVEYS = ["283", "lms", "census"]
 HYBRID_SURVEYS = ["007", "023", "134", "147"]
 
 
-def process(encrypted_message_str: str):
+def process(tx_id: str):
+
     """
     Orchestrates the required steps to process an encrypted json string.
     The encrypted json can represent either a survey submission or survey feedback.
@@ -29,6 +31,10 @@ def process(encrypted_message_str: str):
         - receipting
     and are dependent on the survey and type of the submission.
     """
+
+    logger.info("Reading from the bucket")
+    data_bytes = read(tx_id)
+    encrypted_message_str = data_bytes.decode('utf-8')
 
     logger.info("Processing message")
 

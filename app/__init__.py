@@ -31,6 +31,8 @@ class Config:
         self.QUARANTINE_PUBLISHER = None
         self.QUARANTINE_TOPIC_PATH = None
         self.DATASTORE_CLIENT = None
+        self.BUCKET_NAME = f'{proj_id}-survey-responses'
+        self.BUCKET = None
 
 
 CONFIG = Config(project_id)
