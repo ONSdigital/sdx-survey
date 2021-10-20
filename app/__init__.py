@@ -1,5 +1,5 @@
 import os
-from google.cloud import pubsub_v1
+from google.cloud import pubsub_v1, storage
 from google.cloud import datastore
 from app.logger import logging_config
 from app.secret_manager import get_secret
@@ -46,6 +46,9 @@ def cloud_config():
     and therefore should not be called in situations where these connections are
     not possible, e.g running the unit tests locally.
     """
+
+    storage_client = storage.Client(CONFIG.PROJECT_ID)
+    CONFIG.BUCKET = storage_client.bucket(CONFIG.BUCKET_NAME)
 
     CONFIG.DECRYPT_SURVEY_KEY = get_secret(project_id, 'sdx-private-jwt')
     CONFIG.AUTHENTICATE_SURVEY_KEY = get_secret(project_id, 'eq-public-signing')
