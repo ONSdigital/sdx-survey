@@ -6,7 +6,7 @@ from structlog.contextvars import bind_contextvars, clear_contextvars
 from app import CONFIG
 from app.collect import process
 from app.errors import RetryableError
-from app.quarantine import quarantine_submission, quarantine_message
+from app.quarantine import quarantine_submission
 
 logger = structlog.get_logger()
 
@@ -21,7 +21,7 @@ def callback(message):
     catching exceptions raised during processing.
     """
 
-    tx_id = message.attributes.get('body.name')
+    tx_id = message.attributes.get('objectId')
     bind_contextvars(app="SDX-Survey")
     bind_contextvars(tx_id=tx_id)
     bind_contextvars(thread=threading.currentThread().getName())

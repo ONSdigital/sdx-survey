@@ -8,7 +8,7 @@ def read(filename) -> bytes:
     """
     Retrieve a survey response from the survey response input bucket
     """
-    logger.info('Getting Survey Response file as bytes')
+    logger.info('Reading Survey Response file from bucket')
     blob = CONFIG.BUCKET.blob(filename)
     data_bytes = blob.download_as_bytes()
 

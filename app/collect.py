@@ -32,11 +32,9 @@ def process(tx_id: str):
     and are dependent on the survey and type of the submission.
     """
 
-    logger.info("Reading from the bucket")
+    logger.info("Processing tx_id")
     data_bytes = read(tx_id)
     encrypted_message_str = data_bytes.decode('utf-8')
-
-    logger.info("Processing message")
 
     survey_dict = decrypt_survey(encrypted_message_str)
 
