@@ -21,8 +21,7 @@ def callback(message):
     catching exceptions raised during processing.
     """
 
-    encrypted_message_str = None
-    tx_id = message.attributes.get('tx_id')
+    tx_id = message.attributes.get('body.name')
     bind_contextvars(app="SDX-Survey")
     bind_contextvars(tx_id=tx_id)
     bind_contextvars(thread=threading.currentThread().getName())
@@ -36,12 +35,9 @@ def callback(message):
         message.nack()
 
     except Exception as error:
-        if encrypted_message_str is None:
-            logger.error("encrypted_message_str is none, quarantining message instead!")
-            quarantine_message(message, tx_id, str(error))
-        else:
-            logger.error(f"quarantining message: {error}")
-            quarantine_submission(encrypted_message_str, tx_id, str(error))
+
+        logger.error(f"quarantining message: {error}")
+        quarantine_submission(tx_id, str(error))
         message.ack()
 
     finally:
