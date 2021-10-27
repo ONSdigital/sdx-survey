@@ -7,10 +7,12 @@ from app.logger import _MaxLevelFilter
 
 class TestInit(unittest.TestCase):
 
+    @patch('app.storage')
     @patch('app.get_secret')
     @patch('app.pubsub_v1')
     @patch('app.datastore')
-    def test_cloud_config(self, mock_datastore, mock_pubsub, mock_get_secret):
+    def test_cloud_config(self, mock_datastore, mock_pubsub, mock_get_secret, mock_storage):
+        mock_storage.return_value = Mock()
         mock_pubsub.SubscriberClient.return_value = Mock()
         ds_client = Mock()
         mock_datastore.Client = ds_client
