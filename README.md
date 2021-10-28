@@ -7,8 +7,9 @@ format. These submissions come from EQ and require validation and additional pro
 
 ## Process
 
-The sdx-survey microservice receives JSON submissions via a PubSub subscription: `survey-subscription`. Once received, 
-data is decrypted and validated. If a survey validation fails it is published to
+The sdx-survey microservice receives a notification via a PubSub subscription: `survey-trigger-subscription`.
+From this notification it reads the transaction id and then reads the corresponding file from Bucket: `survey-responses`
+the data is then decrypted and validated. If a survey validation fails it is published to
 the quarantine PubSub topic: `quarantine-survey-topic`. 
 
 Checks are then made on the survey type; if `type: surveyresponse`, comments are extracted and stored via GCP Datastore. 

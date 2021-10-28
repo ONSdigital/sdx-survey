@@ -6,7 +6,7 @@ from structlog.contextvars import bind_contextvars, clear_contextvars
 from app import CONFIG
 from app.collect import process
 from app.errors import RetryableError
-from app.quarantine import quarantine_submission, quarantine_message
+from app.quarantine import quarantine_submission
 
 logger = structlog.get_logger()
 
@@ -21,15 +21,13 @@ def callback(message):
     catching exceptions raised during processing.
     """
 
-    encrypted_message_str = None
-    tx_id = message.attributes.get('tx_id')
+    tx_id = message.attributes.get('objectId')
     bind_contextvars(app="SDX-Survey")
     bind_contextvars(tx_id=tx_id)
     bind_contextvars(thread=threading.currentThread().getName())
 
     try:
-        encrypted_message_str = message.data.decode('utf-8')
-        process(encrypted_message_str)
+        process(tx_id)
         message.ack()
 
     except RetryableError as r:
@@ -37,12 +35,9 @@ def callback(message):
         message.nack()
 
     except Exception as error:
-        if encrypted_message_str is None:
-            logger.error("encrypted_message_str is none, quarantining message instead!")
-            quarantine_message(message, tx_id, str(error))
-        else:
-            logger.error(f"quarantining message: {error}")
-            quarantine_submission(encrypted_message_str, tx_id, str(error))
+
+        logger.error(f"quarantining message: {error}")
+        quarantine_submission(tx_id, str(error))
         message.ack()
 
     finally:
