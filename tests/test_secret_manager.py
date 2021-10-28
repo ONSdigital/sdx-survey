@@ -16,7 +16,7 @@ class TestSecret(unittest.TestCase):
         secret = "my-secret"
         client_mock = Mock()
         response_mock = Mock()
-        response_mock.payload.data.decode = Mock(return_value=secret)
+        response_mock.payload.data.decode = Mock(return_value=[secret])
 
         client_mock.access_secret_version = Mock(return_value=response_mock)
         mock_secret_manager.SecretManagerServiceClient = Mock(return_value=client_mock)

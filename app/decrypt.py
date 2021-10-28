@@ -6,7 +6,6 @@ from cryptography import exceptions
 from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
 from sdc.crypto.decrypter import decrypt as sdc_decrypt
-from app import CONFIG
 from app.errors import QuarantinableError
 
 
@@ -16,15 +15,13 @@ logger = structlog.get_logger()
 class Decrypter:
 
     KEY_PURPOSE_SUBMISSION = 'submission'
+    keys = {}
+    key_store = KeyStore({"keys": keys})
 
-    def __init__(self) -> None:
-        keys = [CONFIG.DECRYPT_SURVEY_KEY, CONFIG.AUTHENTICATE_SURVEY_KEY]
-        key_dict = {}
-        for k_list in keys:
-            for k in k_list:
-                key = yaml.safe_load(k)
-                key_dict[key['keyid']] = key
-        self.key_store = KeyStore({"keys": key_dict})
+    def add_key(self, k):
+        key = yaml.safe_load(k)
+        self.keys[key['keyid']] = key
+        self.key_store = KeyStore({"keys": self.keys})
 
     def decrypt_survey(self, payload: str) -> dict:
         """
@@ -68,3 +65,14 @@ decrypter = Decrypter()
 
 def decrypt_survey(payload: str) -> dict:
     return decrypter.decrypt_survey(payload)
+
+
+def add_key(key) -> None:
+    decrypter.add_key(key)
+
+
+def add_secret(secret) -> None:
+    for k_list in secret:
+        for key in k_list:
+            add_key(key)
+
