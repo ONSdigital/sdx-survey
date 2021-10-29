@@ -9,7 +9,7 @@ from sdc.crypto.encrypter import encrypt
 from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
 
-from app.decrypt import decrypt_survey, add_key
+from app.decrypt import decrypt_survey, add_key, add_keys
 from app.errors import QuarantinableError
 
 
@@ -31,16 +31,7 @@ def load_keys(*keys) -> KeyStore:
     return KeyStore({"keys": key_dict})
 
 
-class TestDecrypt(unittest.TestCase):
-
-    def test_decrypt_survey(self):
-
-        key_file1 = open("test_sdx-private-jwt.yaml")
-        add_key(key_file1)
-        key_file2 = open("test_eq-public-signing.yaml")
-        add_key(key_file2)
-
-        message_dict = json.loads('''{
+message_dict = json.loads('''{
             "collection": {
                 "exercise_sid": "XxsteeWv",
                 "instrument_id": "0167",
@@ -74,10 +65,32 @@ class TestDecrypt(unittest.TestCase):
             "tx_id": "c37a3efa-593c-4bab-b49c-bee0613c4fb2",
             "case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3"
         }''')
+
+
+class TestDecrypt(unittest.TestCase):
+
+    def test_decrypt_survey(self):
+        key_file1 = open("test_sdx-private-jwt.yaml")
+        add_key(key_file1)
+        key_file2 = open("test_eq-public-signing.yaml")
+        add_key(key_file2)
         encrypted_message = encrypt_survey(message_dict)
         decrypted_message = decrypt_survey(encrypted_message)
         key_file1.close()
         key_file2.close()
+        self.assertEqual(decrypted_message, message_dict)
+
+    def test_decrypt_survey_with_secret(self):
+        with open("test_sdx-private-jwt.yaml", "r") as f1:
+            key1 = "".join(f1.readlines())
+
+        with open("test_eq-public-signing.yaml", "r") as f2:
+            key2 = "".join(f2.readlines())
+
+        add_keys([key1, key2])
+
+        encrypted_message = encrypt_survey(message_dict)
+        decrypted_message = decrypt_survey(encrypted_message)
         self.assertEqual(decrypted_message, message_dict)
 
     @patch('app.decrypt.sdc_decrypt')

@@ -71,8 +71,6 @@ def add_key(key) -> None:
     decrypter.add_key(key)
 
 
-def add_secret(secret) -> None:
-    for k_list in secret:
-        for key in k_list:
-            add_key(key)
-
+def add_keys(keys: list) -> None:
+    for key in keys:
+        add_key(key)
