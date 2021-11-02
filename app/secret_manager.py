@@ -4,7 +4,7 @@ import structlog
 logger = structlog.get_logger()
 
 
-def get_secret(project_id, secret_id) -> list:
+def get_secret_list(project_id, secret_id) -> list:
     """
     Secrets are managed by Google Secret Manager.
 

@@ -8,10 +8,10 @@ from app.logger import _MaxLevelFilter
 class TestInit(unittest.TestCase):
 
     @patch('app.storage')
-    @patch('app.get_secret')
+    @patch('app.get_secret_list')
     @patch('app.pubsub_v1')
     @patch('app.datastore')
-    def test_cloud_config(self, mock_datastore, mock_pubsub, mock_get_secret, mock_storage):
+    def test_cloud_config(self, mock_datastore, mock_pubsub, mock_get_secret_list, mock_storage):
         mock_storage.return_value = Mock()
         mock_pubsub.SubscriberClient.return_value = Mock()
         ds_client = Mock()

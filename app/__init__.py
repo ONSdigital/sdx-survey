@@ -2,7 +2,7 @@ import os
 from google.cloud import pubsub_v1, storage
 from google.cloud import datastore
 from app.logger import logging_config
-from app.secret_manager import get_secret
+from app.secret_manager import get_secret_list
 from app.decrypt import add_keys
 
 
@@ -50,10 +50,10 @@ def cloud_config():
     storage_client = storage.Client(CONFIG.PROJECT_ID)
     CONFIG.BUCKET = storage_client.bucket(CONFIG.BUCKET_NAME)
 
-    add_keys(get_secret(project_id, 'sdx-private-jwt'))
-    add_keys(get_secret(project_id, 'eq-public-signing'))
+    add_keys(get_secret_list(project_id, 'sdx-private-jwt'))
+    add_keys(get_secret_list(project_id, 'eq-public-signing'))
 
-    CONFIG.ENCRYPT_COMMENT_KEY = get_secret(project_id, 'sdx-comment-key')
+    CONFIG.ENCRYPT_COMMENT_KEY = get_secret_list(project_id, 'sdx-comment-key')[0]
 
     survey_subscriber = pubsub_v1.SubscriberClient()
     CONFIG.SURVEY_SUBSCRIPTION_PATH = survey_subscriber.subscription_path(project_id, subscription_id)
