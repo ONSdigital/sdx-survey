@@ -4,24 +4,29 @@ import structlog
 logger = structlog.get_logger()
 
 
-def get_secret(project_id, secret_id):
+def get_secret_list(project_id, secret_id) -> list:
     """
-    SDX's secrets are managed by Google Secret Manager.
-    This method provides a way of retrieving a specific secret.
+    Secrets are managed by Google Secret Manager.
 
-    The project id is passed as a parameter to allow for cases where the
-    Secret Manager is not located in the same project as the service.
+    This method returns a list of the currently enabled versions
+    of the secret with name "secret_id" in the given project.
     """
-    version_id = 'latest'
 
-    logger.info("Getting secrets from Secret Manager")
+    logger.info(f"Checking for versions of {secret_id}")
     # Create the Secret Manager client.
     client = secretmanager.SecretManagerServiceClient()
 
     # Build the resource name of the secret version.
-    name = f"projects/{project_id}/secrets/{secret_id}/versions/{version_id}"
+    parent = client.secret_path(project_id, secret_id)
 
-    response = client.access_secret_version(request={"name": name})
+    secrets = []
+    for version in client.list_secret_versions(request={"parent": parent}):
+        if version.state.name == "ENABLED":
+            logger.info(f"Getting secret { version.name} from Secret Manager")
+            response = client.access_secret_version(request={"name": version.name})
+            secrets.append(response.payload.data.decode("UTF-8"))
 
-    payload = response.payload.data.decode("UTF-8")
-    return payload
+    if len(secrets) < 1:
+        logger.error(f"No enabled versions of {secret_id}")
+
+    return secrets
