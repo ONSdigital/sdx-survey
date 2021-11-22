@@ -162,6 +162,8 @@ def get_schema(version):
                 Required("period"): str,
                 Required("exercise_sid"): str,
                 Required("instrument_id"): All(str, Length(max=4)),
+                # Added for eq_v3
+                Optional("schema_name"): str,
             }
         )
 
@@ -191,6 +193,15 @@ def get_schema(version):
                 Required("metadata"): metadata_s,
                 Required("data"): is_valid_survey_data,
                 Optional("paradata"): object,
+                # Added for eq_v3
+                Optional("case_type"): str,
+                Optional("launch_language_code"): str,
+                Optional("submission_language_code"): str,
+                Optional("form_type"): str,
+                Optional("region_code"): str,
+                Optional("case_ref"): str,
+                Optional("case_type"): str,
+                Optional("channel"): str,
             }
         )
         return schema

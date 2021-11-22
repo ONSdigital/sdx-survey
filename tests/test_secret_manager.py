@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import Mock, patch
 
+from google.api_core.exceptions import NotFound
+
 from app import get_secret_list
 
 
@@ -84,3 +86,18 @@ class TestSecret(unittest.TestCase):
         mock_secret_manager.SecretManagerServiceClient = Mock(return_value=client_mock)
 
         self.assertEqual([], get_secret_list(project_id, secret_id))
+
+    @patch('app.secret_manager.secretmanager')
+    @patch('app.secret_manager.logger')
+    def test_secret_not_found(self, mock_logger, mock_secret_manager):
+        project_id = "ons-sdx-sandbox"
+        secret_id = "my_key"
+        client_mock = Mock()
+        exception_mock = Mock()
+        mock_logger.exception = exception_mock
+
+        client_mock.list_secret_versions = Mock(side_effect=NotFound("Missing Secret"))
+        mock_secret_manager.SecretManagerServiceClient = Mock(return_value=client_mock)
+
+        get_secret_list(project_id, secret_id)
+        exception_mock.assert_called()
