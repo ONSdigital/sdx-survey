@@ -401,3 +401,25 @@ class TestValidateService(unittest.TestCase):
         survey["survey_id"] = "567"
         with self.assertRaises(QuarantinableError):
             validate(survey)
+
+    def test_allow_case_type(self):
+        survey = json.loads(self.message['0.0.1'])
+        survey['case_type'] = "B"
+        self.assertValid(survey)
+
+    def test_allow_all_eq_v3_fields(self):
+        survey = json.loads(self.message['0.0.1'])
+        survey['collection']['schema_name'] = "mbs_1704"
+        survey['metadata']['ref_period_start_date'] = "2016-05-01"
+        survey['metadata']['ref_period_end_date'] = "2016-05-31"
+        survey['launch_language_code'] = "en"
+        survey['submission_language_code'] = "en"
+        survey['form_type'] = "0167"
+        survey['region_code'] = "GB-ENG"
+        survey['case_ref'] = "1000000000000001"
+        survey['case_type'] = "B"
+        survey['channel'] = "RAS"
+
+        self.assertValid(survey)
+
+

@@ -12,10 +12,17 @@ from sdc.crypto.key_store import KeyStore
 from app.decrypt import decrypt_survey, add_key, add_keys
 from app.errors import QuarantinableError
 
+KEY_DIR = "keys"
 
-def encrypt_survey(submission: dict) -> str:
-    key1 = open("test_sdx-public-jwt.yaml")
-    key2 = open("test_eq-private-signing.yaml")
+
+def encrypt_survey(submission: dict, eq_v3: bool = False) -> str:
+
+    key1 = open(f"{KEY_DIR}/test_sdx-public-jwt.yaml")
+    if eq_v3:
+        key2 = open(f"{KEY_DIR}/test_eqv3-private-signing.yaml")
+    else:
+        key2 = open(f"{KEY_DIR}/test_eq-private-signing.yaml")
+
     key_store = load_keys(key1, key2)
     payload = encrypt(submission, key_store, 'submission')
     key1.close()
@@ -70,9 +77,20 @@ message_dict = json.loads('''{
 class TestDecrypt(unittest.TestCase):
 
     def test_decrypt_survey(self):
-        key_file1 = open("test_sdx-private-jwt.yaml")
+        key_file1 = open(f"{KEY_DIR}/test_sdx-private-jwt.yaml")
         add_key(key_file1)
-        key_file2 = open("test_eq-public-signing.yaml")
+        key_file2 = open(f"{KEY_DIR}/test_eq-public-signing.yaml")
+        add_key(key_file2)
+        encrypted_message = encrypt_survey(message_dict)
+        decrypted_message = decrypt_survey(encrypted_message)
+        key_file1.close()
+        key_file2.close()
+        self.assertEqual(decrypted_message, message_dict)
+
+    def test_eq_v3_survey(self):
+        key_file1 = open(f"{KEY_DIR}/test_sdx-private-jwt.yaml")
+        add_key(key_file1)
+        key_file2 = open(f"{KEY_DIR}/test_eqv3-public-signing.yaml")
         add_key(key_file2)
         encrypted_message = encrypt_survey(message_dict)
         decrypted_message = decrypt_survey(encrypted_message)
@@ -81,10 +99,10 @@ class TestDecrypt(unittest.TestCase):
         self.assertEqual(decrypted_message, message_dict)
 
     def test_decrypt_survey_with_secret(self):
-        with open("test_sdx-private-jwt.yaml", "r") as f1:
+        with open(f"{KEY_DIR}/test_sdx-private-jwt.yaml", "r") as f1:
             key1 = "".join(f1.readlines())
 
-        with open("test_eq-public-signing.yaml", "r") as f2:
+        with open(f"{KEY_DIR}/test_eq-public-signing.yaml", "r") as f2:
             key2 = "".join(f2.readlines())
 
         add_keys([key1, key2])

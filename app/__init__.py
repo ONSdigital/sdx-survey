@@ -52,6 +52,7 @@ def cloud_config():
 
     add_keys(get_secret_list(project_id, 'sdx-private-jwt'))
     add_keys(get_secret_list(project_id, 'eq-public-signing'))
+    add_keys(get_secret_list(project_id, 'eq-public-jws'))
 
     CONFIG.ENCRYPT_COMMENT_KEY = get_secret_list(project_id, 'sdx-comment-key')[0]
 
