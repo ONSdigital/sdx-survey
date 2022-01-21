@@ -104,6 +104,38 @@ class TestValidateService(unittest.TestCase):
                    "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
                    "version" : "0.0.1"
                 }''',
+
+            'feedback_eqv3': '''{
+                  "case_id": "e4249973-7e7c-49ad-8652-d8f071365154",
+                  "collection": {
+                    "exercise_sid": "96888d51-c9b9-49c2-9413-b1e40e43a85b",
+                    "instrument_id": "0009",
+                    "period": "201605",
+                    "schema_name": "lcree_0009"
+                  },
+                  "data": {
+                    "feedback_count": "1",
+                    "feedback_text": "EQ to SDX testing Mark and Jon",
+                    "feedback_type": "The survey questions"
+                  },
+                  "flushed": false,
+                  "form_type": "0009",
+                  "launch_language_code": "en",
+                  "metadata": {
+                    "ref_period_end_date": "2016-05-31",
+                    "ref_period_start_date": "2016-05-01",
+                    "ru_ref": "12346789012A",
+                    "user_id": "UNKNOWN"
+                  },
+                  "origin": "uk.gov.ons.edc.eq",
+                  "started_at": "2022-01-21T10:13:11.570441+00:00",
+                  "submission_language_code": "en",
+                  "submitted_at": "2022-01-21T10:18:15.573135+00:00",
+                  "survey_id": "007",
+                  "tx_id": "487dddd4-fcd0-4672-a7cf-e4a2d2dfbca2",
+                  "type": "uk.gov.ons.edc.eq:feedback",
+                  "version": "0.0.1"
+                }'''
         }
 
     @staticmethod
@@ -127,6 +159,10 @@ class TestValidateService(unittest.TestCase):
         for v in ['0.0.1', '0.0.2', 'feedback']:
             m = self.message[v]
             self.assertValid(m)
+
+    def test_validates_eqv3_feedback(self):
+        m = self.message['feedback_eqv3']
+        self.assertValid(m)
 
     def test_mwss_valid(self):
         survey = json.loads(self.message['0.0.1'])
