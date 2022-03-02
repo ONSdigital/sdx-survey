@@ -169,12 +169,12 @@ class TestTransform(unittest.TestCase):
             with mock.patch('requests.models.Response.content') as mock_content:
                 mock_content.return_value = ResponseContent
                 dap_dict = json.loads(dap_data)
-                with self.assertRaises(RetryableError) as submission_exception:
+                with self.assertRaises(QuarantinableError) as submission_exception:
                     transform.transform(dap_dict)
                 self.assertEqual(str(submission_exception.exception), bad_response)
 
     def test_transform_bad_request_response(self):
-        bad_response = "Bad Request response from sdx-transform"
+        bad_response = "Bad response from sdx-transform"
         r = requests.Response()
         with mock.patch('app.transform.post') as mock_post:
             mock_post.return_value = r
