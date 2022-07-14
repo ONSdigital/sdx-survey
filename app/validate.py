@@ -1,4 +1,7 @@
+import json
+
 import structlog
+import jsonschema
 
 from functools import partial
 from structlog.contextvars import bind_contextvars, unbind_contextvars
@@ -8,6 +11,12 @@ from uuid import UUID
 from app.errors import QuarantinableError
 
 logger = structlog.get_logger('app.subscriber')
+
+schemas = {}
+
+
+with open("eq_submission_schema.json") as schema_file:
+    schemas["survey"] = json.load(schema_file)
 
 # A dict of dicts containing lists of formtypes mapped to survey ids
 KNOWN_SURVEYS = {
@@ -119,7 +128,7 @@ def validate(survey_dict: dict) -> bool:
                              ru_ref=metadata.get("ru_ref"))
 
             logger.info("Validating json against schema")
-            schema(json_data)
+            jsonschema.validate(json_data, schema)
 
             survey_id = json_data.get("survey_id")
             if survey_id not in KNOWN_SURVEYS.get(version, {}):
@@ -140,6 +149,10 @@ def validate(survey_dict: dict) -> bool:
 
         logger.debug("Success")
 
+    except jsonschema.ValidationError as e:
+        # logger.error("Client error", error=e)
+        raise QuarantinableError(e)
+
     except (MultipleInvalid, KeyError, TypeError, ValueError) as e:
         logger.error("Client error", error=e)
         raise QuarantinableError(e)
@@ -158,56 +171,7 @@ def validate(survey_dict: dict) -> bool:
 
 def get_schema(version):
     if version == "0.0.1":
-        valid_survey_id = partial(is_valid_survey_id, version="0.0.1")
-
-        collection_s = Schema(
-            {
-                Required("period"): str,
-                Required("exercise_sid"): str,
-                Required("instrument_id"): All(str, Length(max=4)),
-                # Added for eq_v3
-                Optional("schema_name"): str,
-            }
-        )
-
-        metadata_s = Schema(
-            {
-                Required("user_id"): str,
-                Required("ru_ref"): All(str, Length(12)),
-                Optional("ref_period_start_date"): parse_timestamp,
-                Optional("ref_period_end_date"): parse_timestamp,
-            }
-        )
-
-        schema = Schema(
-            {
-                Required("type"): "uk.gov.ons.edc.eq:surveyresponse",
-                Required("version"): "0.0.1",
-                Optional("tx_id"): All(str, is_valid_survey_txid),
-                Required("origin"): "uk.gov.ons.edc.eq",
-                Required("survey_id"): All(str, valid_survey_id),
-                Optional("case_id"): str,
-                Optional("case_ref"): str,
-                Optional("completed"): bool,
-                Optional("flushed"): bool,
-                Optional("started_at"): parse_timestamp,
-                Required("submitted_at"): parse_timestamp,
-                Required("collection"): collection_s,
-                Required("metadata"): metadata_s,
-                Required("data"): is_valid_survey_data,
-                Optional("paradata"): object,
-                # Added for eq_v3
-                Optional("case_type"): str,
-                Optional("launch_language_code"): str,
-                Optional("submission_language_code"): str,
-                Optional("form_type"): str,
-                Optional("region_code"): str,
-                Optional("case_ref"): str,
-                Optional("case_type"): str,
-                Optional("channel"): str,
-            }
-        )
-        return schema
+        return schemas["survey"]
 
     elif version == "0.0.2":
         valid_survey_id = partial(is_valid_survey_id, version="0.0.2")
@@ -288,3 +252,5 @@ def get_schema(version):
 
     else:
         return None
+
+
