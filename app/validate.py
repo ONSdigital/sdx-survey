@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import structlog
 import jsonschema
@@ -14,9 +15,11 @@ logger = structlog.get_logger('app.subscriber')
 
 schemas = {}
 
-
-with open("eq_submission_schema.json") as schema_file:
-    schemas["survey"] = json.load(schema_file)
+path = Path("./schemas")
+resolver = jsonschema.validators.RefResolver(
+    base_uri=f"{path.resolve().as_uri()}/",
+    referrer=True,
+)
 
 # A dict of dicts containing lists of formtypes mapped to survey ids
 KNOWN_SURVEYS = {
@@ -115,11 +118,6 @@ def validate(survey_dict: dict) -> bool:
         if response_type.find("feedback") == -1:
             version = json_data["version"]
 
-            schema = get_schema(version)
-
-            if schema is None:
-                raise QuarantinableError("Unsupported schema version '%s'" % version)
-
             metadata = json_data.get("metadata")
             if metadata is None:
                 raise QuarantinableError('Missing metadata field')
@@ -128,7 +126,12 @@ def validate(survey_dict: dict) -> bool:
                              ru_ref=metadata.get("ru_ref"))
 
             logger.info("Validating json against schema")
-            jsonschema.validate(json_data, schema)
+
+            jsonschema.validate(
+                instance=json_data,
+                schema={"$ref": "submission_v1.json"},
+                resolver=resolver,
+            )
 
             survey_id = json_data.get("survey_id")
             if survey_id not in KNOWN_SURVEYS.get(version, {}):
