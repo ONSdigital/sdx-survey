@@ -49,10 +49,7 @@ class TestValidateService(unittest.TestCase):
                }
             }''',
 
-            'feedback': '''{
-                    "flushed" : false,
-                    "case_id": "12345678-1234-1234-1234-123456789012",
-                    
+            'feedback': '''{                   
                    "type" : "uk.gov.ons.edc.eq:feedback",
                    "origin" : "uk.gov.ons.edc.eq",
                    "metadata": {
@@ -68,7 +65,7 @@ class TestValidateService(unittest.TestCase):
                    "submitted_at": "2016-03-07T15:28:05Z",
                    "collection": {
                      "instrument_id": "0203",
-                     "exercise_sid": "739",
+                     "exercise_sid": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
                      "period": "2016-02-01"
                    },
                    "survey_id": "023",
