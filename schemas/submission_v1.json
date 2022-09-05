@@ -98,7 +98,6 @@
     }
   },
   "additionalProperties": false,
-  "unevaluatedProperties": false,
   "if": {
     "properties": { "type": { "const": "uk.gov.ons.edc.eq:feedback" } }
   },

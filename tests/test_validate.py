@@ -1,5 +1,3 @@
-from unittest.mock import patch, Mock
-
 from app.errors import QuarantinableError
 from app.validate import validate, check_known_survey
 
@@ -52,6 +50,9 @@ class TestValidateService(unittest.TestCase):
             }''',
 
             'feedback': '''{
+                    "flushed" : false,
+                    "case_id": "12345678-1234-1234-1234-123456789012",
+                    
                    "type" : "uk.gov.ons.edc.eq:feedback",
                    "origin" : "uk.gov.ons.edc.eq",
                    "metadata": {
@@ -120,10 +121,13 @@ class TestValidateService(unittest.TestCase):
     def assertValid(self, data):
         self.assertTrue(self.validate_response(data))
 
-    def test_validates_json(self):
-        for v in ['submission_v1', 'feedback']:
-            m = self.message[v]
-            self.assertValid(m)
+    def test_validates_submission(self):
+        m = self.message['submission_v1']
+        self.assertValid(m)
+
+    def test_validates_feedback(self):
+        m = self.message['feedback']
+        self.assertValid(m)
 
     def test_validates_eqv3_feedback(self):
         m = self.message['feedback_eqv3']
