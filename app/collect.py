@@ -45,7 +45,7 @@ def process(tx_id: str):
 
     if is_feedback(survey_dict):
         # feedback do not require storing comments, transforming, or receipting.
-        deliver_feedback(survey_dict)
+        deliver_feedback(survey_dict, filename=tx_id)
 
     else:
         store_comments(survey_dict)

@@ -45,7 +45,7 @@ class TestCollect(unittest.TestCase):
     @patch.object(Session, 'post')
     def test_post_feedback_200(self, mock_post):
         mock_post.return_value.status_code = 200
-        deliver_feedback(self.test_survey)
+        deliver_feedback(self.test_survey, filename="1027a13a-c253-4e9d-9e78-d0f0cfdd3988")
         mock_post.assert_called()
 
     @patch.object(Session, 'post')
