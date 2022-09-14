@@ -22,8 +22,9 @@ class TestCollect(unittest.TestCase):
     @patch('app.collect.deliver_feedback')
     @patch('app.collect.send_receipt')
     def test_process_feedback(self, send_receipt, deliver_feedback, validate, decrypt, reader):
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         feedback_response = {
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '023',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
@@ -31,8 +32,8 @@ class TestCollect(unittest.TestCase):
         reader.return_value = json.dumps(feedback_response).encode()
         decrypt.return_value = feedback_response
         validate.return_value = True
-        process('encrypted feedback')
-        deliver_feedback.assert_called_with(feedback_response)
+        process(tx_id)
+        deliver_feedback.assert_called_with(feedback_response, filename=tx_id)
         send_receipt.assert_not_called()
 
     @patch('app.collect.read')

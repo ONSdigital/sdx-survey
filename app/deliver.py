@@ -47,19 +47,22 @@ def deliver_hybrid(survey_dict: dict, zip_file: bytes):
     deliver(survey_dict, HYBRID, files)
 
 
-def deliver_feedback(survey_dict: dict):
+def deliver_feedback(survey_dict: dict, filename: str):
     """deliver a feedback survey submission"""
     logger.info(f"Sending feedback submission")
-    deliver(survey_dict, FEEDBACK)
+    deliver(survey_dict, FEEDBACK, {}, filename)
 
 
-def deliver(survey_dict: dict, output_type: str, files: dict = {}):
+def deliver(survey_dict: dict, output_type: str, files: dict = {}, filename: str = None):
     """
     Calls the deliver endpoint specified by the output_type parameter.
     Returns True or raises appropriate error on response.
     """
+    if not filename:
+        filename = survey_dict['tx_id']
+
     files[SUBMISSION_FILE] = json.dumps(survey_dict).encode(UTF8)
-    response = post(survey_dict['tx_id'], files, output_type)
+    response = post(filename, files, output_type)
     status_code = response.status_code
 
     if status_code == 200:
