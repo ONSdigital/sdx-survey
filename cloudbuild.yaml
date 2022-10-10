@@ -1,0 +1,13 @@
+---
+substitutions:
+  _IMAGE_PATH: 'eu.gcr.io/${PROJECT_ID}/${REPO_NAME}/${BRANCH_NAME}'
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', '${_IMAGE_PATH}:${BUILD_ID}', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', '${_IMAGE_PATH}:${BUILD_ID}', '${_IMAGE_PATH}:latest']
+
+images:
+  - ${_IMAGE_PATH}:latest
+  - ${_IMAGE_PATH}:${BUILD_ID}
