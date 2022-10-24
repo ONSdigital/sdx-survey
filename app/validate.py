@@ -4,7 +4,7 @@ import structlog
 
 from app.errors import QuarantinableError
 
-logger = structlog.get_logger('app.subscriber')
+logger = structlog.get_logger()
 
 path = Path("./schemas")
 resolver = jsonschema.validators.RefResolver(
@@ -87,8 +87,8 @@ def validate(survey_dict: dict) -> bool:
             raise QuarantinableError(f"Unsupported survey_id and/or form_type '{survey_id}:{form_type}'")
 
     except jsonschema.ValidationError as e:
-        logger.error("Client error", error=e)
-        raise QuarantinableError(e)
+        logger.error("Client error", error=e.message)
+        raise QuarantinableError(e.message)
 
     except Exception as e:
         logger.error("Server error", error=e)

@@ -337,3 +337,11 @@ class TestValidateService(unittest.TestCase):
         survey['channel'] = "RAS"
 
         self.assertValid(survey)
+
+    def test_exception_is_descriptive_for_missing_survey_id(self):
+        survey = json.loads(self.message['submission_v1'])
+        del survey["survey_id"]
+        try:
+            validate(survey)
+        except QuarantinableError as e:
+            self.assertEquals("'survey_id' is a required property", str(e))
