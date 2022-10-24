@@ -72,19 +72,30 @@ def validate(survey_dict: dict) -> bool:
 
         logger.info("Validating json against schema")
 
-        jsonschema.validate(
-            instance=json_data,
-            schema={"$ref": "submission_v1.json"},
-            resolver=resolver,
-        )
+        version = json_data.get("version")
+        if version == "v2":
 
-        survey_id = json_data.get("survey_id")
-        form_type = json_data.get("collection", {}).get("instrument_id")
+            jsonschema.validate(
+                instance=json_data,
+                schema={"$ref": "submission_v2.json"},
+                resolver=resolver,
+            )
 
-        try:
-            check_known_survey(survey_id, form_type)
-        except ValueError:
-            raise QuarantinableError(f"Unsupported survey_id and/or form_type '{survey_id}:{form_type}'")
+        else:
+
+            jsonschema.validate(
+                instance=json_data,
+                schema={"$ref": "submission_v2.json"},
+                resolver=resolver,
+            )
+
+            survey_id = json_data.get("survey_id")
+            form_type = json_data.get("collection", {}).get("instrument_id")
+
+            try:
+                check_known_survey(survey_id, form_type)
+            except ValueError:
+                raise QuarantinableError(f"Unsupported survey_id and/or form_type '{survey_id}:{form_type}'")
 
     except jsonschema.ValidationError as e:
         logger.error("Client error", error=e.message)
