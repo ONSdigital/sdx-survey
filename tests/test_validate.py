@@ -5,135 +5,25 @@ import unittest
 import json
 
 
+responseTestDataMap = {
+    "submission": "original/submission.json",
+    "feedback": "original/feedback.json",
+    "survey_v1_001": "payload_v1/surveyresponse_0_0_1.json",
+    "feedback_v1_001": "payload_v1/surveyresponse_0_0_1.json"
+}
+
+
+def get_data(name: str) -> dict:
+    file = responseTestDataMap.get(name)
+    if not file:
+        raise ValueError
+    path = f'tests/submissions/{file}'
+    with open(path) as f:
+        data = json.load(f)
+    return data
+
+
 class TestValidateService(unittest.TestCase):
-
-    def setUp(self):
-
-        self.message = {
-            'submission_v1': '''{
-               "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
-               "type": "uk.gov.ons.edc.eq:surveyresponse",
-               "origin": "uk.gov.ons.edc.eq",
-               "survey_id": "023",
-               "case_id": "12345678-1234-1234-1234-123456789012",
-               "flushed": false,
-               "version": "0.0.1",
-               "collection": {
-                 "exercise_sid": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
-                 "instrument_id": "0203",
-                 "period": "0216"
-               },
-               "started_at": "2016-03-12T09:42:40Z",
-               "submitted_at": "2016-03-12T10:39:40Z",
-               "metadata": {
-                 "user_id": "789473423",
-                 "ru_ref": "12345678901A"
-               },
-               "data": {
-                 "11": "01/04/2016",
-                 "12": "31/10/2016",
-                 "20": "1800000",
-                 "51": "84.00",
-                 "52": "10",
-                 "53": "73",
-                 "54": "24",
-                 "50": "205",
-                 "22": "705000",
-                 "23": "900",
-                 "24": "74",
-                 "25": "50",
-                 "26": "100",
-                 "21": "60000",
-                 "27": "7400",
-                 "146": "some comment"
-               }
-            }''',
-
-            'submission_v2': '''{
-                "tx_id": "ea82c224-0f80-41cc-b877-8a7804b56c26",
-                "type": "uk.gov.ons.edc.eq:surveyresponse",
-                "version": "v2",
-                "data_version": "0.0.1",
-                "origin": "uk.gov.ons.edc.eq",
-                "flushed": false,
-                "submitted_at": "2016-05-21T16:37:56.551086",
-                "launch_language_code": "en",
-                "submission_language_code": "en",
-                "collection_exercise_sid": "9ced8dc9-f2f3-49f3-95af-2f3ca0b74ee3",
-                "schema_name": "mbs_0001",
-                "started_at": "2016-05-21T16:33:30.665144",
-                "case_id": "a386b2de-a615-42c8-a0f4-e274f9eb28ee",
-                "region_code": "GB-ENG",
-                "channel": "RH",
-                "survey_metadata": {
-                "survey_id": "009",
-                "case_ref": "1000000000000001",
-                "questionnaire_id": "0130000000000300"
-                },
-                "data": {
-                    "0001": "This is an answer to q_code 0001",
-                    "0002": "This is an answer to q_code 0002",
-                    "0003": "This is an answer to q_code 0003"
-                }
-            }
-            ''',
-
-            'feedback': '''{                   
-                   "type" : "uk.gov.ons.edc.eq:feedback",
-                   "origin" : "uk.gov.ons.edc.eq",
-                   "metadata": {
-                     "user_id": "789473423",
-                     "ru_ref": "432423423423"
-                   },
-                   "data": {
-                     "url": "https://eq.onsdigital.uk/feedback",
-                     "name": "John Appleseed",
-                     "email": "john.appleseed@ons.gov.uk",
-                     "message": "Feedback message string"
-                   },
-                   "submitted_at": "2016-03-07T15:28:05Z",
-                   "collection": {
-                     "instrument_id": "0203",
-                     "exercise_sid": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
-                     "period": "2016-02-01"
-                   },
-                   "survey_id": "023",
-                   "tx_id": "0f534ffc-9442-414c-b39f-a756b4adc6cb",
-                   "version" : "0.0.1"
-                }''',
-
-            'feedback_eqv3': '''{
-                  "case_id": "e4249973-7e7c-49ad-8652-d8f071365154",
-                  "collection": {
-                    "exercise_sid": "96888d51-c9b9-49c2-9413-b1e40e43a85b",
-                    "instrument_id": "0009",
-                    "period": "201605",
-                    "schema_name": "lcree_0009"
-                  },
-                  "data": {
-                    "feedback_count": "1",
-                    "feedback_text": "EQ to SDX testing Mark and Jon",
-                    "feedback_type": "The survey questions"
-                  },
-                  "flushed": false,
-                  "form_type": "0009",
-                  "launch_language_code": "en",
-                  "metadata": {
-                    "ref_period_end_date": "2016-05-31",
-                    "ref_period_start_date": "2016-05-01",
-                    "ru_ref": "12346789012A",
-                    "user_id": "UNKNOWN"
-                  },
-                  "origin": "uk.gov.ons.edc.eq",
-                  "started_at": "2022-01-21T10:13:11.570441+00:00",
-                  "submission_language_code": "en",
-                  "submitted_at": "2022-01-21T10:18:15.573135+00:00",
-                  "survey_id": "007",
-                  "tx_id": "487dddd4-fcd0-4672-a7cf-e4a2d2dfbca2",
-                  "type": "uk.gov.ons.edc.eq:feedback",
-                  "version": "0.0.1"
-                }'''
-        }
 
     @staticmethod
     def validate_response(data):
@@ -148,11 +38,11 @@ class TestValidateService(unittest.TestCase):
         self.assertTrue(self.validate_response(data))
 
     def test_validates_submission(self):
-        m = self.message['submission_v1']
+        m = get_data('survey_v1_001')
         self.assertValid(m)
 
     def test_validates_feedback(self):
-        m = self.message['feedback']
+        m = get_data('feedback')
         self.assertValid(m)
 
     def test_validates_eqv3_feedback(self):
