@@ -85,7 +85,7 @@ def validate(survey_dict: dict) -> bool:
 
             jsonschema.validate(
                 instance=json_data,
-                schema={"$ref": "submission_v2.json"},
+                schema={"$ref": "submission_v1.json"},
                 resolver=resolver,
             )
 

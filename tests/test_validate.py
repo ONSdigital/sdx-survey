@@ -25,17 +25,12 @@ def get_data(name: str) -> dict:
 
 class TestValidateService(unittest.TestCase):
 
-    @staticmethod
-    def validate_response(data):
-        if isinstance(data, str):
-            data = json.loads(data)
-        return validate(data)
+    def assertInvalid(self, data: dict):
+        with self.assertRaises(QuarantinableError):
+            validate(data)
 
-    def assertInvalid(self, data):
-        self.assertRaises(QuarantinableError, self.validate_response, data)
-
-    def assertValid(self, data):
-        self.assertTrue(self.validate_response(data))
+    def assertValid(self, data: dict):
+        self.assertTrue(validate(data))
 
     def test_validates_submission(self):
         m = get_data('survey_v1_001')
