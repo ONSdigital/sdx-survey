@@ -9,7 +9,7 @@ responseTestDataMap = {
     "submission": "original/submission.json",
     "feedback": "original/feedback.json",
     "survey_v1_001": "payload_v1/surveyresponse_0_0_1.json",
-    "feedback_v1_001": "payload_v1/surveyresponse_0_0_1.json"
+    "feedback_v1_001": "payload_v1/feedback_0_0_1.json"
 }
 
 
@@ -30,10 +30,13 @@ class TestValidateService(unittest.TestCase):
             validate(data)
 
     def assertValid(self, data: dict):
-        self.assertTrue(validate(data))
+        try:
+            self.assertTrue(validate(data))
+        except QuarantinableError as e:
+            self.fail(str(e))
 
     def test_validates_submission(self):
-        m = get_data('survey_v1_001')
+        m = get_data('submission')
         self.assertValid(m)
 
     def test_validates_feedback(self):
@@ -41,23 +44,23 @@ class TestValidateService(unittest.TestCase):
         self.assertValid(m)
 
     def test_validates_eqv3_feedback(self):
-        m = self.message['feedback_eqv3']
+        m = get_data('feedback_v1_001')
         self.assertValid(m)
 
     def test_mwss_valid(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         survey['survey_id'] = "134"
         survey['collection']['instrument_id'] = "0005"
         self.assertValid(survey)
 
     def test_mbs_valid(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         survey['survey_id'] = "009"
         survey['collection']['instrument_id'] = "0255"
         self.assertValid(survey)
 
     def test_epe_valid(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         survey['survey_id'] = "147"
 
         survey['collection']['instrument_id'] = "0003"
@@ -67,7 +70,7 @@ class TestValidateService(unittest.TestCase):
         self.assertValid(survey)
 
     def test_qcas_valid(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         survey['survey_id'] = "019"
 
         survey['collection']['instrument_id'] = "0018"
@@ -85,7 +88,7 @@ class TestValidateService(unittest.TestCase):
     def test_rsi_metadata(self):
         for inst_id in ["0102", "0112", "0203", "0205", "0213", "0215"]:
             with self.subTest(inst_id=inst_id):
-                survey = json.loads(self.message["submission_v1"])
+                survey = get_data('submission')
                 survey["survey_id"] = "023"
                 survey["collection"]["instrument_id"] = inst_id
                 survey["metadata"]["ref_period_start_date"] = "2016-04-01"
@@ -104,57 +107,57 @@ class TestValidateService(unittest.TestCase):
         check_known_survey("134", "0005")
 
     def test_unknown_version_invalid(self):
-        unknown_version = json.loads(self.message['submission_v1'])
+        unknown_version = get_data('submission')
         unknown_version['version'] = "0.0.3"
 
         self.assertInvalid(unknown_version)
 
     def test_unknown_survey_invalid(self):
-        unknown_survey = json.loads(self.message['submission_v1'])
+        unknown_survey = get_data('submission')
         unknown_survey['survey_id'] = "025"
 
         self.assertInvalid(unknown_survey)
 
     def test_blank_survey_invalid(self):
-        unknown_survey = json.loads(self.message['submission_v1'])
+        unknown_survey = get_data('submission')
         unknown_survey['survey_id'] = ""
 
         self.assertInvalid(unknown_survey)
 
     def test_missing_survey_invalid(self):
-        unknown_survey = json.loads(self.message['submission_v1'])
+        unknown_survey = get_data('submission')
         del unknown_survey['survey_id']
 
         self.assertInvalid(unknown_survey)
 
     def test_unknown_instrument_invalid(self):
-        unknown_instrument = json.loads(self.message['submission_v1'])
+        unknown_instrument = get_data('submission')
         unknown_instrument['collection']['instrument_id'] = "999"
 
         self.assertInvalid(unknown_instrument)
 
     def test_known_instrument_wrong_survey_invalid(self):
         # RSI survey_id with Census instrument_id
-        known_instrument = json.loads(self.message['submission_v1'])
+        known_instrument = get_data('submission')
         known_instrument['collection']['instrument_id'] = "household"
 
         self.assertInvalid(known_instrument)
 
     def test_known_instrument_correct_survey_valid(self):
         # RSI survey_id with RSI instrument_id
-        known_instrument = json.loads(self.message['submission_v1'])
+        known_instrument = get_data('submission')
         known_instrument['collection']['instrument_id'] = "0213"
 
         self.assertValid(known_instrument)
 
     def test_empty_data_invalid(self):
-        empty_data = json.loads(self.message['submission_v1'])
+        empty_data = get_data('submission')
         empty_data['data'] = ""
 
         self.assertInvalid(empty_data)
 
     def test_feedback_empty_data_invalid(self):
-        empty_data = json.loads(self.message['feedback'])
+        empty_data = get_data('feedback')
         empty_data['data'] = ""
 
         self.assertInvalid(empty_data)
@@ -170,7 +173,7 @@ class TestValidateService(unittest.TestCase):
         self.assertInvalid(data)
 
     def test_non_guid_tx_id_invalid(self):
-        wrong_tx = json.loads(self.message['submission_v1'])
+        wrong_tx = get_data('submission')
         wrong_tx['tx_id'] = "999"
 
         self.assertInvalid(wrong_tx)
@@ -181,64 +184,64 @@ class TestValidateService(unittest.TestCase):
         self.assertInvalid(wrong_tx)
 
     def test_missing_tx_id_is_invalid(self):
-        message = json.loads(self.message['submission_v1'])
+        message = get_data('submission')
         del message['tx_id']
 
         self.assertInvalid(message)
 
     def test_flushed_not_boolean_fails(self):
-        message = json.loads(self.message['submission_v1'])
+        message = get_data('submission')
         message['flushed'] = ''
 
         self.assertInvalid(message)
 
     def test_flushed_key_missing_fails(self):
-        message = json.loads(self.message['submission_v1'])
+        message = get_data('submission')
         message.pop('flushed')
 
         self.assertInvalid(message)
 
     def test_case_id_and_case_ref_passes(self):
-        message = json.loads(self.message['submission_v1'])
+        message = get_data('submission')
         self.assertValid(message)
 
     def test_case_id_not_str_fails(self):
-        message = json.loads(self.message['submission_v1'])
+        message = get_data('submission')
         message['case_id'] = {}
 
         self.assertInvalid(message)
 
     def test_validate_type_none_is_quarantined(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         del survey["type"]
         with self.assertRaises(QuarantinableError):
             validate(survey)
 
     def test_validate_meta_none_is_quarantined(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         del survey["metadata"]
         with self.assertRaises(QuarantinableError):
             validate(survey)
 
     def test_not_known_survey(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         survey["survey_id"] = "567"
         with self.assertRaises(QuarantinableError):
             validate(survey)
 
     def test_not_known_survey_id(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         survey["survey_id"] = "567"
         with self.assertRaises(QuarantinableError):
             validate(survey)
 
     def test_allow_case_type(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         survey['case_type'] = "HH"
         self.assertValid(survey)
 
     def test_allow_all_eq_v3_fields(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         survey['collection']['schema_name'] = "mbs_1704"
         survey['metadata']['ref_period_start_date'] = "2016-05-01"
         survey['metadata']['ref_period_end_date'] = "2016-05-31"
@@ -253,13 +256,9 @@ class TestValidateService(unittest.TestCase):
         self.assertValid(survey)
 
     def test_exception_is_descriptive_for_missing_survey_id(self):
-        survey = json.loads(self.message['submission_v1'])
+        survey = get_data('submission')
         del survey["survey_id"]
         try:
             validate(survey)
         except QuarantinableError as e:
             self.assertEquals("'survey_id' is a required property", str(e))
-
-    def test_validates_submission_v2(self):
-        m = self.message['submission_v2']
-        self.assertValid(m)
