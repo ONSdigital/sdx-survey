@@ -261,4 +261,4 @@ class TestValidateService(unittest.TestCase):
         try:
             validate(survey)
         except QuarantinableError as e:
-            self.assertEquals("'survey_id' is a required property", str(e))
+            self.assertEqual("'survey_id' is a required property", str(e))
