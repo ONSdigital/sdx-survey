@@ -167,11 +167,6 @@ class TestValidateService(unittest.TestCase):
 
         self.assertRaises(QuarantinableError, validate, data)
 
-    def test_no_data(self):
-        data = None
-
-        self.assertInvalid(data)
-
     def test_non_guid_tx_id_invalid(self):
         wrong_tx = get_data('submission')
         wrong_tx['tx_id'] = "999"
