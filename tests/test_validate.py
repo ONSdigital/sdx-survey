@@ -9,7 +9,11 @@ responseTestDataMap = {
     "submission": "original/submission.json",
     "feedback": "original/feedback.json",
     "survey_v1_001": "payload_v1/surveyresponse_0_0_1.json",
-    "feedback_v1_001": "payload_v1/feedback_0_0_1.json"
+    "feedback_v1_001": "payload_v1/feedback_0_0_1.json",
+    "survey_v2_001": "payload_v2/business/surveyresponse_0_0_1.json",
+    "feedback_v2_001": "payload_v2/business/feedback_0_0_1.json",
+    "survey_adhoc_001": "payload_v2/adhoc/surveyresponse_0_0_1.json",
+    "feedback_adhoc_001": "payload_v2/adhoc/feedback_0_0_1.json",
 }
 
 
@@ -45,6 +49,22 @@ class TestValidateService(unittest.TestCase):
 
     def test_validates_eqv3_feedback(self):
         m = get_data('feedback_v1_001')
+        self.assertValid(m)
+
+    def test_validates_v2_submission(self):
+        m = get_data('survey_v2_001')
+        self.assertValid(m)
+
+    def test_validates_v2_feedback(self):
+        m = get_data('feedback_v2_001')
+        self.assertValid(m)
+
+    def test_validates_adhoc_submission(self):
+        m = get_data('survey_adhoc_001')
+        self.assertValid(m)
+
+    def test_validates_adhoc_feedback(self):
+        m = get_data('feedback_adhoc_001')
         self.assertValid(m)
 
     def test_mwss_valid(self):
