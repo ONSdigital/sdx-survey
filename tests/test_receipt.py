@@ -3,7 +3,8 @@ import unittest
 from unittest import mock
 
 from app.errors import QuarantinableError
-from app.receipt import make_receipt, send_receipt, publish_data
+from app.receipt import make_receipt, send_receipt, publish_data, make_srm_receipt
+from tests import get_data
 
 
 class TestReceipt(unittest.TestCase):
@@ -50,9 +51,13 @@ class TestReceipt(unittest.TestCase):
         tx_id = "123"
 
         mock_config.RECEIPT_TOPIC_PATH = receipt_topic
-        publish_data(receipt, tx_id)
+        publish_data(receipt, tx_id, receipt_topic)
 
         mock_config.RECEIPT_PUBLISHER.publish.assert_called_with(
             receipt_topic,
             receipt.encode("utf-8"),
             tx_id=tx_id)
+
+    def test_make_adhoc_receipt_valid(self):
+        expected = json.dumps({"qid": "0130000000000300"})
+        self.assertEqual(make_srm_receipt(get_data("survey_adhoc_001")), expected)
