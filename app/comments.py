@@ -7,6 +7,7 @@ from cryptography.fernet import Fernet
 from google.cloud import datastore
 
 from app import CONFIG
+from app.submission_type import get_tx_id, get_period, get_survey_id, get_ru_ref
 
 logger = structlog.get_logger()
 
@@ -20,10 +21,10 @@ def store_comments(survey_dict: dict):
     useful metadata required for retrival.
     """
 
-    transaction_id = survey_dict["tx_id"]
-    period = survey_dict["collection"]["period"]
-    survey_id = survey_dict["survey_id"]
-    data = {"ru_ref": survey_dict["metadata"]["ru_ref"],
+    transaction_id = get_tx_id(survey_dict)
+    period = get_period(survey_dict)
+    survey_id = get_survey_id(survey_dict)
+    data = {"ru_ref": get_ru_ref(survey_dict),
             "boxes_selected": get_boxes_selected(survey_dict),
             "comment": get_comment(survey_dict),
             "additional": get_additional_comments(survey_dict)}
@@ -53,9 +54,10 @@ def get_comment(submission: dict) -> list:
     """
     logger.info('Checking comment Q Codes')
 
-    if submission['survey_id'] == '187':
+    survey_id = get_survey_id(submission)
+    if survey_id == '187':
         return extract_comment(submission, '500')
-    elif submission['survey_id'] == '134':
+    elif survey_id == '134':
         return extract_comment(submission, '300')
     else:
         return extract_comment(submission, '146')
@@ -69,7 +71,7 @@ def extract_comment(submission, qcode):
 def get_additional_comments(submission):
     logger.info('Getting additional comments')
     comments_list = []
-    if submission['survey_id'] == '134':
+    if get_survey_id(submission) == '134':
         if '300w' in submission['data']:
             comments_list.append(get_additional(submission, '300w'))
         if '300f' in submission['data']:
@@ -91,7 +93,7 @@ def get_additional(submission, qcode):
 def get_boxes_selected(submission):
     logger.info('Getting all the selected boxes')
     boxes_selected = ''
-    if submission['survey_id'] == '134':
+    if get_survey_id(submission) == '134':
         checkboxes = ['91w', '92w1', '92w2', '94w1', '94w2', '95w', '96w', '97w',
                       '91f', '92f1', '92f2', '94f1', '94f2', '95f', '96f', '97f',
                       '191m', '192m1', '192m2', '194m1', '194m2', '195m', '196m', '197m',
