@@ -61,3 +61,7 @@ class TestReceipt(unittest.TestCase):
     def test_make_adhoc_receipt_valid(self):
         expected = json.dumps({"qid": "0130000000000300"})
         self.assertEqual(make_srm_receipt(get_data("survey_adhoc_001")), expected)
+
+    @mock.patch('app.receipt.publish_data')
+    def test_send_adhoc_receipt_good(self, mock_publish):
+        send_receipt(get_data("survey_adhoc_001"))
