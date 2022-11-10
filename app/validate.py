@@ -61,14 +61,14 @@ def check_known_survey(survey_id: str, form_type: str):
         raise ValueError(f"Invalid form_type: {form_type}")
 
 
-def validate(survey_dict: dict) -> bool:
+def validate(submission: dict) -> bool:
     """
     Validates every aspect of a survey submission in dictionary form.
     Returns True if valid or raises an appropriate exception if not.
     """
 
     try:
-        json_data = survey_dict
+        json_data = submission
 
         logger.info("Validating json against schema")
 

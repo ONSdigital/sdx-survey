@@ -12,6 +12,8 @@ from app import CONFIG
 from app.errors import QuarantinableError, RetryableError
 
 # Constants used within the http request
+from app.submission_type import get_tx_id
+
 DAP = "dap"
 LEGACY = "legacy"
 HYBRID = "hybrid"
@@ -27,41 +29,41 @@ retries = Retry(total=5, backoff_factor=0.1)
 session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
-def deliver_dap(survey_dict: dict):
+def deliver_dap(submission: dict):
     """deliver a survey submission intended for DAP"""
     logger.info("Sending DAP submission")
-    deliver(survey_dict, DAP)
+    deliver(submission, DAP)
 
 
-def deliver_survey(survey_dict: dict, zip_file: bytes):
+def deliver_survey(submission: dict, zip_file: bytes):
     """deliver a survey submission intended for the legacy systems"""
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(survey_dict, LEGACY, files)
+    deliver(submission, LEGACY, files)
 
 
-def deliver_hybrid(survey_dict: dict, zip_file: bytes):
+def deliver_hybrid(submission: dict, zip_file: bytes):
     """deliver a survey submission intended for dap and the legacy systems"""
     logger.info("Sending hybrid submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(survey_dict, HYBRID, files)
+    deliver(submission, HYBRID, files)
 
 
-def deliver_feedback(survey_dict: dict, filename: str):
+def deliver_feedback(submission: dict, filename: str):
     """deliver a feedback survey submission"""
     logger.info(f"Sending feedback submission")
-    deliver(survey_dict, FEEDBACK, {}, filename)
+    deliver(submission, FEEDBACK, {}, filename)
 
 
-def deliver(survey_dict: dict, output_type: str, files: dict = {}, filename: str = None):
+def deliver(submission: dict, output_type: str, files: dict = {}, filename: str = None):
     """
     Calls the deliver endpoint specified by the output_type parameter.
     Returns True or raises appropriate error on response.
     """
     if not filename:
-        filename = survey_dict['tx_id']
+        filename = get_tx_id(submission)
 
-    files[SUBMISSION_FILE] = json.dumps(survey_dict).encode(UTF8)
+    files[SUBMISSION_FILE] = json.dumps(submission).encode(UTF8)
     response = post(filename, files, output_type)
     status_code = response.status_code
 

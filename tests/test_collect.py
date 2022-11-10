@@ -1,7 +1,7 @@
 import json
 import unittest
 from unittest.mock import patch
-from app.collect import process, is_feedback
+from app.collect import process
 from app.errors import QuarantinableError
 
 
@@ -110,16 +110,3 @@ class TestCollect(unittest.TestCase):
         store_comments.assert_called_with(hybrid_response)
         deliver_hybrid.assert_called_with(hybrid_response, zip_bytes)
         send_receipt.assert_called_with(hybrid_response)
-
-    def test_is_feedback(self):
-        feedback_response = {
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
-            'survey_id': '023',
-            'type': 'uk.gov.ons.edc.eq:feedback'
-        }
-        feedback = is_feedback(feedback_response)
-        self.assertTrue(feedback)
-
-        feedback_response['type'] = 'uk.gov.ons.edc.eq:surveyresponse'
-        feedback = is_feedback(feedback_response)
-        self.assertFalse(feedback)
