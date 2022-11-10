@@ -12,6 +12,8 @@ from app import CONFIG
 from app.errors import QuarantinableError, RetryableError
 
 # Constants used within the http request
+from app.submission_type import get_tx_id
+
 DAP = "dap"
 LEGACY = "legacy"
 HYBRID = "hybrid"
@@ -59,7 +61,7 @@ def deliver(submission: dict, output_type: str, files: dict = {}, filename: str 
     Returns True or raises appropriate error on response.
     """
     if not filename:
-        filename = submission['tx_id']
+        filename = get_tx_id(submission)
 
     files[SUBMISSION_FILE] = json.dumps(submission).encode(UTF8)
     response = post(filename, files, output_type)
