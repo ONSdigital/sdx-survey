@@ -33,34 +33,34 @@ def process(tx_id: str):
     data_bytes = read(tx_id)
     encrypted_message_str = data_bytes.decode('utf-8')
 
-    survey_dict = decrypt_survey(encrypted_message_str)
+    submission: dict = decrypt_survey(encrypted_message_str)
 
-    valid = validate(survey_dict)
+    valid = validate(submission)
     if not valid:
         logger.error("Validation failed, quarantining survey")
         raise QuarantinableError("Invalid survey")
 
-    if get_response_type(survey_dict) == ResponseType.FEEDBACK:
+    if get_response_type(submission) == ResponseType.FEEDBACK:
         # feedback do not require storing comments, transforming, or receipting.
-        deliver_feedback(survey_dict, filename=tx_id)
+        deliver_feedback(submission, filename=tx_id)
 
-    elif get_survey_type(survey_dict) == SurveyType.ADHOC:
-        send_receipt(survey_dict)
+    elif get_survey_type(submission) == SurveyType.ADHOC:
+        send_receipt(submission)
 
     else:
-        store_comments(survey_dict)
+        store_comments(submission)
 
-        deliver_target = get_deliver_target(survey_dict)
+        deliver_target = get_deliver_target(submission)
 
         if deliver_target == DeliverTarget.DAP:
             # dap surveys do not require transforming
-            deliver_dap(survey_dict)
+            deliver_dap(submission)
 
         else:
-            zip_file = transform(survey_dict)
+            zip_file = transform(submission)
             if deliver_target == DeliverTarget.HYBRID:
-                deliver_hybrid(survey_dict, zip_file)
+                deliver_hybrid(submission, zip_file)
             else:
-                deliver_survey(survey_dict, zip_file)
+                deliver_survey(submission, zip_file)
 
-        send_receipt(survey_dict)
+        send_receipt(submission)

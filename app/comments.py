@@ -12,7 +12,7 @@ from app.submission_type import get_tx_id, get_period, get_survey_id, get_ru_ref
 logger = structlog.get_logger()
 
 
-def store_comments(survey_dict: dict):
+def store_comments(submission: dict):
     """
     Extracts the comments from a survey submission and
     writes them to Google Datastore
@@ -21,13 +21,13 @@ def store_comments(survey_dict: dict):
     useful metadata required for retrival.
     """
 
-    transaction_id = get_tx_id(survey_dict)
-    period = get_period(survey_dict)
-    survey_id = get_survey_id(survey_dict)
-    data = {"ru_ref": get_ru_ref(survey_dict),
-            "boxes_selected": get_boxes_selected(survey_dict),
-            "comment": get_comment(survey_dict),
-            "additional": get_additional_comments(survey_dict)}
+    transaction_id = get_tx_id(submission)
+    period = get_period(submission)
+    survey_id = get_survey_id(submission)
+    data = {"ru_ref": get_ru_ref(submission),
+            "boxes_selected": get_boxes_selected(submission),
+            "comment": get_comment(submission),
+            "additional": get_additional_comments(submission)}
 
     encrypted_data = encrypt_comment(data)
     kind = f'{survey_id}_{period}'

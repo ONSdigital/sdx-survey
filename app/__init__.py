@@ -10,6 +10,7 @@ logging_config()
 
 project_id = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
 receipt_topic_path = os.getenv('RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/topics/receipt-topic')
+srm_receipt_topic_path = os.getenv('SRM_RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/topics/srm-receipt-topic')
 subscription_id = "survey-trigger-subscription"
 quarantine_topic_id = "quarantine-survey-topic"
 transform_service_url = "sdx-transform:80"
@@ -28,6 +29,7 @@ class Config:
         self.SURVEY_SUBSCRIPTION_PATH = None
         self.RECEIPT_PUBLISHER = None
         self.RECEIPT_TOPIC_PATH = receipt_topic_path
+        self.SRM_RECEIPT_TOPIC_PATH = srm_receipt_topic_path
         self.QUARANTINE_PUBLISHER = None
         self.QUARANTINE_TOPIC_PATH = None
         self.DATASTORE_CLIENT = None

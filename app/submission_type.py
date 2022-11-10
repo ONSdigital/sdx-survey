@@ -28,68 +28,82 @@ class DeliverTarget(Enum):
     FEEDBACK = 4
 
 
-def get_response_type(survey_dict: dict) -> ResponseType:
-    survey_type = survey_dict.get("type")
+def get_response_type(submission: dict) -> ResponseType:
+    survey_type = submission.get("type")
     if survey_type:
-        if "feedback" in survey_dict.get("type"):
+        if "feedback" in submission.get("type"):
             return ResponseType.FEEDBACK
     return ResponseType.SURVEY
 
 
-def get_survey_type(survey_dict: dict) -> SurveyType:
-    channel = survey_dict.get("channel")
+def get_survey_type(submission: dict) -> SurveyType:
+    channel = submission.get("channel")
     if channel:
-        if "RH" in survey_dict.get("channel"):
+        if "RH" in submission.get("channel"):
             return SurveyType.ADHOC
     return SurveyType.BUSINESS
 
 
-def get_schema_version(survey_dict: dict) -> SchemaVersion:
-    version = survey_dict.get("version")
+def get_schema_version(submission: dict) -> SchemaVersion:
+    version = submission.get("version")
     if version:
-        if survey_dict.get("version") == "v2":
+        if submission.get("version") == "v2":
             return SchemaVersion.V2
     return SchemaVersion.V1
 
 
-def get_tx_id(survey_dict: dict) -> str:
-    return survey_dict["tx_id"]
+def get_tx_id(submission: dict) -> str:
+    return submission["tx_id"]
 
 
-def get_survey_id(survey_dict: dict) -> str:
-    if get_schema_version(survey_dict) == SchemaVersion.V2:
-        return survey_dict['survey_metadata']['survey_id']
+def get_survey_id(submission: dict) -> str:
+    if get_schema_version(submission) == SchemaVersion.V2:
+        return submission['survey_metadata']['survey_id']
     else:
-        return survey_dict['survey_id']
+        return submission['survey_id']
 
 
-def get_ru_ref(survey_dict: dict) -> str:
-    if get_survey_type(survey_dict) == SurveyType.ADHOC:
+def get_ru_ref(submission: dict) -> str:
+    if get_survey_type(submission) == SurveyType.ADHOC:
         raise ValueError("Adhoc surveys do not have ru_ref field")
-    if get_schema_version(survey_dict) == SchemaVersion.V2:
-        return survey_dict['survey_metadata']['ru_ref']
+    if get_schema_version(submission) == SchemaVersion.V2:
+        return submission['survey_metadata']['ru_ref']
     else:
-        return survey_dict["metadata"]["ru_ref"]
+        return submission["metadata"]["ru_ref"]
 
 
-def get_period(survey_dict: dict) -> str:
-    if get_survey_type(survey_dict) == SurveyType.ADHOC:
+def get_period(submission: dict) -> str:
+    if get_survey_type(submission) == SurveyType.ADHOC:
         raise ValueError("Adhoc surveys do not have period field")
 
-    if get_schema_version(survey_dict) == SchemaVersion.V2:
-        return survey_dict['survey_metadata']['period_id']
+    if get_schema_version(submission) == SchemaVersion.V2:
+        return submission['survey_metadata']['period_id']
     else:
-        return survey_dict["collection"]["period"]
+        return submission["collection"]["period"]
 
 
-def get_deliver_target(survey_dict: dict) -> DeliverTarget:
-    if get_response_type(survey_dict) == ResponseType.FEEDBACK:
+def get_case_id(submission: dict) -> str:
+    return submission['case_id']
+
+
+def get_user_id(submission: dict) -> str:
+    if get_survey_type(submission) == SurveyType.ADHOC:
+        raise ValueError("Adhoc surveys do not have user_id field")
+
+    if get_schema_version(submission) == SchemaVersion.V2:
+        return submission['survey_metadata']['user_id']
+    else:
+        return submission["metadata"]["user_id"]
+
+
+def get_deliver_target(submission: dict) -> DeliverTarget:
+    if get_response_type(submission) == ResponseType.FEEDBACK:
         return DeliverTarget.FEEDBACK
 
-    if get_survey_type(survey_dict) == SurveyType.ADHOC:
+    if get_survey_type(submission) == SurveyType.ADHOC:
         return DeliverTarget.DAP
 
-    survey_id = get_survey_id(survey_dict)
+    survey_id = get_survey_id(submission)
     if survey_id in _DAP_SURVEYS:
         return DeliverTarget.DAP
     elif survey_id in _HYBRID_SURVEYS:

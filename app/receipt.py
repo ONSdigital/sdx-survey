@@ -3,22 +3,22 @@ import structlog
 
 from app import CONFIG
 from app.errors import QuarantinableError
-from app.submission_type import get_survey_type, SurveyType
+from app.submission_type import get_survey_type, SurveyType, get_tx_id, get_user_id, get_case_id
 
 logger = structlog.get_logger()
 
 
-def send_receipt(survey_dict: dict):
+def send_receipt(submission: dict):
     """Creates and publishes a receipt to the receipt topic"""
 
     logger.info("Receipting...")
-    tx_id = survey_dict['tx_id']
+    tx_id = get_tx_id(submission)
 
-    if get_survey_type(survey_dict) == SurveyType.ADHOC:
-        receipt_str: str = make_srm_receipt(survey_dict)
-        topic_path: str = CONFIG.RECEIPT_TOPIC_PATH
+    if get_survey_type(submission) == SurveyType.ADHOC:
+        receipt_str: str = make_srm_receipt(submission)
+        topic_path: str = CONFIG.SRM_RECEIPT_TOPIC_PATH
     else:
-        receipt_str: str = make_receipt(survey_dict)
+        receipt_str: str = make_receipt(submission)
         topic_path: str = CONFIG.RECEIPT_TOPIC_PATH
 
     publish_data(receipt_str, tx_id, topic_path)
@@ -34,13 +34,13 @@ def publish_data(receipt_str: str, tx_id: str, topic_path: str) -> str:
     return future.result()
 
 
-def make_receipt(survey_dict: dict) -> str:
+def make_receipt(submission: dict) -> str:
     """Creates a receipt for RASRM"""
 
     try:
         receipt_json = {
-            'caseId': survey_dict['case_id'],
-            'partyId': survey_dict['metadata']['user_id']
+            'caseId': get_case_id(submission),
+            'partyId': get_user_id(submission)
         }
     except KeyError as e:
         raise QuarantinableError(f'Failed to make receipt: {str(e)}')
@@ -50,12 +50,12 @@ def make_receipt(survey_dict: dict) -> str:
     return receipt_str
 
 
-def make_srm_receipt(survey_dict: dict) -> str:
+def make_srm_receipt(submission: dict) -> str:
     """Creates a receipt for SRM"""
 
     try:
         receipt_json = {
-            'qid': survey_dict['survey_metadata']['qid']
+            'qid': submission['survey_metadata']['qid']
         }
     except KeyError as e:
         raise QuarantinableError(f'Failed to make receipt: {str(e)}')
