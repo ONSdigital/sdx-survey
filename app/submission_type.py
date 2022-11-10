@@ -1,8 +1,14 @@
 from enum import Enum
 
+"""
+    This file defines a set of classifiers for the different submission types.
+    It also provides a set of functions for retrieving common survey metadata
+    in a 'submission type' agnostic way.
+"""
+
 # list of survey ids that target only DAP
 _DAP_SURVEYS = ["283"]
-# list of surveys that target DAP and Legacy
+# list of survey ids that target both DAP and Legacy
 _HYBRID_SURVEYS = ["007", "023", "134", "147"]
 
 
