@@ -55,7 +55,9 @@ def make_srm_receipt(submission: dict) -> str:
 
     try:
         receipt_json = {
-            'qid': submission['survey_metadata']['qid']
+            'data': {
+                'qid': submission['survey_metadata']['qid']
+            }
         }
     except KeyError as e:
         raise QuarantinableError(f'Failed to make receipt: {str(e)}')
