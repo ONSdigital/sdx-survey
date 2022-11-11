@@ -62,6 +62,6 @@ def make_srm_receipt(submission: dict) -> str:
     except KeyError as e:
         raise QuarantinableError(f'Failed to make receipt: {str(e)}')
 
-    logger.info('Generated SRM receipt', qid=receipt_json['qid'])
+    logger.info('Generated SRM receipt', qid=receipt_json['data'])
     receipt_str = json.dumps(receipt_json)
     return receipt_str
