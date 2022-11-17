@@ -45,6 +45,7 @@ def process(tx_id: str):
         deliver_feedback(submission, filename=tx_id)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
+        # not sure yet what to do with these!
         send_receipt(submission)
 
     else:
