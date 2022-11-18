@@ -58,6 +58,9 @@ class Decrypter:
         except InvalidTokenException as e:
             logger.exception(repr(e))
             raise QuarantinableError(e)
+        except Exception as e:
+            logger.exception(f"Unexpected exception occurred during decryption: {str(e)}")
+            raise QuarantinableError(e)
 
 
 decrypter = Decrypter()
