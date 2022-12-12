@@ -17,14 +17,14 @@ retries = Retry(total=5, backoff_factor=0.1)
 session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
-def transform(survey_dict: dict) -> bytes:
+def transform(submission: dict) -> bytes:
     """
     Makes a call to the transform service and returns the zip
     as bytes or raises the appropriate exception.
     """
 
     logger.info("Transforming...")
-    survey_json = json.dumps(survey_dict)
+    survey_json = json.dumps(submission)
     response = post(survey_json)
 
     if response.status_code == 200:

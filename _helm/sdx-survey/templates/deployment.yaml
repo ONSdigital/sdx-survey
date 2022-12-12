@@ -22,11 +22,11 @@ spec:
         name: sdx-survey
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "1G"
+            cpu: "1"
           limits:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "2G"
+            cpu: "2"
         env:
           - name: PROJECT_ID
             valueFrom:
@@ -43,4 +43,9 @@ spec:
               configMapKeyRef:
                 name: sdx-config
                 key: receipt_topic_path
+          - name: SRM_RECEIPT_TOPIC_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: sdx-config
+                key: srm_receipt_topic_path
       serviceAccountName: sdx-workload-identity

@@ -6,15 +6,12 @@ from app.errors import QuarantinableError
 from app.reader import read
 from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
+from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_deliver_target, \
+    DeliverTarget
 from app.transform import transform
 from app.validate import validate
 
 logger = structlog.get_logger()
-
-# list of survey ids that target only DAP
-DAP_SURVEYS = ["283", "lms", "census"]
-# list of surveys that target DAP and Legacy
-HYBRID_SURVEYS = ["007", "023", "134", "147"]
 
 
 def process(tx_id: str):
@@ -36,35 +33,35 @@ def process(tx_id: str):
     data_bytes = read(tx_id)
     encrypted_message_str = data_bytes.decode('utf-8')
 
-    survey_dict = decrypt_survey(encrypted_message_str)
+    submission: dict = decrypt_survey(encrypted_message_str)
 
-    valid = validate(survey_dict)
+    valid = validate(submission)
     if not valid:
         logger.error("Validation failed, quarantining survey")
         raise QuarantinableError("Invalid survey")
 
-    if is_feedback(survey_dict):
+    if get_response_type(submission) == ResponseType.FEEDBACK:
         # feedback do not require storing comments, transforming, or receipting.
-        deliver_feedback(survey_dict, filename=tx_id)
+        deliver_feedback(submission, filename=tx_id)
+
+    elif get_survey_type(submission) == SurveyType.ADHOC:
+        # not sure yet what to do with these!
+        send_receipt(submission)
 
     else:
-        store_comments(survey_dict)
+        store_comments(submission)
 
-        survey_id = survey_dict['survey_id']
-        if survey_id not in DAP_SURVEYS:
-            zip_file = transform(survey_dict)
-            if survey_id in HYBRID_SURVEYS:
-                deliver_hybrid(survey_dict, zip_file)
-            else:
-                deliver_survey(survey_dict, zip_file)
-        else:
+        deliver_target = get_deliver_target(submission)
+
+        if deliver_target == DeliverTarget.DAP:
             # dap surveys do not require transforming
-            deliver_dap(survey_dict)
+            deliver_dap(submission)
 
-        send_receipt(survey_dict)
+        else:
+            zip_file = transform(submission)
+            if deliver_target == DeliverTarget.HYBRID:
+                deliver_hybrid(submission, zip_file)
+            else:
+                deliver_survey(submission, zip_file)
 
-
-def is_feedback(data: dict) -> bool:
-    logger.info("Checking for feedback")
-    submission_type = data["type"]
-    return "feedback" in submission_type
+        send_receipt(submission)
