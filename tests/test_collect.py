@@ -2,6 +2,7 @@ import json
 import unittest
 from unittest.mock import patch
 from app.collect import process
+from app.deliver import V1
 from app.errors import QuarantinableError
 
 
@@ -56,7 +57,7 @@ class TestCollect(unittest.TestCase):
         process('encrypted dap survey')
 
         store_comments.assert_called_with(dap_response)
-        deliver_dap.assert_called_with(dap_response)
+        deliver_dap.assert_called_with(dap_response, V1)
         send_receipt.assert_called_with(dap_response)
 
     @patch('app.collect.read')
@@ -82,7 +83,7 @@ class TestCollect(unittest.TestCase):
         process('encrypted legacy survey')
 
         store_comments.assert_called_with(legacy_response)
-        deliver_survey.assert_called_with(legacy_response, zip_bytes)
+        deliver_survey.assert_called_with(legacy_response, zip_bytes, V1)
         send_receipt.assert_called_with(legacy_response)
 
     @patch('app.collect.read')
@@ -108,5 +109,5 @@ class TestCollect(unittest.TestCase):
         process('encrypted legacy survey')
 
         store_comments.assert_called_with(hybrid_response)
-        deliver_hybrid.assert_called_with(hybrid_response, zip_bytes)
+        deliver_hybrid.assert_called_with(hybrid_response, zip_bytes, V1)
         send_receipt.assert_called_with(hybrid_response)
