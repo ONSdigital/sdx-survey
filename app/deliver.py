@@ -37,27 +37,27 @@ session.mount('http://', HTTPAdapter(max_retries=retries))
 def deliver_dap(submission: dict, version: str = V1):
     """deliver a survey submission intended for DAP"""
     logger.info("Sending DAP submission")
-    deliver(submission, DAP)
+    deliver(submission, DAP, version=version)
 
 
 def deliver_survey(submission: dict, zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for the legacy systems"""
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(submission, LEGACY, files)
+    deliver(submission, LEGACY, files, version=version)
 
 
 def deliver_hybrid(submission: dict, zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for dap and the legacy systems"""
     logger.info("Sending hybrid submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(submission, HYBRID, files)
+    deliver(submission, HYBRID, files, version=version)
 
 
 def deliver_feedback(submission: dict, filename: str, version: str = V1):
     """deliver a feedback survey submission"""
     logger.info(f"Sending feedback submission")
-    deliver(submission, FEEDBACK, {}, filename)
+    deliver(submission, FEEDBACK, {}, filename, version=version)
 
 
 def deliver(
