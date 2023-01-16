@@ -59,7 +59,7 @@ def process(tx_id: str):
             deliver_dap(submission, version)
 
         else:
-            zip_file = transform(submission)
+            zip_file = transform(submission, version)
             if deliver_target == DeliverTarget.HYBRID:
                 deliver_hybrid(submission, zip_file, version)
             else:
