@@ -45,6 +45,7 @@ def process(tx_id: str):
         deliver_feedback(submission, filename=tx_id)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
+        # adhoc surveys do not require transforming
         deliver_dap(submission, ADHOC)
         send_receipt(submission)
 
