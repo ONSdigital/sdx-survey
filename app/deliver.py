@@ -10,10 +10,10 @@ from requests.exceptions import ConnectionError
 
 from app import CONFIG
 from app.errors import QuarantinableError, RetryableError
-
-# Constants used within the http request
 from app.submission_type import get_tx_id
 
+
+# Constants used within the http request
 DAP = "dap"
 LEGACY = "legacy"
 HYBRID = "hybrid"
@@ -21,6 +21,11 @@ FEEDBACK = "feedback"
 SUBMISSION_FILE = 'submission'
 TRANSFORMED_FILE = 'transformed'
 UTF8 = "utf-8"
+FILE_NAME = "filename"
+VERSION = "version"
+V1 = "v1"
+V2 = "v2"
+ADHOC = "adhoc"
 
 logger = structlog.get_logger()
 
@@ -29,33 +34,38 @@ retries = Retry(total=5, backoff_factor=0.1)
 session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
-def deliver_dap(submission: dict):
+def deliver_dap(submission: dict, version: str = V1):
     """deliver a survey submission intended for DAP"""
     logger.info("Sending DAP submission")
-    deliver(submission, DAP)
+    deliver(submission, DAP, version=version)
 
 
-def deliver_survey(submission: dict, zip_file: bytes):
+def deliver_survey(submission: dict, zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for the legacy systems"""
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(submission, LEGACY, files)
+    deliver(submission, LEGACY, files, version=version)
 
 
-def deliver_hybrid(submission: dict, zip_file: bytes):
+def deliver_hybrid(submission: dict, zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for dap and the legacy systems"""
     logger.info("Sending hybrid submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(submission, HYBRID, files)
+    deliver(submission, HYBRID, files, version=version)
 
 
-def deliver_feedback(submission: dict, filename: str):
+def deliver_feedback(submission: dict, filename: str, version: str = V1):
     """deliver a feedback survey submission"""
     logger.info(f"Sending feedback submission")
-    deliver(submission, FEEDBACK, {}, filename)
+    deliver(submission, FEEDBACK, {}, filename, version=version)
 
 
-def deliver(submission: dict, output_type: str, files: dict = {}, filename: str = None):
+def deliver(
+        submission: dict,
+        output_type: str,
+        files: dict = {},
+        filename: str = None,
+        version: str = V1):
     """
     Calls the deliver endpoint specified by the output_type parameter.
     Returns True or raises appropriate error on response.
@@ -64,7 +74,7 @@ def deliver(submission: dict, output_type: str, files: dict = {}, filename: str 
         filename = get_tx_id(submission)
 
     files[SUBMISSION_FILE] = json.dumps(submission).encode(UTF8)
-    response = post(filename, files, output_type)
+    response = post(filename, files, output_type, version)
     status_code = response.status_code
 
     if status_code == 200:
@@ -79,13 +89,13 @@ def deliver(submission: dict, output_type: str, files: dict = {}, filename: str 
         raise RetryableError(msg)
 
 
-def post(filename: str, files: dict, output_type: str):
+def post(filename: str, files: dict, output_type: str, version: str):
     """Constructs the http call to the deliver service endpoint and posts the request"""
 
     url = f"http://{CONFIG.DELIVER_SERVICE_URL}/deliver/{output_type}"
     logger.info(f"Calling {url}")
     try:
-        response = session.post(url, params={"filename": filename}, files=files)
+        response = session.post(url, params={FILE_NAME: filename, VERSION: version}, files=files)
     except MaxRetryError:
         logger.error("Max retries exceeded", request_url=url)
         raise RetryableError("Max retries exceeded")

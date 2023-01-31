@@ -1,13 +1,13 @@
 import structlog
 
 from app.comments import store_comments
-from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver_hybrid
+from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver_hybrid, ADHOC, V1, V2
 from app.errors import QuarantinableError
 from app.reader import read
 from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
 from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_deliver_target, \
-    DeliverTarget
+    DeliverTarget, get_schema_version, SchemaVersion
 from app.transform import transform
 from app.validate import validate
 
@@ -45,23 +45,25 @@ def process(tx_id: str):
         deliver_feedback(submission, filename=tx_id)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
-        # not sure yet what to do with these!
+        # adhoc surveys do not require transforming
+        deliver_dap(submission, ADHOC)
         send_receipt(submission)
 
     else:
         store_comments(submission)
 
+        version = V2 if get_schema_version(submission) == SchemaVersion.V2 else V1
         deliver_target = get_deliver_target(submission)
 
         if deliver_target == DeliverTarget.DAP:
             # dap surveys do not require transforming
-            deliver_dap(submission)
+            deliver_dap(submission, version)
 
         else:
-            zip_file = transform(submission)
+            zip_file = transform(submission, version)
             if deliver_target == DeliverTarget.HYBRID:
-                deliver_hybrid(submission, zip_file)
+                deliver_hybrid(submission, zip_file, version)
             else:
-                deliver_survey(submission, zip_file)
+                deliver_survey(submission, zip_file, version)
 
         send_receipt(submission)

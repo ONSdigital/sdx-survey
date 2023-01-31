@@ -13,7 +13,7 @@ from requests.exceptions import ConnectionError
 from app.errors import QuarantinableError, RetryableError
 from requests import Session
 from app import transform
-from app.transform import post
+from app.transform import post, V1
 
 
 class ResponseContent:
@@ -190,18 +190,18 @@ class TestTransform(unittest.TestCase):
     def test_post(self, mock_request):
         with pytest.raises(QuarantinableError):
             mock_request.return_value.status_code = 400
-            transform.transform(dap_data)
+            transform.transform(dap_data, V1)
 
     @patch('app.transform.session')
     def test_post_MaxRetryError(self, mock_session):
         survey_json = '{"tx_id":"123"}'
         mock_session.post.side_effect = MaxRetryError("pool", "url", "reason")
         with pytest.raises(RetryableError):
-            post(survey_json)
+            post(survey_json, V1)
 
     @patch('app.transform.session')
     def test_post_ConnectionError(self, mock_session):
         survey_json = '{"tx_id":"123"}'
         mock_session.post.side_effect = ConnectionError()
         with pytest.raises(RetryableError):
-            post(survey_json)
+            post(survey_json, V1)
