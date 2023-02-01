@@ -34,7 +34,7 @@ def process(tx_id: str):
     encrypted_message_str = data_bytes.decode('utf-8')
 
     submission: dict = decrypt_survey(encrypted_message_str)
-
+    logger.info(str(submission))
     valid = validate(submission)
     if not valid:
         logger.error("Validation failed, quarantining survey")
