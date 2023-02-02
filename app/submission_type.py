@@ -9,7 +9,7 @@ from enum import Enum
 # list of survey ids that target only DAP
 _DAP_SURVEYS = ["283"]
 # list of survey ids that target both DAP and Legacy
-_HYBRID_SURVEYS = ["007", "023", "134", "147"]
+_HYBRID_SURVEYS = ["007", "009", "023", "134", "147"]
 
 
 class SurveyType(Enum):
