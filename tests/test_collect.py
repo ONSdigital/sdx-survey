@@ -70,7 +70,7 @@ class TestCollect(unittest.TestCase):
     def test_process_legacy_survey(self, send_receipt, deliver_survey, transform, store_comments, validate, decrypt, reader):
         legacy_response = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
-            'survey_id': '009',
+            'survey_id': '202',
             'type': 'uk.gov.ons.edc.eq:surveyresponse'
         }
 
