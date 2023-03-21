@@ -46,10 +46,11 @@ def process(tx_id: str):
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
         # adhoc surveys do not require transforming
-        deliver_dap(submission, ADHOC)
         send_receipt(submission)
+        deliver_dap(submission, ADHOC)
 
     else:
+        send_receipt(submission)
         store_comments(submission)
 
         version = V2 if get_schema_version(submission) == SchemaVersion.V2 else V1
@@ -65,5 +66,3 @@ def process(tx_id: str):
                 deliver_hybrid(submission, zip_file, version)
             else:
                 deliver_survey(submission, zip_file, version)
-
-        send_receipt(submission)
