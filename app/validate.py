@@ -14,6 +14,9 @@ resolver = jsonschema.validators.RefResolver(
 
 # A dict of dicts containing lists of form_types mapped to survey ids
 KNOWN_SURVEYS = {
+    "002": [
+        "0001"
+    ],
     "007": [
         "0010", "0009"
     ],
