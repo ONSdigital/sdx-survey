@@ -31,6 +31,74 @@
     "PARTICIPANT_WINDOW_ID": "DHRF-123456789012-001"
   },
   "data": {
+    "answer_codes": [
+      {
+        "answer_id": "first-name",
+        "code": "1"
+      },
+      {
+        "answer_id": "last-name",
+        "code": "2"
+      },
+      {
+        "answer_id": "anyone-else",
+        "code": "3"
+      },
+      {
+        "answer_id": "number-of-bedrooms-answer",
+        "code": "4"
+      },
+      {
+        "answer_id": "date-of-birth-answer",
+        "code": "5"
+      },
+      {
+        "answer_id": "internet-answer",
+        "answer_value": "Broadband or WiFi",
+        "code": "6a"
+      },
+      {
+        "answer_id": "internet-answer",
+        "answer_value": "A mobile phone network such as 3G, 4G or 5G",
+        "code": "6b"
+      },
+      {
+        "answer_id": "internet-answer",
+        "answer_value": "Public WiFi hotspot",
+        "code": "6c"
+      },
+      {
+        "answer_id": "business-type-answer",
+        "code": "7"
+      },
+      {
+        "answer_id": "relationship-answer",
+        "code": "8"
+      },
+      {
+        "answer_id": "other-address-uk-answer",
+        "code": "9"
+      },
+      {
+        "answer_id": "checkbox-answer",
+        "answer_value": "Checkbox 1",
+        "code": "10a"
+      },
+      {
+        "answer_id": "checkbox-answer",
+        "answer_value": "Checkbox 2",
+        "code": "10b"
+      },
+      {
+        "answer_id": "checkbox-answer",
+        "answer_value": "Checkbox 3 (this is sent but doesn't have to exist in data.answers)",
+        "code": "10c"
+      },
+      {
+        "answer_id": "duration-answer",
+        "code": "11"
+      }
+    ],
     "answers": [
       {
         "answer_id": "first-name",
