@@ -1,5 +1,3 @@
-import json
-
 from app.errors import QuarantinableError
 from app.validate import validate, check_known_survey
 
