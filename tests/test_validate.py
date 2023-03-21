@@ -1,3 +1,5 @@
+import json
+
 from app.errors import QuarantinableError
 from app.validate import validate, check_known_survey
 
@@ -256,3 +258,8 @@ class TestValidateService(unittest.TestCase):
             validate(survey)
         except QuarantinableError as e:
             self.assertEqual("'survey_id' is a required property", str(e))
+
+    def test_phm(self):
+        with open('tests/submissions/payload_v2/adhoc/phm.json') as f:
+            survey = json.load(f)
+        self.assertValid(survey)
