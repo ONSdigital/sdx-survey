@@ -138,4 +138,5 @@ def commit_to_datastore(comment: Comment):
         )
         datastore.Client().put(entity)
     except ValueError as e:
+        logger.error(str(e))
         raise QuarantinableError(e)
