@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 from app import comments
 from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
     Comment
+from app.errors import QuarantinableError
 
 
 class TestGetComments(unittest.TestCase):
@@ -196,9 +197,8 @@ class TestGetComments(unittest.TestCase):
         comment = Comment("123", "009_2020", b'my data')
         mock_datastore.Entity = Mock(side_effect=ValueError())
 
-        ret = comments.commit_to_datastore(comment)
-
-        self.assertIsNone(ret)
+        with self.assertRaises(QuarantinableError):
+            comments.commit_to_datastore(comment)
 
 
 def decrypt_comment(comment_token: str, key: str) -> dict:

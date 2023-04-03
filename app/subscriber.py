@@ -5,7 +5,7 @@ from concurrent.futures import TimeoutError
 from structlog.contextvars import bind_contextvars, clear_contextvars
 from app import CONFIG
 from app.collect import process
-from app.errors import RetryableError
+from app.errors import RetryableError, QuarantinableError
 from app.quarantine import quarantine_submission
 
 logger = structlog.get_logger()
@@ -30,15 +30,18 @@ def callback(message):
         process(tx_id)
         message.ack()
 
+    except QuarantinableError as q:
+        logger.error(f"quarantining message: {q}")
+        quarantine_submission(tx_id, str(q))
+        message.ack()
+
     except RetryableError as r:
         logger.error("Retryable error, nacking message", error=str(r))
         message.nack()
 
     except Exception as error:
-
-        logger.error(f"quarantining message: {error}")
-        quarantine_submission(tx_id, str(error))
-        message.ack()
+        logger.error("Retrying unexpected error", error=str(error))
+        message.nack()
 
     finally:
         clear_contextvars()

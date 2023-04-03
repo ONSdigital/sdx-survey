@@ -2,7 +2,7 @@ from pathlib import Path
 import jsonschema
 import structlog
 
-from app.errors import QuarantinableError
+from app.errors import QuarantinableError, RetryableError
 
 logger = structlog.get_logger()
 
@@ -106,10 +106,11 @@ def validate(submission: dict) -> bool:
     except jsonschema.ValidationError as e:
         logger.error("Client error", error=e.message)
         raise QuarantinableError(e.message)
-
+    except QuarantinableError as q:
+        raise q
     except Exception as e:
         logger.error("Server error", error=e)
-        raise QuarantinableError(e)
+        raise RetryableError(e)
 
     logger.info(f"Validation successful")
     return True
