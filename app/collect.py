@@ -42,7 +42,15 @@ def process(tx_id: str):
 
     if get_response_type(submission) == ResponseType.FEEDBACK:
         # feedback do not require storing comments, transforming, or receipting.
-        deliver_feedback(submission, filename=tx_id)
+        if get_schema_version(submission) == SchemaVersion.V2:
+            if get_survey_type(submission) == SurveyType.ADHOC:
+                v = ADHOC
+            else:
+                v = V2
+        else:
+            v = V1
+
+        deliver_feedback(submission, filename=tx_id, version=v)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
         # adhoc surveys do not require transforming

@@ -34,7 +34,7 @@ class TestCollect(unittest.TestCase):
         decrypt.return_value = feedback_response
         validate.return_value = True
         process(tx_id)
-        deliver_feedback.assert_called_with(feedback_response, filename=tx_id)
+        deliver_feedback.assert_called_with(feedback_response, filename=tx_id, version=V1)
         send_receipt.assert_not_called()
 
     @patch('app.collect.read')
