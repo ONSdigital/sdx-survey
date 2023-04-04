@@ -6,8 +6,7 @@ from cryptography import exceptions
 from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
 from sdc.crypto.decrypter import decrypt as sdc_decrypt
-from app.errors import QuarantinableError
-
+from app.errors import QuarantinableError, RetryableError
 
 logger = structlog.get_logger()
 
@@ -60,7 +59,7 @@ class Decrypter:
             raise QuarantinableError(e)
         except Exception as e:
             logger.exception(f"Unexpected exception occurred during decryption: {str(e)}")
-            raise QuarantinableError(e)
+            raise RetryableError(e)
 
 
 decrypter = Decrypter()

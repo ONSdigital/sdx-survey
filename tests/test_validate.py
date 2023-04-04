@@ -162,9 +162,10 @@ class TestValidateService(unittest.TestCase):
         self.assertInvalid(empty_data)
 
     def test_string_data_invalid(self):
-        data = "abcd"
+        submission = get_data('submission')
+        submission['data'] = "abcd"
 
-        self.assertRaises(QuarantinableError, validate, data)
+        self.assertInvalid(submission)
 
     def test_non_guid_tx_id_invalid(self):
         wrong_tx = get_data('submission')

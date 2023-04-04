@@ -1,5 +1,7 @@
 from enum import Enum
 
+from app.errors import QuarantinableError
+
 """
     This file defines a set of classifiers for the different submission types.
     It also provides a set of functions for retrieving common survey metadata
@@ -71,7 +73,7 @@ def get_survey_id(submission: dict) -> str:
 
 def get_ru_ref(submission: dict) -> str:
     if get_survey_type(submission) == SurveyType.ADHOC:
-        raise ValueError("Adhoc surveys do not have ru_ref field")
+        raise QuarantinableError("Adhoc surveys do not have ru_ref field")
     if get_schema_version(submission) == SchemaVersion.V2:
         return submission['survey_metadata']['ru_ref']
     else:
@@ -80,7 +82,7 @@ def get_ru_ref(submission: dict) -> str:
 
 def get_period(submission: dict) -> str:
     if get_survey_type(submission) == SurveyType.ADHOC:
-        raise ValueError("Adhoc surveys do not have period field")
+        raise QuarantinableError("Adhoc surveys do not have period field")
 
     if get_schema_version(submission) == SchemaVersion.V2:
         return submission['survey_metadata']['period_id']
@@ -94,7 +96,7 @@ def get_case_id(submission: dict) -> str:
 
 def get_user_id(submission: dict) -> str:
     if get_survey_type(submission) == SurveyType.ADHOC:
-        raise ValueError("Adhoc surveys do not have user_id field")
+        raise QuarantinableError("Adhoc surveys do not have user_id field")
 
     if get_schema_version(submission) == SchemaVersion.V2:
         return submission['survey_metadata']['user_id']

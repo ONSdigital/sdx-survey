@@ -7,6 +7,7 @@ from cryptography.fernet import Fernet
 from google.cloud import datastore
 
 from app import CONFIG
+from app.errors import QuarantinableError
 from app.submission_type import get_tx_id, get_period, get_survey_id, get_ru_ref
 
 logger = structlog.get_logger()
@@ -137,4 +138,5 @@ def commit_to_datastore(comment: Comment):
         )
         datastore.Client().put(entity)
     except ValueError as e:
-        logger.error(e)
+        logger.error(str(e))
+        raise QuarantinableError(e)
