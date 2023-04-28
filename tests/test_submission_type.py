@@ -1,7 +1,8 @@
 import unittest
 
+from app.errors import QuarantinableError
 from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_schema_version, \
-    SchemaVersion
+    SchemaVersion, get_survey_id
 from tests import get_data
 
 
@@ -84,3 +85,18 @@ class TestGetSchemaVersion(unittest.TestCase):
 
     def test_feedback_adhoc(self):
         self.assertEqual(SchemaVersion.V2, get_schema_version(get_data("feedback_adhoc_001")))
+
+
+class TestMissing(unittest.TestCase):
+
+    def test_survey_v1_missing_survey_id(self):
+        data = get_data("survey_v1_001")
+        data.pop("survey_id")
+        with self.assertRaises(QuarantinableError):
+            get_survey_id(data)
+
+    def test_survey_v2_missing_survey_id(self):
+        data = get_data("survey_v2_001")
+        data["survey_metadata"].pop("survey_id")
+        with self.assertRaises(QuarantinableError):
+            get_survey_id(data)
