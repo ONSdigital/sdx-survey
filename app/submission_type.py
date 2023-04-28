@@ -36,6 +36,15 @@ class DeliverTarget(Enum):
     FEEDBACK = 4
 
 
+def get_field(submission: dict, *field_names: str) -> str:
+    current = submission
+    for key in field_names:
+        current = current.get(key)
+        if not current:
+            raise QuarantinableError(f'Missing field {key} from submission!')
+    return current
+
+
 def get_response_type(submission: dict) -> ResponseType:
     survey_type = submission.get("type")
     if survey_type:
@@ -61,23 +70,23 @@ def get_schema_version(submission: dict) -> SchemaVersion:
 
 
 def get_tx_id(submission: dict) -> str:
-    return submission["tx_id"]
+    return get_field(submission, "tx_id")
 
 
 def get_survey_id(submission: dict) -> str:
     if get_schema_version(submission) == SchemaVersion.V2:
-        return submission['survey_metadata']['survey_id']
+        return get_field(submission, "survey_metadata", "survey_id")
     else:
-        return submission['survey_id']
+        return get_field(submission, "survey_id")
 
 
 def get_ru_ref(submission: dict) -> str:
     if get_survey_type(submission) == SurveyType.ADHOC:
         raise QuarantinableError("Adhoc surveys do not have ru_ref field")
     if get_schema_version(submission) == SchemaVersion.V2:
-        return submission['survey_metadata']['ru_ref']
+        return get_field(submission, "survey_metadata", "ru_ref")
     else:
-        return submission["metadata"]["ru_ref"]
+        return get_field(submission, "metadata", "ru_ref")
 
 
 def get_period(submission: dict) -> str:
@@ -85,13 +94,13 @@ def get_period(submission: dict) -> str:
         raise QuarantinableError("Adhoc surveys do not have period field")
 
     if get_schema_version(submission) == SchemaVersion.V2:
-        return submission['survey_metadata']['period_id']
+        return get_field(submission, "survey_metadata", "period_id")
     else:
-        return submission["collection"]["period"]
+        return get_field(submission, "collection", "period")
 
 
 def get_case_id(submission: dict) -> str:
-    return submission['case_id']
+    return get_field(submission, "case_id")
 
 
 def get_user_id(submission: dict) -> str:
@@ -99,9 +108,9 @@ def get_user_id(submission: dict) -> str:
         raise QuarantinableError("Adhoc surveys do not have user_id field")
 
     if get_schema_version(submission) == SchemaVersion.V2:
-        return submission['survey_metadata']['user_id']
+        return get_field(submission, "survey_metadata", "user_id")
     else:
-        return submission["metadata"]["user_id"]
+        return get_field(submission, "metadata", "user_id")
 
 
 def get_deliver_target(submission: dict) -> DeliverTarget:

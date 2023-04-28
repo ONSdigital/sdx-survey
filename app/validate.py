@@ -79,15 +79,7 @@ def validate(submission: dict) -> bool:
         logger.info("Validating json against schema")
 
         version = json_data.get("version")
-        if version == "v2":
-
-            jsonschema.validate(
-                instance=json_data,
-                schema={"$ref": "submission_v2.json"},
-                resolver=resolver,
-            )
-
-        else:
+        if version != "v2":
 
             jsonschema.validate(
                 instance=json_data,
