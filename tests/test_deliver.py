@@ -1,9 +1,6 @@
 import unittest
 from unittest.mock import patch
 
-from requests import Session, exceptions
-from urllib3.exceptions import MaxRetryError
-
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver, post, DAP, deliver_hybrid, V1
 from app.errors import QuarantinableError, RetryableError
 
@@ -42,52 +39,40 @@ class TestCollect(unittest.TestCase):
 
     test_bytes = b'bytes'
 
-    @patch.object(Session, 'post')
+    @patch("app.deliver.post")
     def test_post_feedback_200(self, mock_post):
         mock_post.return_value.status_code = 200
         deliver_feedback(self.test_survey, filename="1027a13a-c253-4e9d-9e78-d0f0cfdd3988")
         mock_post.assert_called()
 
-    @patch.object(Session, 'post')
+    @patch("app.deliver.post")
     def test_post_survey_200(self, mock_post):
         mock_post.return_value.status_code = 200
         deliver_survey(self.test_survey, self.test_bytes)
         mock_post.assert_called()
 
-    @patch.object(Session, 'post')
+    @patch("app.deliver.post")
     def test_post_hybrid_200(self, mock_post):
         mock_post.return_value.status_code = 200
         deliver_hybrid(self.test_survey, self.test_bytes)
         mock_post.assert_called()
 
-    @patch.object(Session, 'post')
+    @patch("app.deliver.post")
     def test_post_dap_200(self, mock_post):
         mock_post.return_value.status_code = 200
         deliver_dap(self.test_survey)
         mock_post.assert_called()
 
-    @patch.object(Session, 'post')
+    @patch("app.deliver.post")
     def test_400_response(self, mock_post):
         with self.assertRaises(QuarantinableError):
             mock_post.return_value.status_code = 400
             assert deliver(self.test_survey, 'feedback')
             mock_post.assert_called()
 
-    @patch.object(Session, 'post')
-    def test_300_response(self, mock_post):
+    @patch("app.deliver.post")
+    def test_500_response(self, mock_post):
         with self.assertRaises(RetryableError):
-            mock_post.return_value.status_code = 300
+            mock_post.return_value.status_code = 500
             assert deliver(self.test_survey, 'feedback')
             mock_post.assert_called()
-
-    @patch('app.deliver.session')
-    def test_post_MaxRetryError(self, mock_session):
-        mock_session.post.side_effect = MaxRetryError("pool", "url", "reason")
-        with self.assertRaises(RetryableError):
-            post("filename", {}, DAP, V1)
-
-    @patch('app.deliver.session')
-    def test_post_ConnectionError(self, mock_session):
-        mock_session.post.side_effect = exceptions.ConnectionError()
-        with self.assertRaises(RetryableError):
-            post("filename", {}, DAP, V1)

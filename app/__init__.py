@@ -13,8 +13,8 @@ receipt_topic_path = os.getenv('RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/t
 srm_receipt_topic_path = os.getenv('SRM_RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/topics/srm-receipt-topic')
 subscription_id = "survey-trigger-subscription"
 quarantine_topic_id = "quarantine-survey-topic"
-transform_service_url = "sdx-transform:80"
-deliver_service_url = "sdx-deliver:80"
+transform_service_url = os.getenv('TRANSFORM_SERVICE_URL', "http://sdx-transform:80")
+deliver_service_url = os.getenv('DELIVER_SERVICE_URL', "http://sdx-deliver:80")
 
 
 class Config:
