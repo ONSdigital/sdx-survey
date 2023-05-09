@@ -1,12 +1,10 @@
 import json
+import time
 
-import requests
 import structlog
-
-from requests.packages.urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.exceptions import MaxRetryError
-from requests.exceptions import ConnectionError
+import requests
+import google.auth.transport.requests
+import google.oauth2.id_token
 
 from app import CONFIG
 from app.errors import QuarantinableError, RetryableError
@@ -28,10 +26,6 @@ V2 = "v2"
 ADHOC = "adhoc"
 
 logger = structlog.get_logger()
-
-session = requests.Session()
-retries = Retry(total=5, backoff_factor=0.1)
-session.mount('http://', HTTPAdapter(max_retries=retries))
 
 
 def deliver_dap(submission: dict, version: str = V1):
@@ -74,33 +68,60 @@ def deliver(
         filename = get_tx_id(submission)
 
     files[SUBMISSION_FILE] = json.dumps(submission).encode(UTF8)
-    response = post(filename, files, output_type, version)
-    status_code = response.status_code
 
-    if status_code == 200:
-        return True
-    elif 400 <= status_code < 500:
-        msg = "Bad Request response from sdx-deliver"
-        logger.error(msg, status_code=status_code)
-        raise QuarantinableError(msg)
+    trying = True
+    retries = 0
+    max_retries = 3
+    http_response = None
+    while trying:
+        try:
+            http_response = post(filename, files, output_type, version)
+            trying = False
+        except RetryableError:
+            retries += 1
+            if retries > max_retries:
+                trying = False
+            else:
+                # sleep for 20 seconds
+                time.sleep(20)
+                logger.info("trying again...")
+
+    if http_response:
+        status_code = http_response.status_code
+        if status_code == 200:
+            return True
+        elif 400 <= status_code < 500:
+            msg = f"Bad Request response from sdx-deliver: {http_response.reason}"
+            logger.error(msg, status_code=status_code)
+            raise QuarantinableError(msg)
+        else:
+            msg = f"Bad Request response from sdx-deliver: {http_response.reason}"
+            logger.error(msg, status_code=status_code)
+            raise RetryableError(msg)
     else:
-        msg = "Bad response from sdx-deliver"
-        logger.error(msg, status_code=status_code)
+        msg = f"No response from sdx-deliver!"
+        logger.error(msg)
         raise RetryableError(msg)
 
 
 def post(filename: str, files: dict, output_type: str, version: str):
     """Constructs the http call to the deliver service endpoint and posts the request"""
+    audience = CONFIG.DELIVER_SERVICE_URL
+    endpoint = f"{audience}/deliver/{output_type}"
+    auth_req = google.auth.transport.requests.Request()
+    id_token = google.oauth2.id_token.fetch_id_token(auth_req, audience)
+    logger.info(f"Calling {endpoint}")
 
-    url = f"http://{CONFIG.DELIVER_SERVICE_URL}/deliver/{output_type}"
-    logger.info(f"Calling {url}")
     try:
-        response = session.post(url, params={FILE_NAME: filename, VERSION: version}, files=files)
-    except MaxRetryError:
-        logger.error("Max retries exceeded", request_url=url)
-        raise RetryableError("Max retries exceeded")
+        response = requests.post(
+            endpoint,
+            params={FILE_NAME: filename, VERSION: version},
+            files=files,
+            headers={"Authorization": f"Bearer {id_token}"}
+        )
+
     except ConnectionError:
-        logger.error("Connection error", request_url=url)
+        logger.error("Connection error", request_url=endpoint)
         raise RetryableError("Connection error")
 
     return response

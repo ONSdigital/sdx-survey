@@ -3,17 +3,12 @@ import os
 import json
 from unittest.mock import patch
 
-import pytest
 import requests
 from zipfile import ZipFile
 from unittest import mock
 
-from urllib3.exceptions import MaxRetryError
-from requests.exceptions import ConnectionError
 from app.errors import QuarantinableError, RetryableError
-from requests import Session
-from app import transform
-from app.transform import post, V1
+from app.transform import transform
 
 
 class ResponseContent:
@@ -155,53 +150,21 @@ class TestTransform(unittest.TestCase):
             with mock.patch('requests.models.Response.content') as mock_content:
                 mock_content.return_value = ResponseContent
                 dap_dict = json.loads(dap_data)
-                transform_dap = transform.transform(dap_dict)
+                transform_dap = transform(dap_dict)
                 self.assertTrue(transform_dap)
         remove_file('sample_file.txt')
         remove_file('sample.zip')
 
-    def test_transform_bad_response(self):
-        bad_response = "Bad response from sdx-transform"
-        r = requests.Response()
-        with mock.patch('app.transform.post') as mock_post:
-            mock_post.return_value = r
-            r.status_code = 300
-            with mock.patch('requests.models.Response.content') as mock_content:
-                mock_content.return_value = ResponseContent
-                dap_dict = json.loads(dap_data)
-                with self.assertRaises(QuarantinableError) as submission_exception:
-                    transform.transform(dap_dict)
-                self.assertEqual(str(submission_exception.exception), bad_response)
+    @patch("app.transform.post")
+    def test_transform_bad_response(self, mock_post):
+        with self.assertRaises(RetryableError):
+            mock_post.return_value.status_code = 500
+            transform(json.loads(dap_data))
+            mock_post.assert_called()
 
-    def test_transform_bad_request_response(self):
-        bad_response = "Bad response from sdx-transform"
-        r = requests.Response()
-        with mock.patch('app.transform.post') as mock_post:
-            mock_post.return_value = r
-            r.status_code = 400
-            with mock.patch('requests.models.Response.content') as mock_content:
-                mock_content.return_value = ResponseContent
-                dap_dict = json.loads(dap_data)
-                with self.assertRaises(QuarantinableError) as submission_exception:
-                    transform.transform(dap_dict)
-                self.assertEqual(str(submission_exception.exception), bad_response)
-
-    @patch.object(Session, 'post')
-    def test_post(self, mock_request):
-        with pytest.raises(QuarantinableError):
-            mock_request.return_value.status_code = 400
-            transform.transform(dap_data, V1)
-
-    @patch('app.transform.session')
-    def test_post_MaxRetryError(self, mock_session):
-        survey_json = '{"tx_id":"123"}'
-        mock_session.post.side_effect = MaxRetryError("pool", "url", "reason")
-        with pytest.raises(RetryableError):
-            post(survey_json, V1)
-
-    @patch('app.transform.session')
-    def test_post_ConnectionError(self, mock_session):
-        survey_json = '{"tx_id":"123"}'
-        mock_session.post.side_effect = ConnectionError()
-        with pytest.raises(RetryableError):
-            post(survey_json, V1)
+    @patch("app.transform.post")
+    def test_transform_bad_request_response(self, mock_post):
+        with self.assertRaises(QuarantinableError):
+            mock_post.return_value.status_code = 400
+            transform(json.loads(dap_data))
+            mock_post.assert_called()
