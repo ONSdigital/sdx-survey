@@ -1,16 +1,14 @@
 import json
-import structlog
 
+from sdx_gcp.app import get_logger
 from datetime import datetime
 from string import ascii_lowercase
 from cryptography.fernet import Fernet
-from google.cloud import datastore
 
-from app import CONFIG
-from app.errors import QuarantinableError
+from app import sdx_app, CONFIG
 from app.submission_type import get_tx_id, get_period, get_survey_id, get_ru_ref
 
-logger = structlog.get_logger()
+logger = get_logger()
 
 
 def store_comments(submission: dict):
@@ -125,18 +123,8 @@ class Comment:
 def commit_to_datastore(comment: Comment):
     """Write an instance of Comment to Google Datastore"""
 
-    try:
-        logger.info(f'Storing comments in Datastore', kind=comment.kind)
-        logger.info(f'Size of comment encrypted_data: {len(comment.encrypted_data)} bytes')
-        entity_key = CONFIG.DATASTORE_CLIENT.key(comment.kind, comment.transaction_id)
-        entity = datastore.Entity(key=entity_key, exclude_from_indexes=("encrypted_data",))
-        entity.update(
-            {
-                "created": comment.created,
-                "encrypted_data": comment.encrypted_data
-            }
-        )
-        datastore.Client().put(entity)
-    except ValueError as e:
-        logger.error(str(e))
-        raise QuarantinableError(e)
+    data = {
+        "created": comment.created,
+        "encrypted_data": comment.encrypted_data
+    }
+    sdx_app.datastore_write(data, comment.kind, comment.transaction_id, exclude_from_indexes="encrypted_data")

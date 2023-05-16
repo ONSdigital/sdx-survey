@@ -1,10 +1,10 @@
 from pathlib import Path
 import jsonschema
-import structlog
 
-from app.errors import QuarantinableError, RetryableError
+from sdx_gcp.errors import DataError, RetryableError
+from sdx_gcp.app import get_logger
 
-logger = structlog.get_logger()
+logger = get_logger()
 
 path = Path("./schemas")
 resolver = jsonschema.validators.RefResolver(
@@ -95,13 +95,13 @@ def validate(submission: dict) -> bool:
             try:
                 check_known_survey(survey_id, form_type)
             except ValueError:
-                raise QuarantinableError(f"Unsupported survey_id and/or form_type '{survey_id}:{form_type}'")
+                raise DataError(f"Unsupported survey_id and/or form_type '{survey_id}:{form_type}'")
 
     except jsonschema.ValidationError as e:
         logger.error("Client error", error=e.message)
-        raise QuarantinableError(e.message)
-    except QuarantinableError as q:
-        raise q
+        raise DataError(e.message)
+    except DataError as de:
+        raise de
     except Exception as e:
         logger.error("Server error", error=e)
         raise RetryableError(e)

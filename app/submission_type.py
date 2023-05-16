@@ -1,6 +1,6 @@
 from enum import Enum
 
-from app.errors import QuarantinableError
+from sdx_gcp.errors import DataError
 
 """
     This file defines a set of classifiers for the different submission types.
@@ -41,7 +41,7 @@ def get_field(submission: dict, *field_names: str) -> str:
     for key in field_names:
         current = current.get(key)
         if not current:
-            raise QuarantinableError(f'Missing field {key} from submission!')
+            raise DataError(f'Missing field {key} from submission!')
     return current
 
 
@@ -82,7 +82,7 @@ def get_survey_id(submission: dict) -> str:
 
 def get_ru_ref(submission: dict) -> str:
     if get_survey_type(submission) == SurveyType.ADHOC:
-        raise QuarantinableError("Adhoc surveys do not have ru_ref field")
+        raise DataError("Adhoc surveys do not have ru_ref field")
     if get_schema_version(submission) == SchemaVersion.V2:
         return get_field(submission, "survey_metadata", "ru_ref")
     else:
@@ -91,7 +91,7 @@ def get_ru_ref(submission: dict) -> str:
 
 def get_period(submission: dict) -> str:
     if get_survey_type(submission) == SurveyType.ADHOC:
-        raise QuarantinableError("Adhoc surveys do not have period field")
+        raise DataError("Adhoc surveys do not have period field")
 
     if get_schema_version(submission) == SchemaVersion.V2:
         return get_field(submission, "survey_metadata", "period_id")
@@ -105,7 +105,7 @@ def get_case_id(submission: dict) -> str:
 
 def get_user_id(submission: dict) -> str:
     if get_survey_type(submission) == SurveyType.ADHOC:
-        raise QuarantinableError("Adhoc surveys do not have user_id field")
+        raise DataError("Adhoc surveys do not have user_id field")
 
     if get_schema_version(submission) == SchemaVersion.V2:
         return get_field(submission, "survey_metadata", "user_id")

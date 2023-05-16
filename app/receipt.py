@@ -1,11 +1,12 @@
 import json
-import structlog
 
-from app import CONFIG
-from app.errors import QuarantinableError
+from sdx_gcp.app import get_logger
+from sdx_gcp.errors import DataError
+
+from app import CONFIG, sdx_app
 from app.submission_type import get_survey_type, SurveyType, get_tx_id, get_user_id, get_case_id
 
-logger = structlog.get_logger()
+logger = get_logger()
 
 
 def send_receipt(submission: dict):
@@ -29,9 +30,8 @@ def publish_data(receipt_str: str, tx_id: str, topic_path: str) -> str:
     """Publishes the receipt to the receipt topic located at topic_path"""
 
     logger.info('Publishing receipt')
-    data = receipt_str.encode("utf-8")
-    future = CONFIG.RECEIPT_PUBLISHER.publish(topic_path, data, tx_id=tx_id)
-    return future.result()
+    result = sdx_app.publish_to_pubsub(topic_path, receipt_str, {"tx_id": tx_id})
+    return result
 
 
 def make_receipt(submission: dict) -> str:
@@ -43,7 +43,7 @@ def make_receipt(submission: dict) -> str:
             'partyId': get_user_id(submission)
         }
     except KeyError as e:
-        raise QuarantinableError(f'Failed to make receipt: {str(e)}')
+        raise DataError(f'Failed to make receipt: {str(e)}')
 
     logger.info('Generated receipt', caseId=receipt_json['caseId'], partyId=receipt_json['partyId'])
     receipt_str = json.dumps(receipt_json)
@@ -60,7 +60,7 @@ def make_srm_receipt(submission: dict) -> str:
             }
         }
     except KeyError as e:
-        raise QuarantinableError(f'Failed to make receipt: {str(e)}')
+        raise DataError(f'Failed to make receipt: {str(e)}')
 
     logger.info('Generated SRM receipt', qid=receipt_json['data'])
     receipt_str = json.dumps(receipt_json)
