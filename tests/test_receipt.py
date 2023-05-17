@@ -46,8 +46,8 @@ class TestReceipt(unittest.TestCase):
             make_receipt(data)
 
     @mock.patch('app.receipt.CONFIG')
-    @mock.patch('app.receipt.sdx_app')
-    def test_publish_data(self, mock_app, mock_config):
+    @mock.patch('app.receipt.publish_message')
+    def test_publish_data(self, mock_publish, mock_config):
         receipt_topic = "receipt_topic"
         receipt = "my_receipt"
         tx_id = "123"
@@ -55,7 +55,7 @@ class TestReceipt(unittest.TestCase):
         mock_config.RECEIPT_TOPIC_PATH = receipt_topic
         publish_data(receipt, tx_id, receipt_topic)
 
-        mock_app.publish_to_pubsub.assert_called_with(receipt_topic, receipt, {"tx_id": tx_id})
+        mock_publish.assert_called_with(receipt_topic, receipt, {"tx_id": tx_id})
 
     def test_make_adhoc_receipt_valid(self):
         expected = json.dumps({"data": {"qid": "0130000000000300"}})

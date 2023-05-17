@@ -2,8 +2,9 @@ import json
 
 from sdx_gcp.app import get_logger
 from sdx_gcp.errors import DataError
+from sdx_gcp.pubsub import publish_message
 
-from app import CONFIG, sdx_app
+from app import CONFIG
 from app.submission_type import get_survey_type, SurveyType, get_tx_id, get_user_id, get_case_id
 
 logger = get_logger()
@@ -30,7 +31,7 @@ def publish_data(receipt_str: str, tx_id: str, topic_path: str) -> str:
     """Publishes the receipt to the receipt topic located at topic_path"""
 
     logger.info('Publishing receipt')
-    result = sdx_app.publish_to_pubsub(topic_path, receipt_str, {"tx_id": tx_id})
+    result = publish_message(topic_path, receipt_str, {"tx_id": tx_id})
     return result
 
 
