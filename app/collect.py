@@ -31,7 +31,7 @@ def process(message: Message):
     and are dependent on the survey and type of the submission.
     """
 
-    logger.info(f"Seft triggered by PubSub with message: {message}")
+    logger.info(f"Survey triggered by PubSub with message: {message}")
     attributes = message["attributes"]
     filename = attributes['objectId']
 
