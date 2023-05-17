@@ -1,9 +1,10 @@
-import structlog
+from sdx_gcp import Message
+from sdx_gcp.app import get_logger
+from sdx_gcp.errors import DataError
 
+from app import CONFIG, sdx_app
 from app.comments import store_comments
 from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver_hybrid, ADHOC, V1, V2
-from app.errors import QuarantinableError
-from app.reader import read
 from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
 from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_deliver_target, \
@@ -11,13 +12,14 @@ from app.submission_type import get_response_type, ResponseType, get_survey_type
 from app.transform import transform
 from app.validate import validate
 
-logger = structlog.get_logger()
+logger = get_logger()
 
 
-def process(tx_id: str):
+def process(message: Message):
 
     """
-    Orchestrates the required steps to process an encrypted json string.
+    Orchestrates the required steps to read and process the encrypted json file
+    from the filename received in the message.
     The encrypted json can represent either a survey submission or survey feedback.
     The steps include:
         - decryption
@@ -29,8 +31,11 @@ def process(tx_id: str):
     and are dependent on the survey and type of the submission.
     """
 
-    logger.info("Processing tx_id")
-    data_bytes = read(tx_id)
+    logger.info(f"Seft triggered by PubSub with message: {message}")
+    attributes = message["attributes"]
+    filename = attributes['objectId']
+
+    data_bytes = sdx_app.gcs_read(filename, CONFIG.BUCKET_NAME)
     encrypted_message_str = data_bytes.decode('utf-8')
 
     submission: dict = decrypt_survey(encrypted_message_str)
@@ -38,7 +43,7 @@ def process(tx_id: str):
     valid = validate(submission)
     if not valid:
         logger.error("Validation failed, quarantining survey")
-        raise QuarantinableError("Invalid survey")
+        raise DataError("Invalid survey")
 
     if get_response_type(submission) == ResponseType.FEEDBACK:
         # feedback do not require storing comments, transforming, or receipting.
@@ -50,7 +55,7 @@ def process(tx_id: str):
         else:
             v = V1
 
-        deliver_feedback(submission, filename=tx_id, version=v)
+        deliver_feedback(submission, filename=filename, version=v)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
         # adhoc surveys do not require transforming

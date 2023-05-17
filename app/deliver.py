@@ -1,15 +1,9 @@
 import json
-import time
 
-import structlog
-import requests
-import google.auth.transport.requests
-import google.oauth2.id_token
+from sdx_gcp.app import get_logger
 
-from app import CONFIG
-from app.errors import QuarantinableError, RetryableError
+from app import sdx_app, CONFIG
 from app.submission_type import get_tx_id
-
 
 # Constants used within the http request
 DAP = "dap"
@@ -25,39 +19,39 @@ V1 = "v1"
 V2 = "v2"
 ADHOC = "adhoc"
 
-logger = structlog.get_logger()
+logger = get_logger()
 
 
-def deliver_dap(submission: dict, version: str = V1):
+def deliver_dap(submission: dict[str, str], version: str = V1):
     """deliver a survey submission intended for DAP"""
     logger.info("Sending DAP submission")
     deliver(submission, DAP, version=version)
 
 
-def deliver_survey(submission: dict, zip_file: bytes, version: str = V1):
+def deliver_survey(submission: dict[str, str], zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for the legacy systems"""
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
     deliver(submission, LEGACY, files, version=version)
 
 
-def deliver_hybrid(submission: dict, zip_file: bytes, version: str = V1):
+def deliver_hybrid(submission: dict[str, str], zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for dap and the legacy systems"""
     logger.info("Sending hybrid submission")
     files = {TRANSFORMED_FILE: zip_file}
     deliver(submission, HYBRID, files, version=version)
 
 
-def deliver_feedback(submission: dict, filename: str, version: str = V1):
+def deliver_feedback(submission: dict[str, str], filename: str, version: str = V1):
     """deliver a feedback survey submission"""
     logger.info(f"Sending feedback submission")
     deliver(submission, FEEDBACK, {}, filename, version=version)
 
 
 def deliver(
-        submission: dict,
+        submission: dict[str, str],
         output_type: str,
-        files: dict = {},
+        files: dict[str, bytes] = {},
         filename: str = None,
         version: str = V1):
     """
@@ -68,60 +62,10 @@ def deliver(
         filename = get_tx_id(submission)
 
     files[SUBMISSION_FILE] = json.dumps(submission).encode(UTF8)
-
-    trying = True
-    retries = 0
-    max_retries = 3
-    http_response = None
-    while trying:
-        try:
-            http_response = post(filename, files, output_type, version)
-            trying = False
-        except RetryableError:
-            retries += 1
-            if retries > max_retries:
-                trying = False
-            else:
-                # sleep for 20 seconds
-                time.sleep(20)
-                logger.info("trying again...")
-
-    if http_response:
-        status_code = http_response.status_code
-        if status_code == 200:
-            return True
-        elif 400 <= status_code < 500:
-            msg = f"Bad Request response from sdx-deliver: {http_response.reason}"
-            logger.error(msg, status_code=status_code)
-            raise QuarantinableError(msg)
-        else:
-            msg = f"Bad Request response from sdx-deliver: {http_response.reason}"
-            logger.error(msg, status_code=status_code)
-            raise RetryableError(msg)
-    else:
-        msg = f"No response from sdx-deliver!"
-        logger.error(msg)
-        raise RetryableError(msg)
-
-
-def post(filename: str, files: dict, output_type: str, version: str):
-    """Constructs the http call to the deliver service endpoint and posts the request"""
-    audience = CONFIG.DELIVER_SERVICE_URL
-    endpoint = f"{audience}/deliver/{output_type}"
-    auth_req = google.auth.transport.requests.Request()
-    id_token = google.oauth2.id_token.fetch_id_token(auth_req, audience)
-    logger.info(f"Calling {endpoint}")
-
-    try:
-        response = requests.post(
-            endpoint,
-            params={FILE_NAME: filename, VERSION: version},
-            files=files,
-            headers={"Authorization": f"Bearer {id_token}"}
-        )
-
-    except ConnectionError:
-        logger.error("Connection error", request_url=endpoint)
-        raise RetryableError("Connection error")
-
-    return response
+    endpoint = f"deliver/{output_type}"
+    sdx_app.http_post(CONFIG.DELIVER_SERVICE_URL,
+                      endpoint,
+                      None,
+                      params={FILE_NAME: filename, VERSION: version},
+                      files=files)
+    return True

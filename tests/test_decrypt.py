@@ -8,9 +8,9 @@ from cryptography import exceptions
 from sdc.crypto.encrypter import encrypt
 from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
+from sdx_gcp.errors import DataError
 
 from app.decrypt import decrypt_survey, add_key, add_keys
-from app.errors import QuarantinableError
 
 KEY_DIR = "keys"
 
@@ -114,47 +114,47 @@ class TestDecrypt(unittest.TestCase):
     @patch('app.decrypt.sdc_decrypt')
     def test_decrypt_survey_UnsupportedAlgorithm(self, sdc_decrypt):
         sdc_decrypt.side_effect = exceptions.UnsupportedAlgorithm("message")
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             decrypt_survey("encrypted survey")
 
     @patch('app.decrypt.sdc_decrypt')
     def test_decrypt_survey_InvalidKey(self, sdc_decrypt):
         sdc_decrypt.side_effect = exceptions.InvalidKey("message")
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             decrypt_survey("encrypted survey")
 
     @patch('app.decrypt.sdc_decrypt')
     def test_decrypt_survey_AlreadyFinalized(self, sdc_decrypt):
         sdc_decrypt.side_effect = exceptions.AlreadyFinalized("message")
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             decrypt_survey("encrypted survey")
 
     @patch('app.decrypt.sdc_decrypt')
     def test_decrypt_survey_InvalidSignature(self, sdc_decrypt):
         sdc_decrypt.side_effect = exceptions.InvalidSignature("message")
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             decrypt_survey("encrypted survey")
 
     @patch('app.decrypt.sdc_decrypt')
     def test_decrypt_survey_NotYetFinalized(self, sdc_decrypt):
         sdc_decrypt.side_effect = exceptions.NotYetFinalized("message")
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             decrypt_survey("encrypted survey")
 
     @patch('app.decrypt.sdc_decrypt')
     def test_decrypt_survey_AlreadyUpdated(self, sdc_decrypt):
         sdc_decrypt.side_effect = exceptions.AlreadyUpdated("message")
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             decrypt_survey("encrypted survey")
 
     @patch('app.decrypt.sdc_decrypt')
     def test_decrypt_survey_binascii_Error(self, sdc_decrypt):
         sdc_decrypt.side_effect = binascii.Error("message")
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             decrypt_survey("encrypted survey")
 
     @patch('app.decrypt.sdc_decrypt')
     def test_decrypt_survey_InvalidTokenException(self, sdc_decrypt):
         sdc_decrypt.side_effect = InvalidTokenException("message")
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             decrypt_survey("encrypted survey")
