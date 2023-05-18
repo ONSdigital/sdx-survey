@@ -15,6 +15,7 @@ TRANSFORMED_FILE = 'transformed'
 UTF8 = "utf-8"
 FILE_NAME = "filename"
 VERSION = "version"
+TX_ID = "tx_id"
 V1 = "v1"
 V2 = "v2"
 ADHOC = "adhoc"
@@ -22,35 +23,36 @@ ADHOC = "adhoc"
 logger = get_logger()
 
 
-def deliver_dap(submission: dict[str, str], version: str = V1):
+def deliver_dap(submission: dict[str, str], tx_id: str, version: str = V1):
     """deliver a survey submission intended for DAP"""
     logger.info("Sending DAP submission")
-    deliver(submission, DAP, version=version)
+    deliver(submission, DAP, tx_id, version=version)
 
 
-def deliver_survey(submission: dict[str, str], zip_file: bytes, version: str = V1):
+def deliver_survey(submission: dict[str, str], zip_file: bytes, tx_id: str, version: str = V1):
     """deliver a survey submission intended for the legacy systems"""
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(submission, LEGACY, files, version=version)
+    deliver(submission, LEGACY, tx_id, files, version=version)
 
 
-def deliver_hybrid(submission: dict[str, str], zip_file: bytes, version: str = V1):
+def deliver_hybrid(submission: dict[str, str], zip_file: bytes, tx_id: str, version: str = V1):
     """deliver a survey submission intended for dap and the legacy systems"""
     logger.info("Sending hybrid submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(submission, HYBRID, files, version=version)
+    deliver(submission, HYBRID, tx_id, files, version=version)
 
 
-def deliver_feedback(submission: dict[str, str], filename: str, version: str = V1):
+def deliver_feedback(submission: dict[str, str], filename: str, tx_id: str, version: str = V1):
     """deliver a feedback survey submission"""
     logger.info(f"Sending feedback submission")
-    deliver(submission, FEEDBACK, {}, filename, version=version)
+    deliver(submission, FEEDBACK, tx_id, {}, filename, version=version)
 
 
 def deliver(
         submission: dict[str, str],
         output_type: str,
+        tx_id: str,
         files: dict[str, bytes] = {},
         filename: str = None,
         version: str = V1):
@@ -66,6 +68,6 @@ def deliver(
     sdx_app.http_post(CONFIG.DELIVER_SERVICE_URL,
                       endpoint,
                       None,
-                      params={FILE_NAME: filename, VERSION: version},
+                      params={FILE_NAME: filename, VERSION: version, TX_ID: tx_id},
                       files=files)
     return True

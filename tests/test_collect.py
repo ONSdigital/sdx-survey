@@ -69,7 +69,7 @@ class TestCollect(unittest.TestCase):
         process(self.message)
 
         store_comments.assert_called_with(dap_response)
-        deliver_dap.assert_called_with(dap_response, V1)
+        deliver_dap.assert_called_with(dap_response, tx_id='0f534ffc-9442-414c-b39f-a756b4adc6cb', version=V1)
         send_receipt.assert_called_with(dap_response)
 
     @patch('app.collect.sdx_app')
