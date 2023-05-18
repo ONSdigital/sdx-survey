@@ -46,7 +46,7 @@ class TestCollect(unittest.TestCase):
         decrypt.return_value = feedback_response
         validate.return_value = True
         process(self.message)
-        deliver_feedback.assert_called_with(feedback_response, filename=tx_id, version='v1')
+        deliver_feedback.assert_called_with(feedback_response, tx_id=tx_id, filename=tx_id, version='v1')
         send_receipt.assert_not_called()
 
     @patch('app.collect.sdx_app')
@@ -69,7 +69,7 @@ class TestCollect(unittest.TestCase):
         process(self.message)
 
         store_comments.assert_called_with(dap_response)
-        deliver_dap.assert_called_with(dap_response, V1)
+        deliver_dap.assert_called_with(dap_response, tx_id='0f534ffc-9442-414c-b39f-a756b4adc6cb', version=V1)
         send_receipt.assert_called_with(dap_response)
 
     @patch('app.collect.sdx_app')
@@ -95,7 +95,10 @@ class TestCollect(unittest.TestCase):
         process(self.message)
 
         store_comments.assert_called_with(legacy_response)
-        deliver_survey.assert_called_with(legacy_response, zip_bytes, V1)
+        deliver_survey.assert_called_with(legacy_response,
+                                          zip_bytes,
+                                          tx_id='0f534ffc-9442-414c-b39f-a756b4adc6cb',
+                                          version=V1)
         send_receipt.assert_called_with(legacy_response)
 
     @patch('app.collect.sdx_app')
@@ -121,5 +124,8 @@ class TestCollect(unittest.TestCase):
         process(self.message)
 
         store_comments.assert_called_with(hybrid_response)
-        deliver_hybrid.assert_called_with(hybrid_response, zip_bytes, V1)
+        deliver_hybrid.assert_called_with(hybrid_response,
+                                          zip_bytes,
+                                          tx_id='0f534ffc-9442-414c-b39f-a756b4adc6cb',
+                                          version=V1)
         send_receipt.assert_called_with(hybrid_response)

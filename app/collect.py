@@ -55,7 +55,7 @@ def process(message: Message):
         else:
             v = V1
 
-        deliver_feedback(submission, filename=filename, version=v)
+        deliver_feedback(submission, tx_id=filename, filename=filename, version=v)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
         # adhoc surveys do not require transforming
@@ -71,11 +71,11 @@ def process(message: Message):
 
         if deliver_target == DeliverTarget.DAP:
             # dap surveys do not require transforming
-            deliver_dap(submission, version)
+            deliver_dap(submission, tx_id=filename, version=version)
 
         else:
-            zip_file = transform(submission, version)
+            zip_file = transform(submission, filename, version)
             if deliver_target == DeliverTarget.HYBRID:
-                deliver_hybrid(submission, zip_file, version)
+                deliver_hybrid(submission, zip_file, tx_id=filename, version=version)
             else:
-                deliver_survey(submission, zip_file, version)
+                deliver_survey(submission, zip_file, tx_id=filename, version=version)
