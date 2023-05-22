@@ -60,7 +60,7 @@ def process(message: Message):
     elif get_survey_type(submission) == SurveyType.ADHOC:
         # adhoc surveys do not require transforming
         send_receipt(submission)
-        deliver_dap(submission, ADHOC)
+        deliver_dap(submission, tx_id=filename, version=ADHOC)
 
     else:
         send_receipt(submission)
