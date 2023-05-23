@@ -1,0 +1,5 @@
+sdx-gcp==1.2.3
+sdc-cryptography==1.0.0
+cryptography==40.0.2
+PyYAML==6.0
+jsonschema~=4.17.3

@@ -3,10 +3,11 @@ import unittest
 from unittest import mock
 from unittest.mock import patch, Mock
 from cryptography.fernet import Fernet
+from sdx_gcp.errors import DataError
+
 from app import comments
 from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
-    Comment
-from app.errors import QuarantinableError
+    Comment, commit_to_datastore
 
 
 class TestGetComments(unittest.TestCase):
@@ -175,30 +176,11 @@ class TestGetComments(unittest.TestCase):
         store_comments(self.test_survey)
         mock_datastore.assert_called()
 
-    @mock.patch('app.comments.datastore')
-    @mock.patch('app.comments.CONFIG')
-    def test_commmit_to_datastore(self, mock_config, mock_datastore):
+    @mock.patch('app.comments.sdx_app')
+    def test_commmit_to_datastore(self, mock_app):
         comment = Comment("123", "009_2020", b'my data')
-
-        mock_entity = Mock()
-        mock_client = Mock()
-
-        mock_datastore.Entity = Mock(return_value=mock_entity)
-        mock_datastore.Client = Mock(return_value=mock_client)
-
-        comments.commit_to_datastore(comment)
-
-        mock_entity.update.assert_called()
-        mock_client.put.assert_called()
-
-    @mock.patch('app.comments.datastore')
-    @mock.patch('app.comments.CONFIG')
-    def test_commmit_to_datastore_error(self, mock_config, mock_datastore):
-        comment = Comment("123", "009_2020", b'my data')
-        mock_datastore.Entity = Mock(side_effect=ValueError())
-
-        with self.assertRaises(QuarantinableError):
-            comments.commit_to_datastore(comment)
+        commit_to_datastore(comment)
+        mock_app.datastore_write.assert_called()
 
 
 def decrypt_comment(comment_token: str, key: str) -> dict:

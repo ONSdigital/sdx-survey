@@ -1,4 +1,5 @@
-from app.errors import QuarantinableError
+from sdx_gcp.errors import DataError
+
 from app.validate import validate, check_known_survey
 
 import unittest
@@ -9,13 +10,13 @@ from tests import get_data
 class TestValidateService(unittest.TestCase):
 
     def assertInvalid(self, data: dict):
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             validate(data)
 
     def assertValid(self, data: dict):
         try:
             self.assertTrue(validate(data))
-        except QuarantinableError as e:
+        except DataError as e:
             self.fail(str(e))
 
     def test_validates_submission(self):
@@ -209,25 +210,25 @@ class TestValidateService(unittest.TestCase):
     def test_validate_type_none_is_quarantined(self):
         survey = get_data('submission')
         del survey["type"]
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             validate(survey)
 
     def test_validate_meta_none_is_quarantined(self):
         survey = get_data('submission')
         del survey["metadata"]
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             validate(survey)
 
     def test_not_known_survey(self):
         survey = get_data('submission')
         survey["survey_id"] = "567"
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             validate(survey)
 
     def test_not_known_survey_id(self):
         survey = get_data('submission')
         survey["survey_id"] = "567"
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             validate(survey)
 
     def test_allow_case_type(self):
@@ -255,5 +256,5 @@ class TestValidateService(unittest.TestCase):
         del survey["survey_id"]
         try:
             validate(survey)
-        except QuarantinableError as e:
+        except DataError as e:
             self.assertEqual("'survey_id' is a required property", str(e))

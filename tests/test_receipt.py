@@ -2,7 +2,8 @@ import json
 import unittest
 from unittest import mock
 
-from app.errors import QuarantinableError
+from sdx_gcp.errors import DataError
+
 from app.receipt import make_receipt, send_receipt, publish_data, make_srm_receipt
 from tests import get_data
 
@@ -41,11 +42,12 @@ class TestReceipt(unittest.TestCase):
     def test_make_receipt_bad(self):
         data = self.test_data
         del data["case_id"]
-        with self.assertRaises(QuarantinableError):
+        with self.assertRaises(DataError):
             make_receipt(data)
 
     @mock.patch('app.receipt.CONFIG')
-    def test_publish_data(self, mock_config):
+    @mock.patch('app.receipt.publish_message')
+    def test_publish_data(self, mock_publish, mock_config):
         receipt_topic = "receipt_topic"
         receipt = "my_receipt"
         tx_id = "123"
@@ -53,10 +55,7 @@ class TestReceipt(unittest.TestCase):
         mock_config.RECEIPT_TOPIC_PATH = receipt_topic
         publish_data(receipt, tx_id, receipt_topic)
 
-        mock_config.RECEIPT_PUBLISHER.publish.assert_called_with(
-            receipt_topic,
-            receipt.encode("utf-8"),
-            tx_id=tx_id)
+        mock_publish.assert_called_with(receipt_topic, receipt, {"tx_id": tx_id})
 
     def test_make_adhoc_receipt_valid(self):
         expected = json.dumps({"data": {"qid": "0130000000000300"}})

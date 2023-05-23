@@ -1,7 +1,5 @@
-FROM python:3.8-slim
+FROM eu.gcr.io/ons-sdx-ci/sdx-gcp:1.2.3
 COPY . /app
 WORKDIR /app
-RUN python -m pip install --upgrade pip
-RUN pip install pipenv
-RUN pipenv install --system --deploy --ignore-pipfile
+RUN pip install -r requirements.txt
 CMD ["python", "./run.py"]
