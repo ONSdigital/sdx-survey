@@ -29,7 +29,7 @@ def requires_converting(submission: Submission) -> bool:
     if get_schema_version(submission) != SchemaVersion.V2:
         return False
 
-    if get_deliver_target(submission) != DeliverTarget.LEGACY:
+    if get_deliver_target(submission) == DeliverTarget.LEGACY:
         return False
 
     return True
