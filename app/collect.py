@@ -71,6 +71,7 @@ def process(message: Message):
         deliver_target = get_deliver_target(submission)
 
         if requires_converting(submission):
+            version = V1
             submission = convert_v2_to_v1(submission)
 
         if deliver_target == DeliverTarget.DAP:
