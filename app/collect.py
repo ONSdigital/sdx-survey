@@ -11,6 +11,7 @@ from app.submission_type import get_response_type, ResponseType, get_survey_type
     DeliverTarget, get_schema_version, SchemaVersion
 from app.transform import transform
 from app.validate import validate
+from app.version_reverter import requires_converting, convert_v2_to_v1
 
 logger = get_logger()
 
@@ -68,6 +69,10 @@ def process(message: Message):
 
         version = V2 if get_schema_version(submission) == SchemaVersion.V2 else V1
         deliver_target = get_deliver_target(submission)
+
+        if requires_converting(submission):
+            version = V1
+            submission = convert_v2_to_v1(submission)
 
         if deliver_target == DeliverTarget.DAP:
             # dap surveys do not require transforming

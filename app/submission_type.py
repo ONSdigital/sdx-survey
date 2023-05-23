@@ -40,7 +40,7 @@ def get_field(submission: dict, *field_names: str) -> str:
     current = submission
     for key in field_names:
         current = current.get(key)
-        if not current:
+        if current is None:
             raise DataError(f'Missing field {key} from submission!')
     return current
 
@@ -127,3 +127,5 @@ def get_deliver_target(submission: dict) -> DeliverTarget:
         return DeliverTarget.HYBRID
     else:
         return DeliverTarget.LEGACY
+
+
