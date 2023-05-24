@@ -1,0 +1,7 @@
+[flake8]
+ignore = E402
+max-line-length=160
+exclude =
+    lib,
+    __pycache__,
+    venv
