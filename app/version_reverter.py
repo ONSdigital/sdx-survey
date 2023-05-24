@@ -36,6 +36,8 @@ def requires_converting(submission: Submission) -> bool:
 
 
 def convert_v2_to_v1(submission: Submission) -> Submission:
+    logger.info("Converting from v2 to v1")
+
     v1_template = {
         "case_id": get_field(submission, "case_id"),
         "tx_id": get_field(submission, "tx_id"),

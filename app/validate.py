@@ -106,5 +106,5 @@ def validate(submission: dict) -> bool:
         logger.error("Server error", error=e)
         raise RetryableError(e)
 
-    logger.info(f"Validation successful")
+    logger.info("Validation successful")
     return True

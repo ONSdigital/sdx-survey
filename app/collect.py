@@ -8,7 +8,7 @@ from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver_h
 from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
 from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_deliver_target, \
-    DeliverTarget, get_schema_version, SchemaVersion
+    DeliverTarget, get_schema_version, SchemaVersion, get_survey_id
 from app.transform import transform
 from app.validate import validate
 from app.version_reverter import requires_converting, convert_v2_to_v1
@@ -45,6 +45,8 @@ def process(message: Message):
     if not valid:
         logger.error("Validation failed, quarantining survey")
         raise DataError("Invalid survey")
+
+    logger.info(f"Survey id: {get_survey_id(submission)}")
 
     if get_response_type(submission) == ResponseType.FEEDBACK:
         # feedback do not require storing comments, transforming, or receipting.

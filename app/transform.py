@@ -17,7 +17,7 @@ def transform(submission: dict, tx_id: str, version: str = V1) -> bytes:
 
     logger.info("Transforming...")
     survey_json = json.dumps(submission)
-    endpoint = f"transform"
+    endpoint = "transform"
     response: RequestsResponse = sdx_app.http_post(CONFIG.TRANSFORM_SERVICE_URL,
                                                    endpoint,
                                                    survey_json,

@@ -45,7 +45,7 @@ def deliver_hybrid(submission: dict[str, str], zip_file: bytes, tx_id: str, vers
 
 def deliver_feedback(submission: dict[str, str], filename: str, tx_id: str, version: str = V1):
     """deliver a feedback survey submission"""
-    logger.info(f"Sending feedback submission")
+    logger.info("Sending feedback submission")
     deliver(submission, FEEDBACK, tx_id, {}, filename, version=version)
 
 

@@ -127,5 +127,3 @@ def get_deliver_target(submission: dict) -> DeliverTarget:
         return DeliverTarget.HYBRID
     else:
         return DeliverTarget.LEGACY
-
-

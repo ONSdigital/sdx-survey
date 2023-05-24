@@ -1,11 +1,9 @@
 import json
 import unittest
 from unittest import mock
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from cryptography.fernet import Fernet
-from sdx_gcp.errors import DataError
 
-from app import comments
 from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
     Comment, commit_to_datastore
 
