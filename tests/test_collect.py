@@ -122,7 +122,7 @@ class TestCollect(unittest.TestCase):
         zip_bytes = b"zip bytes"
         transform.return_value = zip_bytes
 
-        process(self.message, "123")
+        process(self.message, "0f534ffc-9442-414c-b39f-a756b4adc6cb")
 
         store_comments.assert_called_with(hybrid_response)
         deliver_hybrid.assert_called_with(hybrid_response,
