@@ -27,7 +27,7 @@ class TestCollect(unittest.TestCase):
         decrypt.return_value = {'value': 'nonsense'}
         validate.return_value = False
         with self.assertRaises(DataError):
-            process(self.message)
+            process(self.message, "123")
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
@@ -45,7 +45,7 @@ class TestCollect(unittest.TestCase):
         app.gcs_read.return_value = json.dumps(feedback_response).encode()
         decrypt.return_value = feedback_response
         validate.return_value = True
-        process(self.message)
+        process(self.message, tx_id)
         deliver_feedback.assert_called_with(feedback_response, tx_id=tx_id, filename=tx_id, version='v1')
         send_receipt.assert_not_called()
 
@@ -66,7 +66,7 @@ class TestCollect(unittest.TestCase):
         decrypt.return_value = dap_response
         validate.return_value = True
 
-        process(self.message)
+        process(self.message, "0f534ffc-9442-414c-b39f-a756b4adc6cb")
 
         store_comments.assert_called_with(dap_response)
         deliver_dap.assert_called_with(dap_response, tx_id='0f534ffc-9442-414c-b39f-a756b4adc6cb', version=V1)
@@ -80,8 +80,9 @@ class TestCollect(unittest.TestCase):
     @patch('app.collect.deliver_survey')
     @patch('app.collect.send_receipt')
     def test_process_legacy_survey(self, send_receipt, deliver_survey, transform, store_comments, validate, decrypt, app):
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         legacy_response = {
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '202',
             'type': 'uk.gov.ons.edc.eq:surveyresponse'
         }
@@ -92,12 +93,12 @@ class TestCollect(unittest.TestCase):
         zip_bytes = b"zip bytes"
         transform.return_value = zip_bytes
 
-        process(self.message)
+        process(self.message, tx_id)
 
         store_comments.assert_called_with(legacy_response)
         deliver_survey.assert_called_with(legacy_response,
                                           zip_bytes,
-                                          tx_id='0f534ffc-9442-414c-b39f-a756b4adc6cb',
+                                          tx_id=tx_id,
                                           version=V1)
         send_receipt.assert_called_with(legacy_response)
 
@@ -121,7 +122,7 @@ class TestCollect(unittest.TestCase):
         zip_bytes = b"zip bytes"
         transform.return_value = zip_bytes
 
-        process(self.message)
+        process(self.message, "123")
 
         store_comments.assert_called_with(hybrid_response)
         deliver_hybrid.assert_called_with(hybrid_response,
