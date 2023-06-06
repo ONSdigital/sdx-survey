@@ -1,4 +1,4 @@
-from sdx_gcp import Message, TX_ID
+from sdx_gcp import Message, TX_ID, Request, get_message
 from sdx_gcp.app import get_logger
 from sdx_gcp.errors import DataError
 
@@ -14,6 +14,11 @@ from app.validate import validate
 from app.version_reverter import requires_converting, convert_v2_to_v1
 
 logger = get_logger()
+
+
+def get_tx_id_from_object_id(req: Request) -> TX_ID:
+    message: Message = get_message(req)
+    return message["attributes"]["objectId"]
 
 
 def process(message: Message, tx_id: TX_ID):
