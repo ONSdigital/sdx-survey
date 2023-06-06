@@ -1,4 +1,4 @@
-from sdx_gcp import Message
+from sdx_gcp import Message, TX_ID, Request, get_message
 from sdx_gcp.app import get_logger
 from sdx_gcp.errors import DataError
 
@@ -16,7 +16,12 @@ from app.version_reverter import requires_converting, convert_v2_to_v1
 logger = get_logger()
 
 
-def process(message: Message):
+def get_tx_id_from_object_id(req: Request) -> TX_ID:
+    message: Message = get_message(req)
+    return message["attributes"]["objectId"]
+
+
+def process(message: Message, tx_id: TX_ID):
 
     """
     Orchestrates the required steps to read and process the encrypted json file
@@ -58,12 +63,12 @@ def process(message: Message):
         else:
             v = V1
 
-        deliver_feedback(submission, tx_id=filename, filename=filename, version=v)
+        deliver_feedback(submission, tx_id=tx_id, filename=filename, version=v)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
         # adhoc surveys do not require transforming
         send_receipt(submission)
-        deliver_dap(submission, tx_id=filename, version=ADHOC)
+        deliver_dap(submission, tx_id=tx_id, version=ADHOC)
 
     else:
         send_receipt(submission)
@@ -78,11 +83,11 @@ def process(message: Message):
 
         if deliver_target == DeliverTarget.DAP:
             # dap surveys do not require transforming
-            deliver_dap(submission, tx_id=filename, version=version)
+            deliver_dap(submission, tx_id=tx_id, version=version)
 
         else:
             zip_file = transform(submission, filename, version)
             if deliver_target == DeliverTarget.HYBRID:
-                deliver_hybrid(submission, zip_file, tx_id=filename, version=version)
+                deliver_hybrid(submission, zip_file, tx_id=tx_id, version=version)
             else:
-                deliver_survey(submission, zip_file, tx_id=filename, version=version)
+                deliver_survey(submission, zip_file, tx_id=tx_id, version=version)
