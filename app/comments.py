@@ -134,6 +134,9 @@ def commit_to_datastore(comment: Comment):
 
 def extract_berd_comment(submission) -> str:
     try:
+        if 'answer_codes' not in submission['data']:
+            return extract_comment(submission, "712")
+
         answer_codes: list[dict[str, str]] = submission['data']['answer_codes']
         answer_id = ""
         for answer_code in answer_codes:

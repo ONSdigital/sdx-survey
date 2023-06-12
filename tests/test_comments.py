@@ -74,6 +74,19 @@ class StoreCommentsTest(unittest.TestCase):
 
         self.assertEqual(comment, extract_berd_comment(test_data))
 
+    def test_extract_berd_comment_short_form(self):
+        comment = "My Comment!"
+        test_data = {
+            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'survey_id': '002',
+            "data": {
+                "123": "answer1",
+                "712": comment
+            }
+        }
+
+        self.assertEqual(comment, extract_berd_comment(test_data))
+
     def test_get_comment(self):
         test_data = {
             'data': {
