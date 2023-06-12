@@ -28,8 +28,6 @@ def store_comments(submission: dict):
             "comment": get_comment(submission),
             "additional": get_additional_comments(submission)}
 
-    logger.info(json.dumps(data))
-
     encrypted_data = encrypt_comment(data)
     kind = f'{survey_id}_{period}'
 
