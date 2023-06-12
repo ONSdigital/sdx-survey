@@ -46,7 +46,7 @@ def encrypt_comment(data: dict) -> str:
     return token.decode()
 
 
-def get_comment(submission: dict) -> list:
+def get_comment(submission: dict) -> str:
     """
     Returns the respondent typed text from a submission.
     The qcode for this text will be different depending on the survey.
@@ -58,11 +58,13 @@ def get_comment(submission: dict) -> list:
         return extract_comment(submission, '500')
     elif survey_id == '134':
         return extract_comment(submission, '300')
+    elif survey_id == '002':
+        return extract_berd_comment(submission)
     else:
         return extract_comment(submission, '146')
 
 
-def extract_comment(submission, qcode):
+def extract_comment(submission, qcode) -> str:
     logger.info('Extracting comments')
     return submission['data'].get(qcode)
 
@@ -128,3 +130,25 @@ def commit_to_datastore(comment: Comment):
         "encrypted_data": comment.encrypted_data
     }
     sdx_app.datastore_write(data, comment.kind, comment.transaction_id, exclude_from_indexes="encrypted_data")
+
+
+def extract_berd_comment(submission) -> str:
+    try:
+        if 'answer_codes' not in submission['data']:
+            return extract_comment(submission, "712")
+
+        answer_codes: list[dict[str, str]] = submission['data']['answer_codes']
+        answer_id = ""
+        for answer_code in answer_codes:
+            if answer_code["code"] == "712":
+                answer_id = answer_code["answer_id"]
+
+        if answer_id != "":
+            answers: list[dict[str, str]] = submission['data']['answers']
+            for answer in answers:
+                if answer["answer_id"] == answer_id:
+                    return answer["value"]
+    except Exception as e:
+        logger.error(str(e))
+
+    return ""

@@ -5,10 +5,10 @@ from unittest.mock import patch
 from cryptography.fernet import Fernet
 
 from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
-    Comment, commit_to_datastore
+    Comment, commit_to_datastore, extract_berd_comment
 
 
-class TestGetComments(unittest.TestCase):
+class StoreCommentsTest(unittest.TestCase):
     test_survey = {
         "case_id": "bb9eaf11-a729-40b5-8d17-d112e018c0d5",
         "collection": {
@@ -49,6 +49,43 @@ class TestGetComments(unittest.TestCase):
         }
         get_comment(test_data)
         extract_comment.assert_called_with(test_data, "500")
+
+    def test_extract_berd_comment(self):
+        comment = "My Comment!"
+        test_data = {
+            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'survey_id': '002',
+            "data": {
+                "answers": [
+                    {
+                        "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
+                        "value": comment
+                    }
+                ],
+                "lists": [],
+                "answer_codes": [
+                    {
+                        "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
+                        "code": "712"
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(comment, extract_berd_comment(test_data))
+
+    def test_extract_berd_comment_short_form(self):
+        comment = "My Comment!"
+        test_data = {
+            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'survey_id': '002',
+            "data": {
+                "123": "answer1",
+                "712": comment
+            }
+        }
+
+        self.assertEqual(comment, extract_berd_comment(test_data))
 
     def test_get_comment(self):
         test_data = {
