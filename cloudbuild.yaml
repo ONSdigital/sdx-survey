@@ -1,8 +1,10 @@
 steps:
 - id: 'Unit Tests'
-  name: 'eu.gcr.io/ons-sdx-ci/sdx-gcp:1.3.1'
+  name: 'eu.gcr.io/ons-sdx-ci/sdx-gcp:1.3.2'
   script: |
     #!/usr/bin/env bash
+    pip install --upgrade pip
     pip install -r requirements.txt
     pip install -r test-requirements.txt
+    flake8 . --count --statistics
     pytest -v --cov-report term-missing --disable-warnings --cov=app tests/

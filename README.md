@@ -1,8 +1,8 @@
 # sdx-survey
 
-[![Build Status](https://github.com/ONSdigital/sdx-survey/workflows/Build/badge.svg)](https://github.com/ONSdigital/sdx-survey) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0d8f1899b0054322b9d0ec8f2bd62d86)](https://www.codacy.com/app/ons-sdc/sdx-survey?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ONSdigital/sdx-survey&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://github.com/ONSdigital/sdx-survey/workflows/Build/badge.svg)](https://github.com/ONSdigital/sdx-survey)
 
-The SDX-Survey service is used within the Office National of Statistics (ONS) for managing survey submissions in JSON
+The SDX-Survey service is used within the Office National for Statistics (ONS) for managing survey submissions in JSON
 format. These submissions come from EQ and require validation and additional processing depending on their destination downstream.
 
 ## Process
@@ -13,7 +13,7 @@ the data is then decrypted and validated. If a survey validation fails it is pub
 the quarantine PubSub topic: `quarantine-survey-topic`. 
 
 Checks are then made on the survey type; if `type: surveyresponse`, comments are extracted and stored via GCP Datastore. 
-Additionally surveys requiring transformation are sent to SDX-Transform via `<HTTP Post>`. 
+Additionally, surveys requiring transformation are sent to SDX-Transform via `<HTTP Post>`. 
 Once transformed, the data is sent to SDX-Deliver via `<HTTP Post>` and a receipt is published to PubSub 
 topic: `receipt-topic`. This receipt notifies RASRM that the data has been successfully processed. For feedback submissions: `type: feedback`, 
 no additional processing is required and the `/deliver/feedback` endpoint on sdx-deliver is called after decryption and validation.
@@ -133,11 +133,11 @@ Data Field (Converted to JSON):
 ### Datastore
 Survey writes comments into GCP Datastore under the **'{survey_id}_{period}'** kind.
 
-| Attribute       | Description                  | Example
-|-----------------|------------------------------|----------------
-| key (name/id)   | Transaction ID (tx_id)       | `name=09bd7d53-6f16-4efa-a9c0-ea6c35976062`
-| created         | Date and time comment stored | `yyyy-mm-dd, HH:MM:SS.ss`
-| encrypted_data  | Encrypted JSON               | `gAAAAABgOR2_QLs62GL7DFp0Fr_DwRatIQlWK...`
+| Attribute      | Description                  | Example                                     |
+|----------------|------------------------------|---------------------------------------------|
+| key (name/id)  | Transaction ID (tx_id)       | `name=09bd7d53-6f16-4efa-a9c0-ea6c35976062` |
+| created        | Date and time comment stored | `yyyy-mm-dd, HH:MM:SS.ss`                   |
+| encrypted_data | Encrypted JSON               | `gAAAAABgOR2_QLs62GL7DFp0Fr_DwRatIQlWK...`  |
 
 
 ### Secret Manager
