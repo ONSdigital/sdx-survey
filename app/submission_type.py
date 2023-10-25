@@ -9,7 +9,7 @@ from sdx_gcp.errors import DataError
 """
 
 # list of survey ids that target only DAP
-_DAP_SURVEYS = ["283", "739"]
+_DAP_SURVEYS = ["283", "738", "739"]
 # list of survey ids that target both DAP and Legacy
 _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
 
