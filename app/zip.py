@@ -9,4 +9,6 @@ def create_zip(files: dict[str, str]) -> BytesIO:
         for filename, file_contents in files.items():
             zip_archive.writestr(filename, file_contents)
 
+    archive.seek(0)
+
     return archive
