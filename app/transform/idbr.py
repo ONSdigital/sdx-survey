@@ -15,8 +15,10 @@ def _idbr_receipt(survey_id, ru_ref, ru_check, period):
 
 def get_contents(submission: SurveySubmission) -> bytes:
     ru_ref, ru_check = split_ru_ref(submission["survey_metadata"]["ru_ref"])
-    return _idbr_receipt(submission['survey_metadata']['survey_id'], ru_ref, ru_check, submission['survey_metadata']['period_id'])
+    return bytes(_idbr_receipt(submission['survey_metadata']['survey_id'], ru_ref, ru_check, submission['survey_metadata']['period_id']), 'utf-8')
 
 
 def get_name(submission: SurveySubmission) -> str:
+
+    d = get_datetime(submission["submitted_at"])
     return "REC{0}_{1}.DAT".format(get_datetime(submission["submitted_at"]).strftime("%d%m"), get_tx_code(submission["tx_id"]))

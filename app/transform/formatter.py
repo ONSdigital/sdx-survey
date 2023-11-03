@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone, date
 
 import arrow
 
@@ -39,5 +39,52 @@ def format_date(value, style='long'):
     return arrow.get(value).to(timezone).format("DD/MM/YYYY HH:mm:ss")
 
 
-def get_datetime(value: str) -> datetime:
-    return datetime.strptime(value.partition(".")[0], "%Y-%m-%dT%H:%M:%S")
+def get_datetime(text: str) -> datetime | date | None:
+    """Parse a text field for a date or timestamp.
+
+    Date and time formats vary across surveys.
+    This method reads those formats.
+
+    :param str text: The date or timestamp value.
+    :rtype: Python date or datetime.
+
+    """
+
+    cls = datetime
+
+    if text.endswith("Z"):
+        return cls.strptime(text, "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=timezone.utc
+        )
+
+    try:
+        return cls.strptime(text, "%Y-%m-%dT%H:%M:%S.%f%z")
+    except ValueError:
+        pass
+
+    try:
+        return cls.strptime(text, "%Y-%m-%dT%H:%M:%S%z")
+    except ValueError:
+        pass
+
+    try:
+        return cls.strptime(text.partition(".")[0], "%Y-%m-%dT%H:%M:%S")
+    except ValueError:
+        pass
+
+    try:
+        return cls.strptime(text, "%Y-%m-%d").date()
+    except ValueError:
+        pass
+
+    try:
+        return cls.strptime(text, "%d/%m/%Y").date()
+    except ValueError:
+        pass
+
+    try:
+        return cls.strptime(text + "01", "%Y%m%d").date()
+    except ValueError:
+        pass
+
+    return None
