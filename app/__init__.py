@@ -28,7 +28,7 @@ class Config:
         self.SRM_RECEIPT_TOPIC_PATH = srm_receipt_topic_path
         self.QUARANTINE_TOPIC_ID = quarantine_topic_id
         self.BUCKET_NAME = survey_responses_bucket
-        self.FTP_PATH = None
+        self.FTP_PATH = "\\"
         self.IMAGE_SERVICE_URL = image_service_url
         self.TRANSFORM_SERVICE_URL = transformer_service_url
 

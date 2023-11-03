@@ -30,4 +30,4 @@ def get_contents(submission: SurveySubmission, image_name: str) -> bytes:
 
     image_path = CONFIG.FTP_PATH + "EDC_QImages" + "\\Images"
 
-    return bytes(f"{creation_time_long},{image_path}\\{image_name},{creation_time_short},{image_name},{survey_id},{instrument_id},{ru_ref},{period},0")
+    return bytes(f"{creation_time_long},{image_path}\\{image_name},{creation_time_short},{image_name},{survey_id},{instrument_id},{ru_ref},{period},0", 'utf-8')
