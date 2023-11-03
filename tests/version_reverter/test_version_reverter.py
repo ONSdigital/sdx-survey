@@ -1,6 +1,6 @@
 import unittest
 
-from app.version_reverter import convert_v2_to_v1
+from app.transform.version_reverter import convert_v2_to_v1
 
 
 class TestVersionReverter(unittest.TestCase):

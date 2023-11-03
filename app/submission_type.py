@@ -2,6 +2,8 @@ from enum import Enum
 
 from sdx_gcp.errors import DataError
 
+from app.definitions import SurveySubmission
+
 """
     This file defines a set of classifiers for the different submission types.
     It also provides a set of functions for retrieving common survey metadata
@@ -12,6 +14,8 @@ from sdx_gcp.errors import DataError
 _DAP_SURVEYS = ["283", "738", "739"]
 # list of survey ids that target both DAP and Legacy
 _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
+# list of surveys to use the new transform code
+_NEW_TRANSFORMS = ["009"]
 
 
 class SurveyType(Enum):
@@ -34,6 +38,10 @@ class DeliverTarget(Enum):
     DAP = 2
     HYBRID = 3
     FEEDBACK = 4
+
+
+def is_new_transform(submission: SurveySubmission) -> bool:
+    return submission["survey_metadata"]["survey_id"] in _NEW_TRANSFORMS
 
 
 def get_field(submission: dict, *field_names: str) -> str:
