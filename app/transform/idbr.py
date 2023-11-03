@@ -20,5 +20,4 @@ def get_contents(submission: SurveySubmission) -> bytes:
 
 def get_name(submission: SurveySubmission) -> str:
 
-    d = get_datetime(submission["submitted_at"])
     return "REC{0}_{1}.DAT".format(get_datetime(submission["submitted_at"]).strftime("%d%m"), get_tx_code(submission["tx_id"]))
