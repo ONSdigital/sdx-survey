@@ -41,7 +41,7 @@ class DeliverTarget(Enum):
 
 
 def is_new_transform(submission: SurveySubmission) -> bool:
-    return submission["survey_metadata"]["survey_id"] in _NEW_TRANSFORMS
+    return get_survey_id(submission) in _NEW_TRANSFORMS
 
 
 def get_field(submission: dict, *field_names: str) -> str:
