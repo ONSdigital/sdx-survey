@@ -30,7 +30,7 @@ class Config:
         self.BUCKET_NAME = survey_responses_bucket
         self.FTP_PATH = "\\"
         self.IMAGE_SERVICE_URL = image_service_url
-        self.TRANSFORM_SERVICE_URL = transformer_service_url
+        self.TRANSFORMER_SERVICE_URL = transformer_service_url
 
 
 CONFIG = Config(project_id)
