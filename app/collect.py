@@ -12,7 +12,7 @@ from app.submission_type import get_response_type, ResponseType, get_survey_type
 from app.call_transform import call_legacy_transform
 from app.transform.transform import transform
 from app.validate import validate
-from app.version_reverter import requires_converting, convert_v2_to_v1
+from app.transform.json import requires_converting, convert_v2_to_v1
 
 logger = get_logger()
 
