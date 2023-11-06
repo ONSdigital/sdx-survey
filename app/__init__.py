@@ -12,6 +12,8 @@ quarantine_topic_id = "quarantine-survey-topic"
 transform_service_url = os.getenv('TRANSFORM_SERVICE_URL', "http://sdx-transform:80")
 deliver_service_url = os.getenv("DELIVER_SERVICE_URL", "http://sdx-deliver:80")
 survey_responses_bucket = f'{project_id}-survey-responses'
+image_service_url = os.getenv('IMAGE_SERVICE_URL', "http://sdx-image:80")
+transformer_service_url = os.getenv('TRANSFORMER_SERVICE_URL', "transformer-url")
 
 
 class Config:
@@ -26,6 +28,9 @@ class Config:
         self.SRM_RECEIPT_TOPIC_PATH = srm_receipt_topic_path
         self.QUARANTINE_TOPIC_ID = quarantine_topic_id
         self.BUCKET_NAME = survey_responses_bucket
+        self.FTP_PATH = "\\"
+        self.IMAGE_SERVICE_URL = image_service_url
+        self.TRANSFORMER_SERVICE_URL = transformer_service_url
 
 
 CONFIG = Config(project_id)
@@ -37,4 +42,5 @@ def setup_keys():
     add_keys(sdx_app.secrets_get('sdx-private-jwt'))
     add_keys(sdx_app.secrets_get('eq-public-signing'))
     add_keys(sdx_app.secrets_get('eq-public-jws'))
+    CONFIG.FTP_PATH = sdx_app.secrets_get("ftp-path")[0]
     CONFIG.ENCRYPT_COMMENT_KEY = sdx_app.secrets_get('sdx-comment-key')[0]
