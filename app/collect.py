@@ -78,9 +78,10 @@ def process(message: Message, tx_id: TX_ID):
         version = V2 if get_schema_version(submission) == SchemaVersion.V2 else V1
         deliver_target = get_deliver_target(submission)
 
-        if requires_converting(submission):
-            version = V1
-            submission = convert_v2_to_v1(submission)
+        if not is_new_transform(submission):
+            if requires_converting(submission):
+                version = V1
+                submission = convert_v2_to_v1(submission)
 
         if deliver_target == DeliverTarget.DAP:
             # dap surveys do not require transforming
