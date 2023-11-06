@@ -28,7 +28,7 @@ def get_contents(submission: SurveySubmission) -> bytes:
     if requires_converting(submission):
         new_submission = convert_v2_to_v1(submission)
 
-    return bytes(json.dumps(new_submission))
+    return bytes(json.dumps(new_submission), 'utf-8')
 
 
 def get_name(submission: SurveySubmission):
