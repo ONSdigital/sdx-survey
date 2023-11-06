@@ -8,7 +8,7 @@ from app import sdx_app
 from app import CONFIG
 
 from app.definitions import SurveySubmission
-from app.transform.formatter import pck_name
+from app.transform.formatter import get_tx_code
 
 logger = get_logger()
 
@@ -40,4 +40,6 @@ def get_contents(submission: SurveySubmission) -> bytes:
 
 
 def get_name(submission: SurveySubmission) -> str:
-    return pck_name(submission["survey_metadata"]["survey_id"], submission["tx_id"])
+    survey_id = submission["survey_metadata"]["survey_id"]
+    tx_id = submission["tx_id"]
+    return f"{survey_id}_{get_tx_code(tx_id)}"

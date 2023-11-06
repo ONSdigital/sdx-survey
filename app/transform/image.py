@@ -2,7 +2,7 @@ import json
 
 from app import sdx_app, CONFIG
 from app.definitions import SurveySubmission
-from app.transform.formatter import get_image_name
+from app.transform.formatter import get_tx_code
 
 
 def get_image(submission: SurveySubmission) -> bytes:
@@ -13,4 +13,4 @@ def get_image(submission: SurveySubmission) -> bytes:
 
 def get_name(submission: SurveySubmission) -> str:
     tx_id = submission["tx_id"]
-    return get_image_name(tx_id, 1)
+    return f"S{get_tx_code(tx_id)}_1.JPG"
