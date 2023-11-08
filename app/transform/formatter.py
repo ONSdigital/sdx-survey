@@ -20,3 +20,13 @@ def format_date(d: datetime, format_str: str):
 
 def get_datetime(iso_8601_str: str) -> datetime:
     return datetime.fromisoformat(iso_8601_str)
+
+
+def get_period(period: str) -> str:
+    # ensure the period is 6 digits
+    if len(period) == 2:
+        period = "20" + period + "12"
+    elif len(period) == 4:
+        period = "20" + period
+
+    return period

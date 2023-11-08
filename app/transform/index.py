@@ -1,7 +1,7 @@
 import datetime
 
 from app import CONFIG
-from app.transform.formatter import format_date, get_tx_code, get_datetime
+from app.transform.formatter import format_date, get_tx_code, get_datetime, get_period, split_ru_ref
 from app.definitions import SurveySubmission
 
 
@@ -24,8 +24,8 @@ def get_contents(submission: SurveySubmission, image_name: str) -> bytes:
 
     survey_id = submission["survey_metadata"]["survey_id"]
     instrument_id = submission["survey_metadata"]["form_type"]
-    ru_ref = submission["survey_metadata"]["ru_ref"]
-    period = submission["survey_metadata"]["period_id"]
+    ru_ref = split_ru_ref(submission["survey_metadata"]["ru_ref"])[0]
+    period = get_period(submission["survey_metadata"]["period_id"])
 
     image_path = CONFIG.FTP_PATH + "EDC_QImages" + "\\Images"
 

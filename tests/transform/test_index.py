@@ -2,6 +2,7 @@ import datetime
 import unittest
 from unittest.mock import patch
 
+from app.definitions import SurveySubmission
 from app.transform import index
 
 
@@ -43,7 +44,18 @@ class TestIndex(unittest.TestCase):
         image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"
         actual: bytes = index.get_contents(self.submission, image_name)
         expected = (b'03/11/2023 00:00:00,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20231103,'
-                    b'Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,202,1801,12346789012A,201605,0')
+                    b'Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,202,1801,12346789012,201605,0')
+        self.assertEqual(expected, actual)
+
+    @patch('app.transform.index.datetime')
+    def test_index_contents_4_digit_period(self, mock_datetime):
+        mock_datetime.datetime.utcnow.return_value = datetime.datetime.strptime("2023-11-03", "%Y-%m-%d")
+        image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"
+        submission: SurveySubmission = self.submission
+        submission["survey_metadata"]["period_id"] = "2310"
+        actual: bytes = index.get_contents(self.submission, image_name)
+        expected = (b'03/11/2023 00:00:00,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20231103,'
+                    b'Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,202,1801,12346789012,202310,0')
         self.assertEqual(expected, actual)
 
     def test_index_name(self):
