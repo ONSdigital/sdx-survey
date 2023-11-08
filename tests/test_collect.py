@@ -21,20 +21,17 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.validate')
-    def test_failed_validation_raises_exception(self, validate, decrypt, app):
+    def test_failed_validation_raises_exception(self, decrypt, app):
         app.gcs_read.return_value = b'{"value": "nonsense"}'
         decrypt.return_value = {'value': 'nonsense'}
-        validate.return_value = False
         with self.assertRaises(DataError):
             process(self.message, "123")
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.validate')
     @patch('app.collect.deliver_feedback')
     @patch('app.collect.send_receipt')
-    def test_process_feedback(self, send_receipt, deliver_feedback, validate, decrypt, app):
+    def test_process_feedback(self, send_receipt, deliver_feedback, decrypt, app):
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         feedback_response = {
             'tx_id': tx_id,
@@ -44,18 +41,16 @@ class TestCollect(unittest.TestCase):
 
         app.gcs_read.return_value = json.dumps(feedback_response).encode()
         decrypt.return_value = feedback_response
-        validate.return_value = True
         process(self.message, tx_id)
         deliver_feedback.assert_called_with(feedback_response, tx_id=tx_id, filename=tx_id, version='v1')
         send_receipt.assert_not_called()
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.validate')
     @patch('app.collect.store_comments')
     @patch('app.collect.deliver_dap')
     @patch('app.collect.send_receipt')
-    def test_process_dap_survey(self, send_receipt, deliver_dap, store_comments, validate, decrypt, app):
+    def test_process_dap_survey(self, send_receipt, deliver_dap, store_comments, decrypt, app):
         dap_response = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
             'survey_id': '283',
@@ -64,7 +59,6 @@ class TestCollect(unittest.TestCase):
 
         app.gcs_read.return_value = json.dumps(dap_response).encode()
         decrypt.return_value = dap_response
-        validate.return_value = True
 
         process(self.message, "0f534ffc-9442-414c-b39f-a756b4adc6cb")
 
@@ -74,12 +68,11 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.validate')
     @patch('app.collect.store_comments')
-    @patch('app.collect.call_legacy_transform')
+    @patch('app.collect.transform')
     @patch('app.collect.deliver_survey')
     @patch('app.collect.send_receipt')
-    def test_process_legacy_survey(self, send_receipt, deliver_survey, transform, store_comments, validate, decrypt, app):
+    def test_process_legacy_survey(self, send_receipt, deliver_survey, transform, store_comments, decrypt, app):
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         legacy_response = {
             'tx_id': tx_id,
@@ -89,7 +82,6 @@ class TestCollect(unittest.TestCase):
 
         app.gcs_read.return_value = json.dumps(legacy_response).encode()
         decrypt.return_value = legacy_response
-        validate.return_value = True
         zip_bytes = b"zip bytes"
         transform.return_value = zip_bytes
 
@@ -104,12 +96,11 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.validate')
     @patch('app.collect.store_comments')
     @patch('app.collect.call_legacy_transform')
     @patch('app.collect.deliver_hybrid')
     @patch('app.collect.send_receipt')
-    def test_process_hybrid_survey(self, send_receipt, deliver_hybrid, transform, store_comments, validate, decrypt, app):
+    def test_process_hybrid_survey(self, send_receipt, deliver_hybrid, transform, store_comments, decrypt, app):
         hybrid_response = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
             'survey_id': '147',
@@ -118,7 +109,6 @@ class TestCollect(unittest.TestCase):
 
         app.gcs_read.return_value = json.dumps(hybrid_response).encode()
         decrypt.return_value = hybrid_response
-        validate.return_value = True
         zip_bytes = b"zip bytes"
         transform.return_value = zip_bytes
 

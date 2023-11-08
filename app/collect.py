@@ -1,6 +1,5 @@
 from sdx_gcp import Message, TX_ID, Request, get_message
 from sdx_gcp.app import get_logger
-from sdx_gcp.errors import DataError
 
 from app import CONFIG, sdx_app
 from app.comments import store_comments
@@ -11,7 +10,6 @@ from app.submission_type import get_response_type, ResponseType, get_survey_type
     DeliverTarget, get_schema_version, SchemaVersion, get_survey_id, is_new_transform
 from app.call_transform import call_legacy_transform
 from app.transform.transform import transform
-from app.validate import validate
 from app.transform.json import requires_converting, convert_v2_to_v1
 
 logger = get_logger()
@@ -30,7 +28,6 @@ def process(message: Message, tx_id: TX_ID):
     The encrypted json can represent either a survey submission or survey feedback.
     The steps include:
         - decryption
-        - validation
         - transformation
         - comment persistence
         - delivery
@@ -46,12 +43,6 @@ def process(message: Message, tx_id: TX_ID):
     encrypted_message_str = data_bytes.decode('utf-8')
 
     submission: dict = decrypt_survey(encrypted_message_str)
-
-    valid = validate(submission)
-    if not valid:
-        logger.error("Validation failed, quarantining survey")
-        raise DataError("Invalid survey")
-
     logger.info(f"Survey id: {get_survey_id(submission)}")
 
     if get_response_type(submission) == ResponseType.FEEDBACK:

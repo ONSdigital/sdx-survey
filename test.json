@@ -1,0 +1,31 @@
+{
+  "case_id": "322ff8b8-052f-4428-8bb6-f0209f51b18d",
+  "tx_id": "fab28bd7-3da7-4fab-bb2d-68173be2a0f6",
+  "type": "uk.gov.ons.edc.eq:surveyresponse",
+  "version": "v2",
+  "data_version": "0.0.1",
+  "origin": "uk.gov.ons.edc.eq",
+  "collection_exercise_sid": "4c6dd8fd-ef30-4a96-9040-f37081e22078",
+  "schema_name": "mbs_0106",
+  "flushed": false,
+  "submitted_at": "2023-11-06T14:16:27+00:00",
+  "launch_language_code": "en",
+  "survey_metadata": {
+    "survey_id": "009",
+    "user_id": "UNKNOWN",
+    "period_id": "201605",
+    "ru_name": "ESSENTIAL ENTERPRISE LTD.",
+    "ru_ref": "12346789012A",
+    "trad_as": "ESSENTIAL ENTERPRISE LTD.",
+    "ref_p_start_date": "2016-05-01",
+    "ref_p_end_date": "2016-05-31",
+    "form_type": "0106"
+  },
+  "data": {
+    "9999": "Yes, I can report for this period",
+    "40": "34000",
+    "146": "No comment"
+  },
+  "started_at": "2023-11-06T14:16:03.069764+00:00",
+  "submission_language_code": "en"
+}
