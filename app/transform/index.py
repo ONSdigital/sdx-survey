@@ -19,14 +19,19 @@ def get_contents(submission: SurveySubmission, image_name: str) -> bytes:
 
     now = datetime.datetime.utcnow()
 
-    creation_time_short = format_date(now, "%Y%m%d")
-    creation_time_long = format_date(now, '%d/%m/%Y %H:%M:%S')
+    short_time = format_date(now, "%Y%m%d")
+    long_time = format_date(now, '%d/%m/%Y %H:%M:%S')
 
     survey_id = submission["survey_metadata"]["survey_id"]
-    instrument_id = submission["survey_metadata"]["form_type"]
+    form_type = submission["survey_metadata"]["form_type"]
     ru_ref = split_ru_ref(submission["survey_metadata"]["ru_ref"])[0]
     period = get_period(submission["survey_metadata"]["period_id"])
 
     image_path = CONFIG.FTP_PATH + "EDC_QImages" + "\\Images"
+    # image_name_without_ext
+    x = image_name.split(".")[0]
 
-    return bytes(f"{creation_time_long},{image_path}\\{image_name},{creation_time_short},{image_name},{survey_id},{instrument_id},{ru_ref},{period},0", 'utf-8')
+    return bytes(
+        f"{long_time},{image_path}\\{image_name},{short_time},{x},{survey_id},{form_type},{ru_ref},{period},001,0",
+        'utf-8'
+    )
