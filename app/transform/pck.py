@@ -42,6 +42,10 @@ def get_name(submission: SurveySubmission) -> str:
     survey_id = submission["survey_metadata"]["survey_id"]
     if survey_id == "202":
         survey_id = get_abs_survey_id(submission["survey_metadata"]["form_type"])
+
+    if survey_id in ["182", "183", "184", "185"]:
+        survey_id = "181"
+
     tx_id = submission["tx_id"]
     return f"{survey_id}_{get_tx_code(tx_id)}"
 
