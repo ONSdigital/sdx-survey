@@ -15,7 +15,8 @@ _DAP_SURVEYS = ["283", "738", "739"]
 # list of survey ids that target both DAP and Legacy
 _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
 # list of surveys to use the new transform code
-_NEW_TRANSFORMS = ["009", "127", "144", "202", "092", "171", "073", "074", "066", "076"]
+_NEW_TRANSFORMS = ['009', '017', '019', '073', '074', '092', '127', '134', '139', '144', '160', '165', '169', '171', '182', '183', '184', '185', '187', '202', '228']
+
 
 
 class SurveyType(Enum):
