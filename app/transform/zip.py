@@ -2,9 +2,10 @@ from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
 
 
-def create_zip(files: dict[str, bytes]) -> BytesIO:
+def create_zip(files: dict[str, bytes]) -> bytes:
     """
-    :param files - A dictionary that maps the name of the file, to it's contents
+    Takes a dictionary that maps the name of the file, to its contents
+    and converts it to a zip file in memory.
     """
     archive = BytesIO()
 
@@ -14,4 +15,4 @@ def create_zip(files: dict[str, bytes]) -> BytesIO:
 
     archive.seek(0)
 
-    return archive
+    return archive.read()

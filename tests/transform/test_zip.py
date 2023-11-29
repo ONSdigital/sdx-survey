@@ -21,13 +21,13 @@ class TestZip(unittest.TestCase):
 
     def test_zip(self):
         my_files = {
-            "file1": "contents for file 1",
-            "subdir/file2": "contents for file 2",
-            "subdir/file3": "contents for file 3"
+            "file1": b"contents for file 1",
+            "subdir/file2": b"contents for file 2",
+            "subdir/file3": b"contents for file 3"
         }
 
-        zip_archive: BytesIO = create_zip(my_files)
+        zip_archive: bytes = create_zip(my_files)
 
-        result = extract_zip(zip_archive.read())
+        result = extract_zip(zip_archive)
 
-        self.assertDictEqual(my_files, {k: v.decode() for k, v in result.items()})
+        self.assertDictEqual(my_files, {k: v for k, v in result.items()})

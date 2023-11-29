@@ -7,10 +7,11 @@ from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver_h
 from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
 from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_deliver_target, \
-    DeliverTarget, get_schema_version, SchemaVersion, get_survey_id, is_new_transform
+    DeliverTarget, get_schema_version, SchemaVersion, get_survey_id, requires_legacy_transform, \
+    requires_v1_conversion
 from app.call_transform import call_legacy_transform
 from app.transform.transform import transform
-from app.transform.json import requires_converting, convert_v2_to_v1
+from app.transform.json import convert_v2_to_v1
 
 logger = get_logger()
 
@@ -69,21 +70,19 @@ def process(message: Message, tx_id: TX_ID):
         version = V2 if get_schema_version(submission) == SchemaVersion.V2 else V1
         deliver_target = get_deliver_target(submission)
 
-        if not is_new_transform(submission):
-            if requires_converting(submission):
+        if deliver_target == DeliverTarget.DAP:
+            if requires_v1_conversion(submission):
                 version = V1
                 submission = convert_v2_to_v1(submission)
-
-        if deliver_target == DeliverTarget.DAP:
             # dap surveys do not require transforming
             deliver_dap(submission, tx_id=tx_id, version=version)
 
         else:
 
-            if is_new_transform(submission):
-                zip_file = transform(submission)
-            else:
+            if requires_legacy_transform(submission):
                 zip_file = call_legacy_transform(submission, filename, version)
+            else:
+                zip_file = transform(submission)
 
             if deliver_target == DeliverTarget.HYBRID:
                 deliver_hybrid(submission, zip_file, tx_id=tx_id, version=version)

@@ -97,7 +97,7 @@ class TestCollect(unittest.TestCase):
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
     @patch('app.collect.store_comments')
-    @patch('app.collect.call_legacy_transform')
+    @patch('app.collect.transform')
     @patch('app.collect.deliver_hybrid')
     @patch('app.collect.send_receipt')
     def test_process_hybrid_survey(self, send_receipt, deliver_hybrid, transform, store_comments, decrypt, app):
