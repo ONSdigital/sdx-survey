@@ -12,13 +12,14 @@ from app.definitions import SurveySubmission
 
 # list of survey ids that target only DAP
 _DAP_SURVEYS = ["283", "738", "739"]
+
 # list of survey ids that target both DAP and Legacy
 _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
-# list of survey ids that required an image from transformed data
-_TRANSFORMED_IMAGE_SURVEYS = ["024", "194"]
+
 # list of surveys that require a PCK file
 _PCK_SURVEYS = ['009', '017', '019', '073', '074', '127', '134', '139', '144', '160', '165', '169', '171',
                 '182', '183', '184', '185', '187', '202', '228']
+
 # surveys that still use SDX transform
 _LEGACY_TRANSFORMER = ['002', '092']
 # surveys that need to remain v1 submissions
@@ -61,10 +62,6 @@ def requires_legacy_transform(submission: SurveySubmission) -> bool:
 
 def requires_pck(submission: SurveySubmission) -> bool:
     return get_survey_id(submission) in _PCK_SURVEYS
-
-
-def requires_transformed_image(submission: SurveySubmission) -> bool:
-    return get_survey_id(submission) in _TRANSFORMED_IMAGE_SURVEYS
 
 
 def get_field(submission: dict, *field_names: str) -> str:
