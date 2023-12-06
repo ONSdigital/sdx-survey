@@ -8,7 +8,7 @@ from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
 from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_deliver_target, \
     DeliverTarget, get_schema_version, SchemaVersion, get_survey_id, requires_legacy_transform, \
-    requires_v1_conversion
+    requires_v1_conversion, prepop_submission
 from app.call_transform import call_legacy_transform
 from app.transform.transform import transform
 from app.transform.json import convert_v2_to_v1
@@ -57,6 +57,10 @@ def process(message: Message, tx_id: TX_ID):
             v = V1
 
         deliver_feedback(submission, tx_id=tx_id, filename=filename, version=v)
+
+    elif prepop_submission(submission):
+        # just send a receipt as we are not yet ready downstream
+        send_receipt(submission)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
         # adhoc surveys do not require transforming

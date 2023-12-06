@@ -22,8 +22,22 @@ _PCK_SURVEYS = ['009', '017', '019', '073', '074', '127', '134', '139', '144', '
 
 # surveys that still use SDX transform
 _LEGACY_TRANSFORMER = ['002', '092']
+
 # surveys that need to remain v1 submissions
 _V1_SURVEYS = ["283", "002", "007", "009", "023", "134", "147"]
+
+# prepop surveys
+_PREPOP_SURVEYS = ["014",
+                   "132",
+                   "133",
+                   "156",
+                   "141",
+                   "221",
+                   "241",
+                   "068",
+                   "071",
+                   "066",
+                   "076"]
 
 
 class SurveyType(Enum):
@@ -62,6 +76,10 @@ def requires_legacy_transform(submission: SurveySubmission) -> bool:
 
 def requires_pck(submission: SurveySubmission) -> bool:
     return get_survey_id(submission) in _PCK_SURVEYS
+
+
+def prepop_submission(submission: SurveySubmission) -> bool:
+    return get_survey_id(submission) in _PREPOP_SURVEYS
 
 
 def get_field(submission: dict, *field_names: str) -> str:
