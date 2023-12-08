@@ -59,6 +59,7 @@ def process(message: Message, tx_id: TX_ID):
         deliver_feedback(submission, tx_id=tx_id, filename=filename, version=v)
 
     elif prepop_submission(submission):
+        logger.info("Receipting prepop survey")
         # just send a receipt as we are not yet ready downstream
         send_receipt(submission)
 

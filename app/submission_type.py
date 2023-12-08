@@ -27,17 +27,7 @@ _LEGACY_TRANSFORMER = ['002', '092']
 _V1_SURVEYS = ["283", "002", "007", "009", "023", "134", "147"]
 
 # prepop surveys
-_PREPOP_SURVEYS = ["014",
-                   "132",
-                   "133",
-                   "156",
-                   "141",
-                   "221",
-                   "241",
-                   "068",
-                   "071",
-                   "066",
-                   "076"]
+_PREPOP_SURVEYS = ["068", "071"]
 
 
 class SurveyType(Enum):
