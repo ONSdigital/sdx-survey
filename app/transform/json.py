@@ -4,7 +4,7 @@ from sdx_gcp.errors import DataError
 from sdx_gcp.app import get_logger
 
 from app.definitions import SurveySubmission
-from app.submission_type import get_field, requires_v1_conversion
+from app.submission_type import get_field, requires_v1_conversion, get_survey_id, get_tx_id
 from app.transform.formatter import get_tx_code
 
 logger = get_logger()
@@ -31,7 +31,7 @@ def get_contents(submission: SurveySubmission) -> bytes:
 
 
 def get_name(submission: SurveySubmission):
-    return "{0}_{1}.json".format(submission["survey_metadata"]["survey_id"], get_tx_code(submission["tx_id"]))
+    return "{0}_{1}.json".format(get_survey_id(submission), get_tx_code(get_tx_id(submission)))
 
 
 def convert_v2_to_v1(submission: SurveySubmission) -> SubmissionV1:

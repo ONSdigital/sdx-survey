@@ -3,12 +3,15 @@ from enum import Enum
 from sdx_gcp.errors import DataError
 
 from app.definitions import SurveySubmission
+from sdx_gcp.app import get_logger
 
 """
     This file defines a set of classifiers for the different submission types.
     It also provides a set of functions for retrieving common survey metadata
     in a 'submission type' agnostic way.
 """
+
+logger = get_logger()
 
 # list of survey ids that target only DAP
 _DAP_SURVEYS = ["283", "738", "739"]
@@ -77,8 +80,27 @@ def get_field(submission: dict, *field_names: str) -> str:
     for key in field_names:
         current = current.get(key)
         if current is None:
+            logger.error(f'Missing field {key} from submission!', submission=get_safe_submission(submission))
             raise DataError(f'Missing field {key} from submission!')
     return current
+
+
+def get_form_type(submission: dict) -> ResponseType:
+    return get_field(submission, "survey_metadata", "form_type")
+
+
+def get_period_start_date(submission: dict) -> ResponseType:
+    if get_schema_version(submission) == SchemaVersion.V2:
+        return get_field(submission, "survey_metadata", "ref_p_start_date")
+
+    return get_field(submission, "metadata", "ref_period_start_date")
+
+
+def get_period_end_date(submission: dict) -> ResponseType:
+    if get_schema_version(submission) == SchemaVersion.V2:
+        return get_field(submission, "survey_metadata", "ref_p_end_date")
+
+    return get_field(submission, "metadata", "ref_period_end_date")
 
 
 def get_response_type(submission: dict) -> ResponseType:
@@ -87,6 +109,10 @@ def get_response_type(submission: dict) -> ResponseType:
         if "feedback" in submission.get("type"):
             return ResponseType.FEEDBACK
     return ResponseType.SURVEY
+
+
+def get_submitted_at(submission: dict) -> str:
+    return get_field(submission, "submitted_at")
 
 
 def get_survey_type(submission: dict) -> SurveyType:
@@ -107,6 +133,14 @@ def get_schema_version(submission: dict) -> SchemaVersion:
 
 def get_tx_id(submission: dict) -> str:
     return get_field(submission, "tx_id")
+
+
+def get_data(submission: dict) -> str:
+    return get_field(submission, "data")
+
+
+def get_qid(submission: dict) -> str:
+    return get_field(submission, "survey_metadata", "qid")
 
 
 def get_survey_id(submission: dict) -> str:
@@ -163,3 +197,17 @@ def get_deliver_target(submission: dict) -> DeliverTarget:
         return DeliverTarget.HYBRID
     else:
         return DeliverTarget.LEGACY
+
+
+def get_safe_submission(submission) -> dict:
+    """
+    Remove all data from the submission
+    and only retain the keys / structure of the submission
+    """
+
+    if isinstance(submission, list):
+        return [get_safe_submission(item) for item in submission]
+    elif isinstance(submission, dict):
+        return {key: get_safe_submission(value) for key, value in submission.items()}
+    else:
+        return ""

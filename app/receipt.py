@@ -5,7 +5,7 @@ from sdx_gcp.errors import DataError
 from sdx_gcp.pubsub import publish_message
 
 from app import CONFIG
-from app.submission_type import get_survey_type, SurveyType, get_tx_id, get_user_id, get_case_id
+from app.submission_type import get_survey_type, SurveyType, get_tx_id, get_user_id, get_case_id, get_qid
 
 logger = get_logger()
 
@@ -57,7 +57,7 @@ def make_srm_receipt(submission: dict) -> str:
     try:
         receipt_json = {
             'data': {
-                'qid': submission['survey_metadata']['qid']
+                'qid': get_qid(submission)
             }
         }
     except KeyError as e:
