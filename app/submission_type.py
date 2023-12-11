@@ -3,12 +3,15 @@ from enum import Enum
 from sdx_gcp.errors import DataError
 
 from app.definitions import SurveySubmission
+from sdx_gcp.app import get_logger
 
 """
     This file defines a set of classifiers for the different submission types.
     It also provides a set of functions for retrieving common survey metadata
     in a 'submission type' agnostic way.
 """
+
+logger = get_logger()
 
 # list of survey ids that target only DAP
 _DAP_SURVEYS = ["283", "738", "739"]
@@ -77,7 +80,7 @@ def get_field(submission: dict, *field_names: str) -> str:
     for key in field_names:
         current = current.get(key)
         if current is None:
-            # TODO log structure
+            logger.error(f'Missing field {key} from submission!', submission=get_safe_submission(submission))
             raise DataError(f'Missing field {key} from submission!')
     return current
 
@@ -182,3 +185,17 @@ def get_deliver_target(submission: dict) -> DeliverTarget:
         return DeliverTarget.HYBRID
     else:
         return DeliverTarget.LEGACY
+
+
+def get_safe_submission(submission) -> dict:
+    """
+    Remove all data from the submission
+    and only retain the keys / structure of the submission
+    """
+
+    if isinstance(submission, list):
+        return [get_safe_submission(item) for item in submission]
+    elif isinstance(submission, dict):
+        return {key: get_safe_submission(value) for key, value in submission.items()}
+    else:
+        return ""

@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 from app.transform.transform import transform
-
+from sdx_gcp.errors import DataError
 
 class TestTransform(unittest.TestCase):
 
@@ -71,3 +71,40 @@ class TestTransform(unittest.TestCase):
         mock_create_zip.assert_called_with(
             expected_files
         )
+
+    @patch("app.transform.transform.create_zip")
+    @patch("app.transform.transform.json")
+    @patch("app.transform.transform.idbr")
+    @patch("app.transform.transform.index")
+    @patch("app.transform.transform.image")
+    @patch("app.transform.transform.pck")
+    def test_transform_with_no_survey_metadata(self, mock_pck, mock_image, mock_index, mock_idbr, mock_json, mock_create_zip: Mock):
+
+        mock_pck.get_contents.return_value = "pck_contents"
+        mock_pck.get_name.return_value = "pck_name"
+
+        mock_image.get_image.return_value = "image_contents"
+        mock_image.get_name.return_value = "image_name"
+
+        mock_index.get_contents.return_value = "index_contents"
+        mock_index.get_name.return_value = "index_name"
+
+        mock_idbr.get_contents.return_value = "idbr_contents"
+        mock_idbr.get_name.return_value = "idbr_name"
+
+        mock_json.get_contents.return_value = "json_contents"
+        mock_json.get_name.return_value = "json_name"
+
+        expected_files = {
+            "EDC_QData/pck_name": "pck_contents",
+            "EDC_QImages/Images/image_name": "image_contents",
+            "EDC_QImages/Index/index_name": "index_contents",
+            "EDC_QReceipts/idbr_name": "idbr_contents",
+            "EDC_QJson/json_name": "json_contents",
+        }
+
+        # Remove the survey metadata
+        del self.submission["survey_metadata"]
+
+        with self.assertRaises(DataError):
+            transform(self.submission)
