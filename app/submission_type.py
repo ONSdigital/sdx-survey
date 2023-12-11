@@ -111,6 +111,10 @@ def get_response_type(submission: dict) -> ResponseType:
     return ResponseType.SURVEY
 
 
+def get_submitted_at(submission: dict) -> str:
+    return get_field(submission, "submitted_at")
+
+
 def get_survey_type(submission: dict) -> SurveyType:
     channel = submission.get("channel")
     if channel:

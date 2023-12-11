@@ -1,4 +1,3 @@
-import json
 import unittest
 
 from sdx_gcp.errors import DataError

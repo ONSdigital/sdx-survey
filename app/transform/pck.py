@@ -8,7 +8,7 @@ from app import sdx_app
 from app import CONFIG
 
 from app.definitions import SurveySubmission
-from app.submission_type import get_survey_id, get_period, get_field, get_ru_ref, get_form_type, get_period_start_date, \
+from app.submission_type import get_survey_id, get_period, get_ru_ref, get_form_type, get_period_start_date, \
     get_period_end_date
 from app.transform.formatter import get_tx_code
 

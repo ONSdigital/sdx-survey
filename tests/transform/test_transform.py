@@ -4,6 +4,7 @@ from unittest.mock import patch, Mock
 from app.transform.transform import transform
 from sdx_gcp.errors import DataError
 
+
 class TestTransform(unittest.TestCase):
 
     def setUp(self):
@@ -94,14 +95,6 @@ class TestTransform(unittest.TestCase):
 
         mock_json.get_contents.return_value = "json_contents"
         mock_json.get_name.return_value = "json_name"
-
-        expected_files = {
-            "EDC_QData/pck_name": "pck_contents",
-            "EDC_QImages/Images/image_name": "image_contents",
-            "EDC_QImages/Index/index_name": "index_contents",
-            "EDC_QReceipts/idbr_name": "idbr_contents",
-            "EDC_QJson/json_name": "json_contents",
-        }
 
         # Remove the survey metadata
         del self.submission["survey_metadata"]
