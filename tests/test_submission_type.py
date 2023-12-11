@@ -1,9 +1,10 @@
+import json
 import unittest
 
 from sdx_gcp.errors import DataError
 
 from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_schema_version, \
-    SchemaVersion, get_survey_id, get_form_type, get_period_start_date, get_period_end_date
+    SchemaVersion, get_survey_id, get_form_type, get_period_start_date, get_period_end_date, get_safe_submission
 from tests import get_data
 
 
@@ -122,3 +123,30 @@ class TestMissing(unittest.TestCase):
         data["survey_metadata"].pop("survey_id")
         with self.assertRaises(DataError):
             get_survey_id(data)
+
+
+class TestGetSafeSubmission(unittest.TestCase):
+
+    def test_makes_submission_safe(self):
+
+        my_dict = {
+            "tx_id": "super_secret_thing",
+            "data": {
+                "q1": "answer1",
+                "q2": "answer2",
+                "more": ["answer3", "answer4"]
+            },
+            "date": "d1"
+        }
+
+        expected = {
+            "tx_id": "",
+            "data": {
+                "q1": "",
+                "q2": "",
+                "more": ["", ""]
+            },
+            "date": ""
+        }
+
+        self.assertEqual(get_safe_submission(my_dict), expected)
