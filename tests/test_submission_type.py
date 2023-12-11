@@ -2,8 +2,7 @@ import unittest
 
 from sdx_gcp.errors import DataError
 
-from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_schema_version, \
-    SchemaVersion, get_survey_id, get_form_type, get_period_start_date, get_period_end_date, get_safe_submission
+from app.response import get_safe_submission, SurveyType, ResponseType, SchemaVersion
 from tests import get_data
 
 

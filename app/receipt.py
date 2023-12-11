@@ -5,22 +5,22 @@ from sdx_gcp.errors import DataError
 from sdx_gcp.pubsub import publish_message
 
 from app import CONFIG
-from app.submission_type import get_survey_type, SurveyType, get_tx_id, get_user_id, get_case_id, get_qid
+from app.response import Response, SurveyType
 
 logger = get_logger()
 
 
-def send_receipt(submission: dict):
+def send_receipt(response: Response):
     """Creates and publishes a receipt to the receipt topic"""
 
     logger.info("Receipting...")
-    tx_id = get_tx_id(submission)
+    tx_id = response.get_tx_id()
 
-    if get_survey_type(submission) == SurveyType.ADHOC:
-        receipt_str: str = make_srm_receipt(submission)
+    if response.get_survey_type() == SurveyType.ADHOC:
+        receipt_str: str = make_srm_receipt(response)
         topic_path: str = CONFIG.SRM_RECEIPT_TOPIC_PATH
     else:
-        receipt_str: str = make_receipt(submission)
+        receipt_str: str = make_receipt(response)
         topic_path: str = CONFIG.RECEIPT_TOPIC_PATH
 
     publish_data(receipt_str, tx_id, topic_path)
@@ -35,13 +35,13 @@ def publish_data(receipt_str: str, tx_id: str, topic_path: str) -> str:
     return result
 
 
-def make_receipt(submission: dict) -> str:
+def make_receipt(response: Response) -> str:
     """Creates a receipt for RASRM"""
 
     try:
         receipt_json = {
-            'caseId': get_case_id(submission),
-            'partyId': get_user_id(submission)
+            'caseId': response.get_case_id(),
+            'partyId': response.get_user_id()
         }
     except KeyError as e:
         raise DataError(f'Failed to make receipt: {str(e)}')
@@ -51,13 +51,13 @@ def make_receipt(submission: dict) -> str:
     return receipt_str
 
 
-def make_srm_receipt(submission: dict) -> str:
+def make_srm_receipt(response: Response) -> str:
     """Creates a receipt for SRM"""
 
     try:
         receipt_json = {
             'data': {
-                'qid': get_qid(submission)
+                'qid': response.get_qid()
             }
         }
     except KeyError as e:

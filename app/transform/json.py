@@ -1,10 +1,8 @@
-import json
-
-from sdx_gcp.errors import DataError
 from sdx_gcp.app import get_logger
+from sdx_gcp.errors import DataError
 
-from app.definitions import SurveySubmission
-from app.submission_type import get_field, requires_v1_conversion, get_survey_id, get_tx_id
+from app.response import get_field, Response
+from app.submission_type import requires_v1_conversion
 from app.transform.formatter import get_tx_code
 
 logger = get_logger()
@@ -21,20 +19,21 @@ def get_optional(submission: dict, *field_names: str) -> str:
         return ""
 
 
-def get_contents(submission: SurveySubmission) -> bytes:
+def get_contents(response: Response) -> bytes:
 
-    new_submission = submission
-    if requires_v1_conversion(submission):
-        new_submission = convert_v2_to_v1(submission)
+    r = response
+    if requires_v1_conversion(response):
+        r = convert_v2_to_v1(response)
 
-    return bytes(json.dumps(new_submission), 'utf-8')
-
-
-def get_name(submission: SurveySubmission):
-    return "{0}_{1}.json".format(get_survey_id(submission), get_tx_code(get_tx_id(submission)))
+    return bytes(r.to_json(), 'utf-8')
 
 
-def convert_v2_to_v1(submission: SurveySubmission) -> SubmissionV1:
+def get_name(response: Response):
+    return "{0}_{1}.json".format(response.get_survey_id(), get_tx_code(response.get_tx_id()))
+
+
+def convert_v2_to_v1(response: Response) -> Response:
+    submission = response.get_submission()
     logger.info("Converting from v2 to v1")
 
     v1_template = {
@@ -65,4 +64,4 @@ def convert_v2_to_v1(submission: SurveySubmission) -> SubmissionV1:
         "submission_language_code": get_optional(submission, "submission_language_code")
     }
 
-    return v1_template
+    return Response(v1_template)

@@ -2,16 +2,13 @@ from sdx_gcp import Message, TX_ID, Request, get_message
 from sdx_gcp.app import get_logger
 
 from app import CONFIG, sdx_app
-from app.comments import store_comments
-from app.deliver import deliver_feedback, deliver_survey, deliver_dap, deliver_hybrid, ADHOC, V1, V2
-from app.receipt import send_receipt
 from app.decrypt import decrypt_survey
-from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_deliver_target, \
-    DeliverTarget, get_schema_version, SchemaVersion, get_survey_id, requires_legacy_transform, \
-    requires_v1_conversion, prepop_submission
-from app.call_transform import call_legacy_transform
-from app.transform.transform import transform
-from app.transform.json import convert_v2_to_v1
+from app.definitions import SurveySubmission
+from app.processor import Processor, FeedbackProcessor, PrepopProcessor, AdhocProcessor, DapProcessor, HybridProcessor, \
+    SurveyProcessor
+from app.submission_type import prepop_submission, get_deliver_target
+from app.response import get_response_type, get_survey_type, get_survey_id, Response, SurveyType, ResponseType, \
+    DeliverTarget
 
 logger = get_logger()
 
@@ -43,53 +40,27 @@ def process(message: Message, tx_id: TX_ID):
     data_bytes = sdx_app.gcs_read(filename, CONFIG.BUCKET_NAME)
     encrypted_message_str = data_bytes.decode('utf-8')
 
-    submission: dict = decrypt_survey(encrypted_message_str)
+    submission: SurveySubmission = decrypt_survey(encrypted_message_str)
     logger.info(f"Survey id: {get_survey_id(submission)}")
 
+    response: Response = Response(submission)
+    processor: Processor
     if get_response_type(submission) == ResponseType.FEEDBACK:
-        # feedback do not require storing comments, transforming, or receipting.
-        if get_schema_version(submission) == SchemaVersion.V2:
-            if get_survey_type(submission) == SurveyType.ADHOC:
-                v = ADHOC
-            else:
-                v = V2
-        else:
-            v = V1
+        processor = FeedbackProcessor(response, filename)
 
-        deliver_feedback(submission, tx_id=tx_id, filename=filename, version=v)
-
-    elif prepop_submission(submission):
-        logger.info("Receipting prepop survey")
-        # just send a receipt as we are not yet ready downstream
-        send_receipt(submission)
+    elif prepop_submission(response):
+        processor = PrepopProcessor(response)
 
     elif get_survey_type(submission) == SurveyType.ADHOC:
-        # adhoc surveys do not require transforming
-        send_receipt(submission)
-        deliver_dap(submission, tx_id=tx_id, version=ADHOC)
+        processor = AdhocProcessor(response)
+
+    elif get_deliver_target(response) == DeliverTarget.DAP:
+        processor = DapProcessor(response)
+
+    elif get_deliver_target(response) == DeliverTarget.HYBRID:
+        processor = HybridProcessor(response)
 
     else:
-        send_receipt(submission)
-        store_comments(submission)
+        processor = SurveyProcessor(response)
 
-        version = V2 if get_schema_version(submission) == SchemaVersion.V2 else V1
-        deliver_target = get_deliver_target(submission)
-
-        if deliver_target == DeliverTarget.DAP:
-            if requires_v1_conversion(submission):
-                version = V1
-                submission = convert_v2_to_v1(submission)
-            # dap surveys do not require transforming
-            deliver_dap(submission, tx_id=tx_id, version=version)
-
-        else:
-
-            if requires_legacy_transform(submission):
-                zip_file = call_legacy_transform(submission, filename, version)
-            else:
-                zip_file = transform(submission)
-
-            if deliver_target == DeliverTarget.HYBRID:
-                deliver_hybrid(submission, zip_file, tx_id=tx_id, version=version)
-            else:
-                deliver_survey(submission, zip_file, tx_id=tx_id, version=version)
+    processor.run()
