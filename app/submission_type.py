@@ -135,6 +135,10 @@ def get_tx_id(submission: dict) -> str:
     return get_field(submission, "tx_id")
 
 
+def get_data(submission: dict) -> str:
+    return get_field(submission, "data")
+
+
 def get_survey_id(submission: dict) -> str:
     if get_schema_version(submission) == SchemaVersion.V2:
         return get_field(submission, "survey_metadata", "survey_id")
