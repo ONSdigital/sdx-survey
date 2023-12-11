@@ -77,8 +77,27 @@ def get_field(submission: dict, *field_names: str) -> str:
     for key in field_names:
         current = current.get(key)
         if current is None:
+            # TODO log structure
             raise DataError(f'Missing field {key} from submission!')
     return current
+
+
+def get_form_type(submission: dict) -> ResponseType:
+    return get_field(submission, "survey_metadata", "form_type")
+
+
+def get_period_start_date(submission: dict) -> ResponseType:
+    if get_schema_version(submission) == SchemaVersion.V2:
+        return get_field(submission, "survey_metadata", "ref_p_start_date")
+
+    return get_field(submission, "metadata", "ref_period_start_date")
+
+
+def get_period_end_date(submission: dict) -> ResponseType:
+    if get_schema_version(submission) == SchemaVersion.V2:
+        return get_field(submission, "survey_metadata", "ref_p_end_date")
+
+    return get_field(submission, "metadata", "ref_period_end_date")
 
 
 def get_response_type(submission: dict) -> ResponseType:

@@ -8,6 +8,8 @@ from app import sdx_app
 from app import CONFIG
 
 from app.definitions import SurveySubmission
+from app.submission_type import get_survey_id, get_period, get_field, get_ru_ref, get_form_type, get_period_start_date, \
+    get_period_end_date
 from app.transform.formatter import get_tx_code
 
 logger = get_logger()
@@ -26,12 +28,12 @@ def get_contents(submission: SurveySubmission) -> bytes:
         survey_data,
         params={
             "tx_id": tx_id,
-            "survey_id": submission["survey_metadata"]["survey_id"],
-            "period_id": submission["survey_metadata"]["period_id"],
-            "ru_ref": submission["survey_metadata"]["ru_ref"],
-            "form_type": submission["survey_metadata"]["form_type"],
-            "period_start_date": submission["survey_metadata"]["ref_p_start_date"],
-            "period_end_date": submission["survey_metadata"]["ref_p_end_date"],
+            "survey_id": get_survey_id(submission),
+            "period_id": get_period(submission),
+            "ru_ref": get_ru_ref(submission),
+            "form_type": get_form_type(submission),
+            "period_start_date": get_period_start_date(submission),
+            "period_end_date": get_period_end_date(submission),
         }
     )
 

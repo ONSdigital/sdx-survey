@@ -3,7 +3,7 @@ import unittest
 from sdx_gcp.errors import DataError
 
 from app.submission_type import get_response_type, ResponseType, get_survey_type, SurveyType, get_schema_version, \
-    SchemaVersion, get_survey_id
+    SchemaVersion, get_survey_id, get_form_type, get_period_start_date, get_period_end_date
 from tests import get_data
 
 
@@ -59,6 +59,27 @@ class TestGetSurveyType(unittest.TestCase):
 
     def test_feedback_adhoc(self):
         self.assertEqual(SurveyType.ADHOC, get_survey_type(get_data("feedback_adhoc_001")))
+
+
+class TestGetFormType(unittest.TestCase):
+
+    def test_get_form_type_feedback_v2(self):
+        self.assertEqual("0253", get_form_type(get_data("feedback_v2_001")))
+
+
+class TestGetPeriodDates(unittest.TestCase):
+
+    def test_get_v2_period_start_date(self):
+        self.assertEqual("2021-01-01", get_period_start_date(get_data("survey_v2_001")))
+
+    def test_get_v1_period_start_date(self):
+        self.assertEqual("2019-07-01", get_period_start_date(get_data("survey_v1_001")))
+
+    def test_get_v2_period_end_date(self):
+        self.assertEqual("2021-06-01", get_period_end_date(get_data("survey_v2_001")))
+
+    def test_get_v1_period_end_date(self):
+        self.assertEqual("2019-10-31", get_period_end_date(get_data("survey_v1_001")))
 
 
 class TestGetSchemaVersion(unittest.TestCase):
