@@ -86,7 +86,7 @@ class DapProcessor(SurveyProcessor):
         deliver_dap(self._response, tx_id=self._tx_id, version=version)
 
 
-class AdhocProcessor(SurveyProcessor):
+class AdhocProcessor(DapProcessor):
 
     def comments(self):
         pass

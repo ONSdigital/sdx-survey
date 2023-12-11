@@ -6,9 +6,8 @@ from app.decrypt import decrypt_survey
 from app.definitions import SurveySubmission
 from app.processor import Processor, FeedbackProcessor, PrepopProcessor, AdhocProcessor, DapProcessor, HybridProcessor, \
     SurveyProcessor
+from app.response import Response, SurveyType, ResponseType, DeliverTarget
 from app.submission_type import prepop_submission, get_deliver_target
-from app.response import get_response_type, get_survey_type, get_survey_id, Response, SurveyType, ResponseType, \
-    DeliverTarget
 
 logger = get_logger()
 
@@ -18,8 +17,7 @@ def get_tx_id_from_object_id(req: Request) -> TX_ID:
     return message["attributes"]["objectId"]
 
 
-def process(message: Message, tx_id: TX_ID):
-
+def process(message: Message, _tx_id: TX_ID):
     """
     Orchestrates the required steps to read and process the encrypted json file
     from the filename received in the message.
@@ -41,17 +39,18 @@ def process(message: Message, tx_id: TX_ID):
     encrypted_message_str = data_bytes.decode('utf-8')
 
     submission: SurveySubmission = decrypt_survey(encrypted_message_str)
-    logger.info(f"Survey id: {get_survey_id(submission)}")
 
     response: Response = Response(submission)
+    logger.info(f"Survey id: {response.get_survey_id()}")
+
     processor: Processor
-    if get_response_type(submission) == ResponseType.FEEDBACK:
+    if response.get_response_type() == ResponseType.FEEDBACK:
         processor = FeedbackProcessor(response, filename)
 
     elif prepop_submission(response):
         processor = PrepopProcessor(response)
 
-    elif get_survey_type(submission) == SurveyType.ADHOC:
+    elif response.get_survey_type() == SurveyType.ADHOC:
         processor = AdhocProcessor(response)
 
     elif get_deliver_target(response) == DeliverTarget.DAP:
