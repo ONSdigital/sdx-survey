@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 from app.comments import store_comments
 from app.deliver import deliver_dap, V2, V1, deliver_feedback, ADHOC, deliver_survey, deliver_hybrid
 from app.receipt import send_receipt
@@ -7,20 +9,25 @@ from app.transform.json import convert_v2_to_v1
 from app.transform.transform import transform
 
 
+Action = Callable[[Response],]
+
+
 class Processor:
 
     def __init__(self, response: Response):
         self._response = response
-        self._tx_id = response.get_tx_id()
+        self._actions: list[Action] = []
+
+    def add_actions(self, *actions: Action):
+        self._actions.extend(actions)
 
     def run(self):
-        version: str = self.version()
-        self.receipt()
-        self.comments()
-        zip_file: bytes = self.transform()
-        self.deliver(zip_file, version)
+        version = self._version()
+        for action in self._actions:
+            action(self._response)
+        self.deliver(version)
 
-    def version(self) -> str:
+    def _version(self) -> str:
         if self._response.get_survey_type() == SurveyType.ADHOC:
             return ADHOC
         else:
@@ -28,16 +35,7 @@ class Processor:
                 return V1
             return V2
 
-    def receipt(self):
-        pass
-
-    def comments(self):
-        pass
-
-    def transform(self) -> bytes | None:
-        pass
-
-    def deliver(self, zip_file: bytes | None, version: str):
+    def deliver(self, version: str):
         pass
 
 
@@ -47,58 +45,55 @@ class FeedbackProcessor(Processor):
         super().__init__(response)
         self.filename = filename
 
-    def deliver(self, _zip_file: None, version: str):
-        deliver_feedback(
-            self._response,
-            tx_id=self._tx_id,
-            filename=self.filename,
-            version=version)
+    def deliver(self, version: str):
+        deliver_feedback(self._response, version=version)
+
+
+class AdhocProcessor(Processor):
+
+    def __init__(self, response: Response):
+        super().__init__(response)
+        self.add_actions(send_receipt)
+
+    def deliver(self, version: str):
+        deliver_dap(self._response, version=version)
 
 
 class SurveyProcessor(Processor):
 
-    def receipt(self):
-        send_receipt(self._response)
+    def __init__(self, response: Response):
+        super().__init__(response)
+        self.add_actions(send_receipt, store_comments)
 
-    def comments(self):
-        store_comments(self._response)
-
-    def transform(self) -> bytes:
-        return transform(self._response)
-
-    def deliver(self, zip_file: bytes, version: str):
-        deliver_survey(self._response, zip_file, tx_id=self._tx_id, version=version)
+    def deliver(self, version: str):
+        zip_file = transform(self._response)
+        deliver_survey(self._response, zip_file, version=version)
 
 
 class HybridProcessor(SurveyProcessor):
 
-    def deliver(self, zip_file: bytes, version: str):
-        deliver_hybrid(self._response, zip_file, tx_id=self._tx_id, version=version)
+    def deliver(self, version: str):
+        zip_file = transform(self._response)
+        deliver_hybrid(self._response, zip_file, version=version)
 
 
-class DapProcessor(SurveyProcessor):
+class DapProcessor(Processor):
 
-    def transform(self) -> None:
+    def __init__(self, response: Response):
+        super().__init__(response)
+        self.add_actions(send_receipt, store_comments)
+
+    def deliver(self, version: str):
         if requires_v1_conversion(self._response):
             self._response = convert_v2_to_v1(self._response)
-
-    def deliver(self, _zip_file: None, version: str):
-        deliver_dap(self._response, tx_id=self._tx_id, version=version)
-
-
-class AdhocProcessor(DapProcessor):
-
-    def comments(self):
-        pass
+        deliver_dap(self._response, version=version)
 
 
 class PrepopProcessor(SurveyProcessor):
 
-    def comments(self):
-        pass
+    def __init__(self, response: Response):
+        super().__init__(response)
+        self.add_actions(send_receipt)
 
-    def transform(self) -> bytes | None:
-        pass
-
-    def deliver(self, zip_file: bytes | None, version: str):
+    def deliver(self, version: str):
         pass

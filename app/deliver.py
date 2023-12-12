@@ -23,30 +23,31 @@ ADHOC = "adhoc"
 logger = get_logger()
 
 
-def deliver_dap(response: Response, tx_id: str, version: str = V1):
+def deliver_dap(response: Response, version: str = V1):
     """deliver a survey submission intended for DAP"""
     logger.info("Sending DAP submission")
-    deliver(response.get_submission(), DAP, tx_id, version=version)
+    deliver(response.get_submission(), DAP, response.get_tx_id(), version=version)
 
 
-def deliver_survey(response: Response, zip_file: bytes, tx_id: str, version: str = V1):
+def deliver_survey(response: Response, zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for the legacy systems"""
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(response.get_submission(), LEGACY, tx_id, files, version=version)
+    deliver(response.get_submission(), LEGACY, response.get_tx_id(), files, version=version)
 
 
-def deliver_hybrid(response: Response, zip_file: bytes, tx_id: str, version: str = V1):
+def deliver_hybrid(response: Response, zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for dap and the legacy systems"""
     logger.info("Sending hybrid submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(response.get_submission(), HYBRID, tx_id, files, version=version)
+    deliver(response.get_submission(), HYBRID, response.get_tx_id(), files, version=version)
 
 
-def deliver_feedback(response: Response, filename: str, tx_id: str, version: str = V1):
+def deliver_feedback(response: Response, version: str = V1):
     """deliver a feedback survey submission"""
     logger.info("Sending feedback submission")
-    deliver(response.get_submission(), FEEDBACK, tx_id, {}, filename, version=version)
+    tx_id = response.get_tx_id()
+    deliver(response.get_submission(), FEEDBACK, tx_id, {}, version=version)
 
 
 def deliver(
@@ -54,14 +55,12 @@ def deliver(
         output_type: str,
         tx_id: str,
         files: dict[str, bytes] = {},
-        filename: str = None,
         version: str = V1):
     """
     Calls the sdx-deliver endpoint specified by the output_type parameter.
     Returns True or raises appropriate error on response.
     """
-    if not filename:
-        filename = tx_id
+    filename = tx_id
 
     files[SUBMISSION_FILE] = json.dumps(submission).encode(UTF8)
     endpoint = f"deliver/{output_type}"
