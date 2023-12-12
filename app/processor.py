@@ -16,10 +16,10 @@ class Processor:
 
     def __init__(self, response: Response):
         self._response = response
-        self._actions: list[Action] = []
+        self._actions: list[Action] = self.load_actions()
 
-    def add_actions(self, *actions: Action):
-        self._actions.extend(actions)
+    def load_actions(self) -> list[Action]:
+        return []
 
     def run(self):
         version = self._version()
@@ -47,9 +47,8 @@ class FeedbackProcessor(Processor):
 
 class AdhocProcessor(Processor):
 
-    def __init__(self, response: Response):
-        super().__init__(response)
-        self.add_actions(send_receipt)
+    def load_actions(self) -> list[Action]:
+        return [send_receipt]
 
     def deliver(self, version: str):
         deliver_dap(self._response, version=version)
@@ -57,9 +56,8 @@ class AdhocProcessor(Processor):
 
 class SurveyProcessor(Processor):
 
-    def __init__(self, response: Response):
-        super().__init__(response)
-        self.add_actions(send_receipt, store_comments)
+    def load_actions(self) -> list[Action]:
+        return [send_receipt, store_comments]
 
     def deliver(self, version: str):
         zip_file = transform(self._response)
@@ -75,9 +73,8 @@ class HybridProcessor(SurveyProcessor):
 
 class DapProcessor(Processor):
 
-    def __init__(self, response: Response):
-        super().__init__(response)
-        self.add_actions(send_receipt, store_comments)
+    def load_actions(self) -> list[Action]:
+        return [send_receipt, store_comments]
 
     def deliver(self, version: str):
         if requires_v1_conversion(self._response):
@@ -87,9 +84,8 @@ class DapProcessor(Processor):
 
 class PrepopProcessor(SurveyProcessor):
 
-    def __init__(self, response: Response):
-        super().__init__(response)
-        self.add_actions(send_receipt)
+    def load_actions(self) -> list[Action]:
+        return [send_receipt]
 
     def deliver(self, version: str):
         pass
