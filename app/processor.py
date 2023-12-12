@@ -41,10 +41,6 @@ class Processor:
 
 class FeedbackProcessor(Processor):
 
-    def __init__(self, response: Response, filename: str):
-        super().__init__(response)
-        self.filename = filename
-
     def deliver(self, version: str):
         deliver_feedback(self._response, version=version)
 
