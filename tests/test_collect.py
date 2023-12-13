@@ -29,8 +29,8 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.deliver_feedback')
-    @patch('app.collect.send_receipt')
+    @patch('app.processor.deliver_feedback')
+    @patch('app.processor.send_receipt')
     def test_process_feedback(self, send_receipt, deliver_feedback, decrypt, app):
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         feedback_response = {
@@ -47,9 +47,9 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.store_comments')
-    @patch('app.collect.deliver_dap')
-    @patch('app.collect.send_receipt')
+    @patch('app.processor.store_comments')
+    @patch('app.processor.deliver_dap')
+    @patch('app.processor.send_receipt')
     def test_process_dap_survey(self, send_receipt, deliver_dap, store_comments, decrypt, app):
         dap_response = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
@@ -96,10 +96,10 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.store_comments')
-    @patch('app.collect.transform')
-    @patch('app.collect.deliver_hybrid')
-    @patch('app.collect.send_receipt')
+    @patch('app.processor.store_comments')
+    @patch('app.processor.transform')
+    @patch('app.processor.deliver_hybrid')
+    @patch('app.processor.send_receipt')
     def test_process_hybrid_survey(self, send_receipt, deliver_hybrid, transform, store_comments, decrypt, app):
         hybrid_response = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',

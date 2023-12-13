@@ -1,5 +1,7 @@
 import json
 
+from app.response import Response
+
 responseTestDataMap = {
     "submission": "original/submission.json",
     "feedback": "original/feedback.json",
@@ -12,11 +14,11 @@ responseTestDataMap = {
 }
 
 
-def get_data(name: str) -> dict:
+def get_data(name: str) -> Response:
     file = responseTestDataMap.get(name)
     if not file:
         raise ValueError
     path = f'tests/submissions/{file}'
     with open(path) as f:
         data = json.load(f)
-    return data
+    return Response(data)

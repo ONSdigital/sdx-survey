@@ -10,7 +10,7 @@ from app.transform.json import convert_v2_to_v1
 from app.transform.transform import transform
 
 
-Action = Callable[[Response],]
+Action = Callable[[Response], None]
 
 
 class Processor:
