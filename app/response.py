@@ -140,6 +140,15 @@ class Response:
         else:
             return get_field(self._submission, "metadata", "user_id")
 
+    def __eq__(self, other):
+        """
+        Override the equality method
+        to be able to compare two Responses
+        """
+        if isinstance(other, Response):
+            return self._submission == other._submission
+        return False
+
 
 def get_safe_submission(submission) -> dict | list | str:
     """
