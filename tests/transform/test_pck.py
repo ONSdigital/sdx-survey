@@ -1,6 +1,7 @@
 import unittest
 
 from app.definitions import SurveySubmission
+from app.response import Response
 from app.transform import pck
 
 
@@ -36,7 +37,7 @@ class TestPCK(unittest.TestCase):
         }
 
     def test_get_name(self):
-        actual: str = pck.get_name(self.submission)
+        actual: str = pck.get_name(Response(self.submission))
         expected = "144_befa5444749f407a"
         self.assertEqual(expected, actual)
 
@@ -45,6 +46,6 @@ class TestPCK(unittest.TestCase):
         submission["survey_metadata"]["survey_id"] = "202"
         submission["survey_metadata"]["form_type"] = "1802"
 
-        actual = pck.get_name(submission)
+        actual = pck.get_name(Response(submission))
         expected = "053_befa5444749f407a"
         self.assertEqual(expected, actual)

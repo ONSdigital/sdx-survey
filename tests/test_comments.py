@@ -119,8 +119,8 @@ class StoreCommentsTest(unittest.TestCase):
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
         self.assertEqual(get_additional_comments(Response(test_data)), [{'qcode': '300w', "comment": '300w'},
-                                                              {'qcode': '300m', "comment": '300m'},
-                                                              {'qcode': '300w5', "comment": '300w5'}])
+                                                                        {'qcode': '300m', "comment": '300m'},
+                                                                        {'qcode': '300w5', "comment": '300w5'}])
 
     def test_get_additional_comments_2(self):
         test_data = {
@@ -133,7 +133,7 @@ class StoreCommentsTest(unittest.TestCase):
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
         self.assertEqual(get_additional_comments(Response(test_data)), [{'qcode': '300f', "comment": 'hello'},
-                                                              {'qcode': '300w4', "comment": 'bye'}])
+                                                                        {'qcode': '300w4', "comment": 'bye'}])
 
     def test_get_additional_comments_none(self):
         test_data = {
