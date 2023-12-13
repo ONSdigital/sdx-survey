@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 
 from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
     Comment, commit_to_datastore, extract_berd_comment
+from app.response import Response
 
 
 class StoreCommentsTest(unittest.TestCase):
@@ -47,8 +48,10 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '187',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        get_comment(test_data)
-        extract_comment.assert_called_with(test_data, "500")
+
+        data = Response(test_data)
+        get_comment(data)
+        extract_comment.assert_called_with(data, "500")
 
     def test_extract_berd_comment(self):
         comment = "My Comment!"
@@ -72,7 +75,7 @@ class StoreCommentsTest(unittest.TestCase):
             }
         }
 
-        self.assertEqual(comment, extract_berd_comment(test_data))
+        self.assertEqual(comment, extract_berd_comment(Response(test_data)))
 
     def test_extract_berd_comment_short_form(self):
         comment = "My Comment!"
@@ -85,7 +88,7 @@ class StoreCommentsTest(unittest.TestCase):
             }
         }
 
-        self.assertEqual(comment, extract_berd_comment(test_data))
+        self.assertEqual(comment, extract_berd_comment(Response(test_data)))
 
     def test_get_comment(self):
         test_data = {
@@ -98,11 +101,11 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '187',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_comment(test_data), 'Im the 500 comment')
+        self.assertEqual(get_comment(Response(test_data)), 'Im the 500 comment')
         test_data['survey_id'] = '134'
-        self.assertEqual(get_comment(test_data), 'Im the 300 comment')
+        self.assertEqual(get_comment(Response(test_data)), 'Im the 300 comment')
         test_data['survey_id'] = '017'
-        self.assertEqual(get_comment(test_data), 'Im the 146 comment')
+        self.assertEqual(get_comment(Response(test_data)), 'Im the 146 comment')
 
     def test_get_additional_comments(self):
         test_data = {
@@ -115,7 +118,7 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_additional_comments(test_data), [{'qcode': '300w', "comment": '300w'},
+        self.assertEqual(get_additional_comments(Response(test_data)), [{'qcode': '300w', "comment": '300w'},
                                                               {'qcode': '300m', "comment": '300m'},
                                                               {'qcode': '300w5', "comment": '300w5'}])
 
@@ -129,7 +132,7 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_additional_comments(test_data), [{'qcode': '300f', "comment": 'hello'},
+        self.assertEqual(get_additional_comments(Response(test_data)), [{'qcode': '300f', "comment": 'hello'},
                                                               {'qcode': '300w4', "comment": 'bye'}])
 
     def test_get_additional_comments_none(self):
@@ -143,7 +146,7 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_additional_comments(test_data), [])
+        self.assertEqual(get_additional_comments(Response(test_data)), [])
 
     def test_get_boxes_selected(self):
         test_data = {
@@ -157,7 +160,7 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual("91w, 94w2, 192w42, 197w4, ", get_boxes_selected(test_data))
+        self.assertEqual("91w, 94w2, 192w42, 197w4, ", get_boxes_selected(Response(test_data)))
 
     def test_get_boxes_selected_2(self):
         test_data = {
@@ -168,7 +171,7 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '009',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual("146a ", get_boxes_selected(test_data))
+        self.assertEqual("146a ", get_boxes_selected(Response(test_data)))
 
     def test_get_boxes_selected_none(self):
         test_data = {
@@ -182,7 +185,7 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_boxes_selected(test_data), "")
+        self.assertEqual(get_boxes_selected(Response(test_data)), "")
 
     @mock.patch('app.comments.CONFIG')
     def test_encryption_comments(self, mock_config):
@@ -208,7 +211,7 @@ class StoreCommentsTest(unittest.TestCase):
     def test_store_comments_valid(self, mock_datastore, mock_config):
         key = "E3rjFT2i9ALcvc99Pe3YqjIGrzm3LdMsCXc8nUaOEbc="
         mock_config.ENCRYPT_COMMENT_KEY = key
-        store_comments(self.test_survey)
+        store_comments(Response(self.test_survey))
         mock_datastore.assert_called()
 
     @mock.patch('app.comments.sdx_app')
