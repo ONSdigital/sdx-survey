@@ -43,7 +43,7 @@ class TestCollect(unittest.TestCase):
         app.gcs_read.return_value = json.dumps(feedback_response).encode()
         decrypt.return_value = feedback_response
         process(self.message, tx_id)
-        deliver_feedback.assert_called_with(feedback_response, tx_id=tx_id, filename=tx_id, version='v1')
+        deliver_feedback.assert_called_with(Response(feedback_response), version=V1)
         send_receipt.assert_not_called()
 
     @patch('app.collect.sdx_app')
