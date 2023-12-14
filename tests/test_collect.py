@@ -6,7 +6,7 @@ from sdx_gcp import Message
 from sdx_gcp.errors import DataError
 
 from app.collect import process
-from app.deliver import V1
+from app.deliver import V2
 from app.response import Response
 
 
@@ -43,7 +43,7 @@ class TestCollect(unittest.TestCase):
         app.gcs_read.return_value = json.dumps(feedback_response).encode()
         decrypt.return_value = feedback_response
         process(self.message, tx_id)
-        deliver_feedback.assert_called_with(Response(feedback_response), version=V1)
+        deliver_feedback.assert_called_with(Response(feedback_response), version=V2)
         send_receipt.assert_not_called()
 
     @patch('app.collect.sdx_app')
@@ -66,7 +66,7 @@ class TestCollect(unittest.TestCase):
         process(self.message, "0f534ffc-9442-414c-b39f-a756b4adc6cb")
 
         store_comments.assert_called_with(dap_response_object)
-        deliver_dap.assert_called_with(dap_response_object, version=V1)
+        deliver_dap.assert_called_with(dap_response_object, version=V2)
         send_receipt.assert_called_with(dap_response_object)
 
     @patch('app.collect.sdx_app')
@@ -95,7 +95,7 @@ class TestCollect(unittest.TestCase):
         store_comments.assert_called_with(response_object)
         deliver_survey.assert_called_with(response_object,
                                           zip_bytes,
-                                          version=V1)
+                                          version=V2)
         send_receipt.assert_called_with(response_object)
 
     @patch('app.collect.sdx_app')
@@ -123,5 +123,5 @@ class TestCollect(unittest.TestCase):
         store_comments.assert_called_with(response_object)
         deliver_hybrid.assert_called_with(response_object,
                                           zip_bytes,
-                                          version=V1)
+                                          version=V2)
         send_receipt.assert_called_with(response_object)
