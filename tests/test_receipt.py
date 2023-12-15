@@ -5,6 +5,7 @@ from unittest import mock
 from sdx_gcp.errors import DataError
 
 from app.receipt import make_receipt, send_receipt, publish_data, make_srm_receipt
+from app.response import Response
 from tests import get_data
 
 
@@ -26,7 +27,7 @@ class TestReceipt(unittest.TestCase):
 
     def test_make_receipt_valid(self):
         expected = json.dumps({"caseId": "123", "partyId": "user_id"})
-        self.assertEqual(make_receipt(self.test_data), expected)
+        self.assertEqual(make_receipt(Response(self.test_data)), expected)
 
     @mock.patch('app.receipt.publish_data')
     @mock.patch('app.receipt.make_receipt')
@@ -37,13 +38,13 @@ class TestReceipt(unittest.TestCase):
 
     @mock.patch('app.receipt.publish_data')
     def test_send_receipt_good(self, mock_publish):
-        send_receipt(self.test_data)
+        send_receipt(Response(self.test_data))
 
     def test_make_receipt_bad(self):
         data = self.test_data
         del data["case_id"]
         with self.assertRaises(DataError):
-            make_receipt(data)
+            make_receipt(Response(data))
 
     @mock.patch('app.receipt.CONFIG')
     @mock.patch('app.receipt.publish_message')

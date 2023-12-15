@@ -1,6 +1,7 @@
+import json
 import unittest
 
-from app.transform.json import convert_v2_to_v1
+from app.response import Response
 
 
 class TestVersionReverter(unittest.TestCase):
@@ -98,7 +99,8 @@ class TestVersionReverter(unittest.TestCase):
             "submission_language_code": "en"
         }
 
-        actual = convert_v2_to_v1(data)
+        actual = Response(data).to_v1_json()
+        expected = json.dumps(expected)
 
         self.assertEqual(expected, actual)
 
@@ -193,6 +195,7 @@ class TestVersionReverter(unittest.TestCase):
             "submission_language_code": "en"
         }
 
-        actual = convert_v2_to_v1(data)
+        actual = Response(data).to_v1_json()
+        expected = json.dumps(expected)
 
         self.assertEqual(expected, actual)

@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 
+from app.response import Response
 from app.transform.transform import transform
 from sdx_gcp.errors import DataError
 
@@ -67,7 +68,7 @@ class TestTransform(unittest.TestCase):
             "EDC_QJson/json_name": "json_contents",
         }
 
-        transform(self.submission)
+        transform(Response(self.submission))
 
         mock_create_zip.assert_called_with(
             expected_files
@@ -100,4 +101,4 @@ class TestTransform(unittest.TestCase):
         del self.submission["survey_metadata"]
 
         with self.assertRaises(DataError):
-            transform(self.submission)
+            transform(Response(self.submission))

@@ -1,12 +1,9 @@
 from typing import TypedDict, NotRequired
 
-SurveyData = dict | list
+SurveyData = dict[str, str | list[str]]
 
 
-class SurveyMetadata(TypedDict):
-    """
-    Business Survey Metadata
-    """
+class BusinessSurveyMetadata(TypedDict):
     ru_name: str
     user_id: str
     period_id: str
@@ -25,6 +22,24 @@ class SurveyMetadata(TypedDict):
     sds_dataset_id: NotRequired[str]
 
 
+class AdhocSurveyMetadata(TypedDict):
+    survey_id: str
+    qid: str
+    PORTAL_ID: str
+    PARTICIPANT_WINDOW_ID: str
+
+    case_ref: NotRequired[str]
+    BLOOD_TEST_BARCODE: NotRequired[str]
+    SWAB_TEST_BARCODE: NotRequired[str]
+    PARTICIPANT_ID: NotRequired[str]
+    TEST_QUESTIONS: NotRequired[str]
+    COLLEX_OPEN_DATE: NotRequired[str]
+    COLLEX_CLOSE_DATE: NotRequired[str]
+    FIRST_NAME: NotRequired[str]
+    WINDOW_START_DATE: NotRequired[str]
+    WINDOW_CLOSE_DATE: NotRequired[str]
+
+
 class SurveySubmission(TypedDict):
     tx_id: str
     type: str
@@ -36,7 +51,7 @@ class SurveySubmission(TypedDict):
     launch_language_code: str
     collection_exercise_sid: str
     case_id: str
-    survey_metadata: SurveyMetadata
+    survey_metadata: BusinessSurveyMetadata | AdhocSurveyMetadata
     data: SurveyData
 
     channel: NotRequired[str]

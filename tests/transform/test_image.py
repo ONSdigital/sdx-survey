@@ -1,5 +1,6 @@
 import unittest
 
+from app.response import Response
 from app.transform import image
 
 
@@ -35,6 +36,6 @@ class TestImage(unittest.TestCase):
         }
 
     def test_get_name(self):
-        actual: str = image.get_name(self.submission)
+        actual: str = image.get_name(Response(self.submission))
         expected = "Sbefa5444749f407a_1.JPG"
         self.assertEqual(expected, actual)
