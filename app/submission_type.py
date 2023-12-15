@@ -22,7 +22,7 @@ _PCK_SURVEYS = ['009', '017', '019', '073', '074', '127', '134', '139', '144', '
 _LEGACY_TRANSFORMER = ['002', '092']
 
 # surveys that need to remain v1 submissions
-_V1_SURVEYS = ["283", "002", "007", "009", "023", "134", "147"]
+_V1_SURVEYS = ["283", "007", "009", "023", "134", "147"]
 
 # prepop surveys
 _PREPOP_SURVEYS = ["068", "071"]
