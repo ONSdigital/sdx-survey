@@ -9,11 +9,24 @@ from app.response import Response, SurveyType
 from app.transform.json import convert_v2_to_v1
 from app.transform.transform import transform
 
+"""
+    This file defines a set of classes
+    that are used to process a single
+    survey, each processor can run a set
+    of actions, actions are simple functions
+    that take a Response object and return None
+    this could be receipting, storing comments etc
+"""
 
 Action = Callable[[Response], None]
 
 
 class Processor:
+    """
+    The Processor is responsible
+    for processing a given survey, extend this
+    class to provide logic for processing a specific survey
+    """
 
     def __init__(self, response: Response):
         self._response = response
@@ -23,12 +36,21 @@ class Processor:
         return []
 
     def run(self):
+        """
+        The method that processes
+        the survey, extract version, run actions
+        and deliver
+        """
         version = self._version()
         for action in self._actions:
             action(self._response)
         self.deliver(version)
 
     def _version(self) -> str:
+        """
+        Extract the appropriate version from
+        the survey response
+        """
         if self._response.get_survey_type() == SurveyType.ADHOC:
             return ADHOC
         else:
@@ -37,6 +59,7 @@ class Processor:
             return V2
 
     def deliver(self, version: str):
+
         pass
 
 
