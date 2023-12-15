@@ -17,6 +17,7 @@ END_POINT: Final = "pck"
 def get_contents(response: Response) -> bytes:
     logger.info("Calling sdx-transformer...")
     survey_data = json.dumps(response.get_data())
+
     endpoint = END_POINT
     tx_id = response.get_tx_id()
     response: RequestsResponse = sdx_app.http_post(

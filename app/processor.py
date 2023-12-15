@@ -6,7 +6,6 @@ from app.deliver import deliver_dap, V2, V1, deliver_feedback, ADHOC, deliver_su
 from app.receipt import send_receipt
 from app.submission_type import requires_v1_conversion
 from app.response import Response, SurveyType
-from app.transform.json import convert_v2_to_v1
 from app.transform.transform import transform
 
 """
@@ -108,8 +107,6 @@ class DapProcessor(Processor):
         return [send_receipt, store_comments]
 
     def deliver(self, version: str):
-        if requires_v1_conversion(self._response):
-            self._response = convert_v2_to_v1(self._response)
         deliver_dap(self._response, version=version)
 
 

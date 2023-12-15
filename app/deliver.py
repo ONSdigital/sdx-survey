@@ -1,4 +1,3 @@
-import json
 
 from sdx_gcp.app import get_logger
 
@@ -26,43 +25,46 @@ logger = get_logger()
 def deliver_dap(response: Response, version: str = V1):
     """deliver a survey submission intended for DAP"""
     logger.info("Sending DAP submission")
-    deliver(response.get_submission(), DAP, response.get_tx_id(), version=version)
+    deliver(response, DAP, {}, version=version)
 
 
 def deliver_survey(response: Response, zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for the legacy systems"""
     logger.info("Sending survey submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(response.get_submission(), LEGACY, response.get_tx_id(), files, version=version)
+    deliver(response, LEGACY, files, version=version)
 
 
 def deliver_hybrid(response: Response, zip_file: bytes, version: str = V1):
     """deliver a survey submission intended for dap and the legacy systems"""
     logger.info("Sending hybrid submission")
     files = {TRANSFORMED_FILE: zip_file}
-    deliver(response.get_submission(), HYBRID, response.get_tx_id(), files, version=version)
+    deliver(response, HYBRID, files, version=version)
 
 
 def deliver_feedback(response: Response, version: str = V1):
     """deliver a feedback survey submission"""
     logger.info("Sending feedback submission")
-    tx_id = response.get_tx_id()
-    deliver(response.get_submission(), FEEDBACK, tx_id, {}, version=version)
+    deliver(response, FEEDBACK, {}, version=version)
 
 
-def deliver(
-        submission: dict[str, str],
-        output_type: str,
-        tx_id: str,
-        files: dict[str, bytes] = {},
-        version: str = V1):
+def deliver(response: Response, output_type: str, files: dict[str, bytes], version: str = V1):
     """
     Calls the sdx-deliver endpoint specified by the output_type parameter.
     Returns True or raises appropriate error on response.
     """
+
+    tx_id = response.get_tx_id()
+
     filename = tx_id
 
-    files[SUBMISSION_FILE] = json.dumps(submission).encode(UTF8)
+    if version == V1:
+        submissionJson = response.to_v1_json()
+    else:
+        submissionJson = response.to_json()
+
+    files[SUBMISSION_FILE] = submissionJson.encode(UTF8)
+
     endpoint = f"deliver/{output_type}"
     sdx_app.http_post(CONFIG.DELIVER_SERVICE_URL,
                       endpoint,
