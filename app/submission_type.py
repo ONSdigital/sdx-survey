@@ -24,8 +24,8 @@ _LEGACY_TRANSFORMER = ['002', '092']
 # surveys that need to remain v1 submissions
 _V1_SURVEYS = ["283", "007", "009", "023", "134", "147"]
 
-# prepop surveys
-_PREPOP_SURVEYS = ["068", "071"]
+# surveys that currently only require a receipt
+_RECEIPT_ONLY_SURVEYS = ["071"]
 
 # json name change
 _JSON_NAME_CHANGE = ["024", "194"]
@@ -51,8 +51,8 @@ def requires_json_name_change(response: Response) -> bool:
     return response.get_survey_id() in _JSON_NAME_CHANGE
 
 
-def prepop_submission(response: Response) -> bool:
-    return response.get_survey_id() in _PREPOP_SURVEYS
+def receipt_only_submission(response: Response) -> bool:
+    return response.get_survey_id() in _RECEIPT_ONLY_SURVEYS
 
 
 def get_deliver_target(response: Response) -> DeliverTarget:

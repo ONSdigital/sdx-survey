@@ -110,7 +110,7 @@ class DapProcessor(Processor):
         deliver_dap(self._response, version=version)
 
 
-class PrepopProcessor(SurveyProcessor):
+class ReceiptOnlyProcessor(SurveyProcessor):
 
     def load_actions(self) -> list[Action]:
         return [send_receipt]

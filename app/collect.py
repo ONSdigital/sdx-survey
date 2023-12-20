@@ -4,10 +4,10 @@ from sdx_gcp.app import get_logger
 from app import CONFIG, sdx_app
 from app.decrypt import decrypt_survey
 from app.definitions import SurveySubmission
-from app.processor import Processor, FeedbackProcessor, PrepopProcessor, AdhocProcessor, DapProcessor, HybridProcessor, \
+from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, HybridProcessor, \
     SurveyProcessor, LegacyHybridProcessor
 from app.response import Response, SurveyType, ResponseType, DeliverTarget
-from app.submission_type import prepop_submission, get_deliver_target, requires_legacy_transform
+from app.submission_type import receipt_only_submission, get_deliver_target, requires_legacy_transform
 
 logger = get_logger()
 
@@ -47,8 +47,8 @@ def process(message: Message, _tx_id: TX_ID):
     if response.get_response_type() == ResponseType.FEEDBACK:
         processor = FeedbackProcessor(response)
 
-    elif prepop_submission(response):
-        processor = PrepopProcessor(response)
+    elif receipt_only_submission(response):
+        processor = ReceiptOnlyProcessor(response)
 
     elif response.get_survey_type() == SurveyType.ADHOC:
         processor = AdhocProcessor(response)
