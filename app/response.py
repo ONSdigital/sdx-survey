@@ -1,3 +1,4 @@
+import copy
 import json
 from enum import Enum
 
@@ -61,7 +62,7 @@ class Response:
         self._submission = submission
 
     def get_submission(self) -> SurveySubmission:
-        return self._submission
+        return copy.deepcopy(self._submission)
 
     def to_v1_json(self) -> str:
         logger.info("Retrieving submission as V1")
@@ -144,6 +145,9 @@ class Response:
 
     def get_data(self) -> dict[str, str] | list[any]:
         return self._submission["data"]
+
+    def get_data_version(self) -> str:
+        return self._submission["data_version"]
 
     def get_qid(self) -> str:
         return get_field(self._submission, "survey_metadata", "qid")

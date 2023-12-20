@@ -1,12 +1,9 @@
-import json
 from typing import Final
 
-from sdx_gcp import RequestsResponse
 from sdx_gcp.app import get_logger
 
-from app import CONFIG
-from app import sdx_app
 from app.response import Response
+from app.transform.call_transformer import call_transformer
 from app.transform.formatter import get_tx_code
 
 logger = get_logger()
@@ -15,27 +12,7 @@ END_POINT: Final = "pck"
 
 
 def get_contents(response: Response) -> bytes:
-    logger.info("Calling sdx-transformer...")
-    survey_data = json.dumps(response.get_data())
-
-    endpoint = END_POINT
-    tx_id = response.get_tx_id()
-    response: RequestsResponse = sdx_app.http_post(
-        CONFIG.TRANSFORMER_SERVICE_URL,
-        endpoint,
-        survey_data,
-        params={
-            "tx_id": tx_id,
-            "survey_id": response.get_survey_id(),
-            "period_id": response.get_period(),
-            "ru_ref": response.get_ru_ref(),
-            "form_type": response.get_form_type(),
-            "period_start_date": response.get_period_start_date(),
-            "period_end_date": response.get_period_end_date(),
-        }
-    )
-
-    return response.content
+    return call_transformer(response, use_image_formatter=False)
 
 
 def get_name(response: Response) -> str:
