@@ -1,14 +1,10 @@
 import json
 from typing import TypedDict, NotRequired
 
-from sdx_gcp.app import get_logger
-
 from app import sdx_app, CONFIG
 from app.response import Response
 from app.transform.call_transformer import call_transformer
 from app.transform.formatter import get_tx_code
-
-logger = get_logger()
 
 
 class ImageResponse(TypedDict):
@@ -30,7 +26,6 @@ def get_image(response: Response) -> bytes:
             submission["supplementary_data"] = data["supplementary_data"]
 
         survey_json: str = json.dumps(submission)
-        logger.info(survey_json)
     else:
         survey_json: str = response.to_json()
 
