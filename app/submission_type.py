@@ -30,6 +30,9 @@ _RECEIPT_ONLY_SURVEYS = ["071"]
 # json name change
 _JSON_NAME_CHANGE = ["024", "194"]
 
+# json transformation
+_JSON_TRANSFORM = ["002"]
+
 
 def requires_v1_conversion(response: Response) -> bool:
     if response.get_response_type() == ResponseType.FEEDBACK:
@@ -49,6 +52,10 @@ def requires_pck(response: Response) -> bool:
 
 def requires_json_name_change(response: Response) -> bool:
     return response.get_survey_id() in _JSON_NAME_CHANGE
+
+
+def requires_json_transform(response: Response) -> bool:
+    return response.get_survey_id() in _JSON_TRANSFORM
 
 
 def receipt_only_submission(response: Response) -> bool:
