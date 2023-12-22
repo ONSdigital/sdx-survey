@@ -1,6 +1,5 @@
 from collections.abc import Callable
 
-from app.call_transform import call_legacy_transform
 from app.comments import store_comments
 from app.deliver import deliver_dap, V2, V1, deliver_feedback, ADHOC, deliver_survey, deliver_hybrid
 from app.receipt import send_receipt
@@ -91,13 +90,6 @@ class HybridProcessor(SurveyProcessor):
 
     def deliver(self, version: str):
         zip_file = transform(self._response)
-        deliver_hybrid(self._response, zip_file, version=version)
-
-
-class LegacyHybridProcessor(HybridProcessor):
-
-    def deliver(self, version: str):
-        zip_file = call_legacy_transform(self._response, version=version)
         deliver_hybrid(self._response, zip_file, version=version)
 
 
