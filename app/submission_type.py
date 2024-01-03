@@ -18,9 +18,6 @@ _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
 _PCK_SURVEYS = ['009', '017', '019', '073', '074', '127', '134', '139', '144', '160', '165', '169', '171',
                 '182', '183', '184', '185', '187', '202', '228']
 
-# surveys that still use SDX transform
-_LEGACY_TRANSFORMER = ['002', '092']
-
 # surveys that need to remain v1 submissions
 _V1_SURVEYS = ["283", "007", "009", "023", "134", "147"]
 
@@ -29,6 +26,9 @@ _RECEIPT_ONLY_SURVEYS = ["071"]
 
 # json name change
 _JSON_NAME_CHANGE = ["024", "194"]
+
+# json transformation
+_JSON_TRANSFORM = ["002"]
 
 
 def requires_v1_conversion(response: Response) -> bool:
@@ -39,16 +39,16 @@ def requires_v1_conversion(response: Response) -> bool:
     return response.get_survey_id() in _V1_SURVEYS
 
 
-def requires_legacy_transform(response: Response) -> bool:
-    return response.get_survey_id() in _LEGACY_TRANSFORMER
-
-
 def requires_pck(response: Response) -> bool:
     return response.get_survey_id() in _PCK_SURVEYS
 
 
 def requires_json_name_change(response: Response) -> bool:
     return response.get_survey_id() in _JSON_NAME_CHANGE
+
+
+def requires_json_transform(response: Response) -> bool:
+    return response.get_survey_id() in _JSON_TRANSFORM
 
 
 def receipt_only_submission(response: Response) -> bool:

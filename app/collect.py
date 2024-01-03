@@ -5,9 +5,9 @@ from app import CONFIG, sdx_app
 from app.decrypt import decrypt_survey
 from app.definitions import SurveySubmission
 from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, HybridProcessor, \
-    SurveyProcessor, LegacyHybridProcessor
+    SurveyProcessor
 from app.response import Response, SurveyType, ResponseType, DeliverTarget
-from app.submission_type import receipt_only_submission, get_deliver_target, requires_legacy_transform
+from app.submission_type import receipt_only_submission, get_deliver_target
 
 logger = get_logger()
 
@@ -55,9 +55,6 @@ def process(message: Message, _tx_id: TX_ID):
 
     elif get_deliver_target(response) == DeliverTarget.DAP:
         processor = DapProcessor(response)
-
-    elif requires_legacy_transform(response):
-        processor = LegacyHybridProcessor(response)
 
     elif get_deliver_target(response) == DeliverTarget.HYBRID:
         processor = HybridProcessor(response)
