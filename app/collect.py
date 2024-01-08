@@ -17,7 +17,7 @@ def get_tx_id_from_object_id(req: Request) -> TX_ID:
     return message["attributes"]["objectId"]
 
 
-def process(message: Message, _tx_id: TX_ID):
+def process(message: Message, tx_id: TX_ID):
     """
     Orchestrates the required steps to read and process the encrypted json file
     from the filename received in the message.
@@ -40,7 +40,8 @@ def process(message: Message, _tx_id: TX_ID):
 
     submission: SurveySubmission = decrypt_survey(encrypted_message_str)
 
-    response: Response = Response(submission)
+    response: Response = Response(submission, tx_id)
+
     logger.info(f"Survey id: {response.get_survey_id()}")
 
     processor: Processor

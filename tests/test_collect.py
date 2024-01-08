@@ -43,7 +43,7 @@ class TestCollect(unittest.TestCase):
         app.gcs_read.return_value = json.dumps(feedback_response).encode()
         decrypt.return_value = feedback_response
         process(self.message, tx_id)
-        deliver_feedback.assert_called_with(Response(feedback_response), version=V2)
+        deliver_feedback.assert_called_with(Response(feedback_response, tx_id), version=V2)
         send_receipt.assert_not_called()
 
     @patch('app.collect.sdx_app')
@@ -52,18 +52,21 @@ class TestCollect(unittest.TestCase):
     @patch('app.processor.deliver_dap')
     @patch('app.processor.send_receipt')
     def test_process_dap_survey(self, send_receipt, deliver_dap, store_comments, decrypt, app):
+
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
+
         dap_response = {
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '283',
             'type': 'uk.gov.ons.edc.eq:surveyresponse'
         }
 
-        dap_response_object = Response(dap_response)
+        dap_response_object = Response(dap_response, tx_id)
 
         app.gcs_read.return_value = json.dumps(dap_response).encode()
         decrypt.return_value = dap_response
 
-        process(self.message, "0f534ffc-9442-414c-b39f-a756b4adc6cb")
+        process(self.message, tx_id)
 
         store_comments.assert_called_with(dap_response_object)
         deliver_dap.assert_called_with(dap_response_object, version=V2)
@@ -90,7 +93,7 @@ class TestCollect(unittest.TestCase):
 
         process(self.message, tx_id)
 
-        response_object = Response(legacy_response)
+        response_object = Response(legacy_response, tx_id)
 
         store_comments.assert_called_with(response_object)
         deliver_survey.assert_called_with(response_object,
@@ -105,8 +108,10 @@ class TestCollect(unittest.TestCase):
     @patch('app.processor.deliver_hybrid')
     @patch('app.processor.send_receipt')
     def test_process_hybrid_survey(self, send_receipt, deliver_hybrid, transform, store_comments, decrypt, app):
+
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         hybrid_response = {
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '147',
             'type': 'uk.gov.ons.edc.eq:surveyresponse'
         }
@@ -116,9 +121,9 @@ class TestCollect(unittest.TestCase):
         zip_bytes = b"zip bytes"
         transform.return_value = zip_bytes
 
-        process(self.message, "0f534ffc-9442-414c-b39f-a756b4adc6cb")
+        process(self.message, tx_id)
 
-        response_object = Response(hybrid_response)
+        response_object = Response(hybrid_response, tx_id)
 
         store_comments.assert_called_with(response_object)
         deliver_hybrid.assert_called_with(response_object,

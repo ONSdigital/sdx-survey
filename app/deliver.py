@@ -59,11 +59,11 @@ def deliver(response: Response, output_type: str, files: dict[str, bytes], versi
     filename = tx_id
 
     if version == V1:
-        submissionJson = response.to_v1_json()
+        submission_json = response.to_v1_json()
     else:
-        submissionJson = response.to_json()
+        submission_json = response.to_json()
 
-    files[SUBMISSION_FILE] = submissionJson.encode(UTF8)
+    files[SUBMISSION_FILE] = submission_json.encode(UTF8)
 
     endpoint = f"deliver/{output_type}"
     sdx_app.http_post(CONFIG.DELIVER_SERVICE_URL,

@@ -9,6 +9,8 @@ from sdx_gcp.errors import DataError
 class TestTransform(unittest.TestCase):
 
     def setUp(self):
+
+        self.tx_id = "befa5444-749f-407a-b3a2-19f1d1c7324b"
         self.submission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
             "tx_id": "befa5444-749f-407a-b3a2-19f1d1c7324b",
@@ -68,7 +70,7 @@ class TestTransform(unittest.TestCase):
             "EDC_QJson/json_name": "json_contents",
         }
 
-        transform(Response(self.submission))
+        transform(Response(self.submission, self.tx_id))
 
         mock_create_zip.assert_called_with(
             expected_files
@@ -101,4 +103,4 @@ class TestTransform(unittest.TestCase):
         del self.submission["survey_metadata"]
 
         with self.assertRaises(DataError):
-            transform(Response(self.submission))
+            transform(Response(self.submission, self.tx_id))

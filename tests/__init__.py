@@ -21,4 +21,5 @@ def get_data(name: str) -> Response:
     path = f'tests/submissions/{file}'
     with open(path) as f:
         data = json.load(f)
-    return Response(data)
+    # SHould probably pass in tx_id, but this will do
+    return Response(data, "123")
