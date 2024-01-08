@@ -58,8 +58,9 @@ def get_optional(submission: dict, *field_names: str) -> str:
 
 class Response:
 
-    def __init__(self, submission: SurveySubmission):
+    def __init__(self, submission: SurveySubmission, tx_id: str):
         self._submission = submission
+        self.tx_id = tx_id
 
     def get_submission(self) -> SurveySubmission:
         return copy.deepcopy(self._submission)
@@ -102,7 +103,7 @@ class Response:
         return json.dumps(self._submission)
 
     def get_tx_id(self) -> str:
-        return get_field(self._submission, "tx_id")
+        return self.tx_id
 
     def get_form_type(self) -> str:
         return get_field(self._submission, "survey_metadata", "form_type")

@@ -43,20 +43,23 @@ class StoreCommentsTest(unittest.TestCase):
 
     @patch('app.comments.extract_comment')
     def test_get_comment_187(self, extract_comment):
+
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data = {
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '187',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
 
-        data = Response(test_data)
+        data = Response(test_data, tx_id)
         get_comment(data)
         extract_comment.assert_called_with(data, "500")
 
     def test_extract_berd_comment(self):
         comment = "My Comment!"
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '002',
             "data": {
                 "answers": [
@@ -75,10 +78,11 @@ class StoreCommentsTest(unittest.TestCase):
             }
         }
 
-        self.assertEqual(comment, extract_berd_comment(Response(test_data)))
+        self.assertEqual(comment, extract_berd_comment(Response(test_data, tx_id)))
 
     def test_extract_berd_comment_short_form(self):
         comment = "My Comment!"
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
             'survey_id': '002',
@@ -88,67 +92,77 @@ class StoreCommentsTest(unittest.TestCase):
             }
         }
 
-        self.assertEqual(comment, extract_berd_comment(Response(test_data)))
+        self.assertEqual(comment, extract_berd_comment(Response(test_data, tx_id)))
 
     def test_get_comment(self):
+
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'data': {
                 "500": "Im the 500 comment",
                 "300": "Im the 300 comment",
                 "146": "Im the 146 comment",
             },
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '187',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_comment(Response(test_data)), 'Im the 500 comment')
+        self.assertEqual(get_comment(Response(test_data, tx_id)), 'Im the 500 comment')
         test_data['survey_id'] = '134'
-        self.assertEqual(get_comment(Response(test_data)), 'Im the 300 comment')
+        self.assertEqual(get_comment(Response(test_data, tx_id)), 'Im the 300 comment')
         test_data['survey_id'] = '017'
-        self.assertEqual(get_comment(Response(test_data)), 'Im the 146 comment')
+        self.assertEqual(get_comment(Response(test_data, tx_id)), 'Im the 146 comment')
 
     def test_get_additional_comments(self):
+
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'data': {
                 "300w": "300w",
                 "300m": "300m",
                 "300w5": "300w5"
             },
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_additional_comments(Response(test_data)), [{'qcode': '300w', "comment": '300w'},
+        self.assertEqual(get_additional_comments(Response(test_data, tx_id)), [{'qcode': '300w', "comment": '300w'},
                                                                         {'qcode': '300m', "comment": '300m'},
                                                                         {'qcode': '300w5', "comment": '300w5'}])
 
     def test_get_additional_comments_2(self):
+
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data = {
             'data': {
                 "300f": "hello",
                 "300w4": "bye"
             },
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_additional_comments(Response(test_data)), [{'qcode': '300f', "comment": 'hello'},
+        self.assertEqual(get_additional_comments(Response(test_data, tx_id)), [{'qcode': '300f', "comment": 'hello'},
                                                                         {'qcode': '300w4', "comment": 'bye'}])
 
     def test_get_additional_comments_none(self):
+
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data = {
             'data': {
                 "300a": "300w",
                 "300b": "300m",
                 "300c": "300w5"
             },
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_additional_comments(Response(test_data)), [])
+        self.assertEqual(get_additional_comments(Response(test_data, tx_id)), [])
 
     def test_get_boxes_selected(self):
+
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data = {
             'data': {
                 "91w": "Yes",
@@ -156,13 +170,15 @@ class StoreCommentsTest(unittest.TestCase):
                 "192w42": "Yes",
                 "197w4": "Yes"
             },
-            'tx_id': '0f534ffc-9442-414c-b39f-a756b4adc6cb',
+            'tx_id': tx_id,
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual("91w, 94w2, 192w42, 197w4, ", get_boxes_selected(Response(test_data)))
+        self.assertEqual("91w, 94w2, 192w42, 197w4, ", get_boxes_selected(Response(test_data, tx_id)))
 
     def test_get_boxes_selected_2(self):
+
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'data': {
                 "146a": "Yes"
@@ -171,9 +187,11 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '009',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual("146a ", get_boxes_selected(Response(test_data)))
+        self.assertEqual("146a ", get_boxes_selected(Response(test_data, tx_id)))
 
     def test_get_boxes_selected_none(self):
+
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'data': {
                 "91w123": "Yes",
@@ -185,7 +203,7 @@ class StoreCommentsTest(unittest.TestCase):
             'survey_id': '134',
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
-        self.assertEqual(get_boxes_selected(Response(test_data)), "")
+        self.assertEqual(get_boxes_selected(Response(test_data, tx_id)), "")
 
     @mock.patch('app.comments.CONFIG')
     def test_encryption_comments(self, mock_config):
@@ -211,7 +229,7 @@ class StoreCommentsTest(unittest.TestCase):
     def test_store_comments_valid(self, mock_datastore, mock_config):
         key = "E3rjFT2i9ALcvc99Pe3YqjIGrzm3LdMsCXc8nUaOEbc="
         mock_config.ENCRYPT_COMMENT_KEY = key
-        store_comments(Response(self.test_survey))
+        store_comments(Response(self.test_survey, "123"))
         mock_datastore.assert_called()
 
     @mock.patch('app.comments.sdx_app')
