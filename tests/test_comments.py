@@ -43,7 +43,6 @@ class StoreCommentsTest(unittest.TestCase):
 
     @patch('app.comments.extract_comment')
     def test_get_comment_187(self, extract_comment):
-
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data = {
             'tx_id': tx_id,
@@ -95,7 +94,6 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual(comment, extract_berd_comment(Response(test_data, tx_id)))
 
     def test_get_comment(self):
-
         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'data': {
@@ -114,7 +112,6 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual(get_comment(Response(test_data, tx_id)), 'Im the 146 comment')
 
     def test_get_additional_comments(self):
-
         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'data': {
@@ -127,11 +124,10 @@ class StoreCommentsTest(unittest.TestCase):
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
         self.assertEqual(get_additional_comments(Response(test_data, tx_id)), [{'qcode': '300w', "comment": '300w'},
-                                                                        {'qcode': '300m', "comment": '300m'},
-                                                                        {'qcode': '300w5', "comment": '300w5'}])
+                                                                               {'qcode': '300m', "comment": '300m'},
+                                                                               {'qcode': '300w5', "comment": '300w5'}])
 
     def test_get_additional_comments_2(self):
-
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data = {
             'data': {
@@ -143,10 +139,9 @@ class StoreCommentsTest(unittest.TestCase):
             'type': 'uk.gov.ons.edc.eq:feedback'
         }
         self.assertEqual(get_additional_comments(Response(test_data, tx_id)), [{'qcode': '300f', "comment": 'hello'},
-                                                                        {'qcode': '300w4', "comment": 'bye'}])
+                                                                               {'qcode': '300w4', "comment": 'bye'}])
 
     def test_get_additional_comments_none(self):
-
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data = {
             'data': {
@@ -161,7 +156,6 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual(get_additional_comments(Response(test_data, tx_id)), [])
 
     def test_get_boxes_selected(self):
-
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data = {
             'data': {
@@ -177,7 +171,6 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual("91w, 94w2, 192w42, 197w4, ", get_boxes_selected(Response(test_data, tx_id)))
 
     def test_get_boxes_selected_2(self):
-
         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'data': {
@@ -190,7 +183,6 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual("146a ", get_boxes_selected(Response(test_data, tx_id)))
 
     def test_get_boxes_selected_none(self):
-
         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data = {
             'data': {
