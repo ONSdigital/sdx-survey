@@ -9,7 +9,6 @@ receipt_topic_path = os.getenv('RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/t
 srm_receipt_topic_path = os.getenv('SRM_RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/topics/srm-receipt-topic')
 subscription_id = "survey-trigger-subscription"
 quarantine_topic_id = "quarantine-survey-topic"
-transform_service_url = os.getenv('TRANSFORM_SERVICE_URL', "http://sdx-transform:80")
 deliver_service_url = os.getenv("DELIVER_SERVICE_URL", "http://sdx-deliver:80")
 survey_responses_bucket = f'{project_id}-survey-responses'
 image_service_url = os.getenv('IMAGE_SERVICE_URL', "http://sdx-image:80")
@@ -21,7 +20,6 @@ class Config:
 
     def __init__(self, proj_id) -> None:
         self.PROJECT_ID = proj_id
-        self.TRANSFORM_SERVICE_URL = transform_service_url
         self.DELIVER_SERVICE_URL = deliver_service_url
         self.ENCRYPT_COMMENT_KEY = None
         self.RECEIPT_TOPIC_PATH = receipt_topic_path
