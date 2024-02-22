@@ -21,8 +21,8 @@ _PCK_SURVEYS = ['009', '017', '019', '066', '076', '073', '074', '127', '134', '
 # surveys that need to remain v1 submissions
 _V1_SURVEYS = ["283", "007", "009", "023", "134", "147"]
 
-# surveys that currently only require a receipt
-_RECEIPT_ONLY_SURVEYS = ["071"]
+# surveys that currently only require a receipt (usually for testing purposes)
+_RECEIPT_ONLY_SURVEYS = []
 
 # json name change
 _JSON_NAME_CHANGE = ["024", "194"]
