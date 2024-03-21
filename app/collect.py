@@ -36,6 +36,12 @@ def process(message: Message, tx_id: TX_ID):
     filename = attributes['objectId']
 
     data_bytes = sdx_app.gcs_read(filename, CONFIG.BUCKET_NAME)
+
+    # Sometimes duplicate messages cause the object to not be found.
+    # If this is the case then there is nothing to process
+    if data_bytes is None:
+        return
+
     encrypted_message_str = data_bytes.decode('utf-8')
 
     submission: SurveySubmission = decrypt_survey(encrypted_message_str)
