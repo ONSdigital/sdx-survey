@@ -25,7 +25,7 @@ _V1_SURVEYS = ["283", "007", "009", "023", "134", "147"]
 _RECEIPT_ONLY_SURVEYS = []
 
 # json name change
-_JSON_NAME_CHANGE = ["024", "194"]
+_JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 
 # json transformation
 _JSON_TRANSFORM = ["002"]
