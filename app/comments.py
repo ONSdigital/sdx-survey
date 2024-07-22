@@ -1,4 +1,5 @@
 import json
+from typing import TypedDict, Optional
 
 from sdx_gcp.app import get_logger
 from datetime import datetime
@@ -69,7 +70,12 @@ def extract_comment(response: Response, qcode) -> str:
     return response.get_data().get(qcode)
 
 
-def get_additional_comments(response: Response):
+class AdditionalComment(TypedDict):
+    qcode: str
+    comment: Optional[str]
+
+
+def get_additional_comments(response: Response) -> list[AdditionalComment]:
     logger.info('Getting additional comments')
     comments_list = []
     data = response.get_data()
@@ -87,12 +93,12 @@ def get_additional_comments(response: Response):
     return comments_list
 
 
-def get_additional(response: Response, qcode: str):
+def get_additional(response: Response, qcode: str) -> AdditionalComment:
     logger.info('Getting additional')
     return {'qcode': qcode, "comment": response.get_data().get(qcode)}
 
 
-def get_boxes_selected(response: Response):
+def get_boxes_selected(response: Response) -> str:
     logger.info('Getting all the selected boxes')
     boxes_selected = ''
     if response.get_survey_id() == '134':
@@ -133,15 +139,15 @@ def commit_to_datastore(comment: Comment):
     sdx_app.datastore_write(data, comment.kind, comment.transaction_id, exclude_from_indexes="encrypted_data")
 
 
-def extract_berd_comment(response: Response) -> str:
+def extract_data_0_0_3_comment(response: Response, qcode: str) -> str:
     try:
         if 'answer_codes' not in response.get_data():
-            return extract_comment(response, "712")
+            return extract_comment(response, qcode)
 
         answer_codes: list[dict[str, str]] = response.get_data()['answer_codes']
         answer_id = ""
         for answer_code in answer_codes:
-            if answer_code["code"] == "712":
+            if answer_code["code"] == qcode:
                 answer_id = answer_code["answer_id"]
 
         if answer_id != "":
@@ -153,3 +159,11 @@ def extract_berd_comment(response: Response) -> str:
         logger.error(str(e))
 
     return ""
+
+
+def extract_berd_comment(response: Response) -> str:
+    return extract_data_0_0_3_comment(response, "712")
+
+
+def extract_bres_comment(response: Response) -> str:
+    return extract_data_0_0_3_comment(response, "081")
