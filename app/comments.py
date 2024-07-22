@@ -166,4 +166,8 @@ def extract_berd_comment(response: Response) -> str:
 
 
 def extract_bres_comment(response: Response) -> str:
-    return extract_data_0_0_3_comment(response, "081")
+    comment = extract_data_0_0_3_comment(response, "081")
+    if comment == "":
+        comment = extract_data_0_0_3_comment(response, "a081")
+
+    return comment

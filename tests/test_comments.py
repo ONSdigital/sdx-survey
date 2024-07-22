@@ -90,7 +90,7 @@ class StoreCommentsTest(unittest.TestCase):
 
         self.assertEqual(comment, extract_berd_comment(Response(test_data, tx_id)))
 
-    def test_extract_bres_comment(self):
+    def test_extract_bres_comment_081(self):
         comment = "My Bres Comment!"
         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_survey
@@ -108,6 +108,30 @@ class StoreCommentsTest(unittest.TestCase):
                 {
                     "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
                     "code": "081"
+                }
+            ]
+        }
+
+        self.assertEqual(comment, extract_bres_comment(Response(test_data, tx_id)))
+
+    def test_extract_bres_comment_a081(self):
+        comment = "My Bres Comment!"
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
+        test_data: SurveySubmission = self.test_survey
+        test_data['tx_id'] = tx_id
+        test_data['survey_metadata']['survey_id'] = '221'
+        test_data['data'] = {
+            "answers": [
+                {
+                    "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
+                    "value": comment
+                }
+            ],
+            "lists": [],
+            "answer_codes": [
+                {
+                    "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
+                    "code": "a081"
                 }
             ]
         }
