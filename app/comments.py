@@ -166,8 +166,13 @@ def extract_berd_comment(response: Response) -> str:
 
 
 def extract_bres_comment(response: Response) -> str:
-    comment = extract_data_0_0_3_comment(response, "081")
-    if comment == "":
-        comment = extract_data_0_0_3_comment(response, "a081")
+    comment = "Name:\n"
+    comment += extract_data_0_0_3_comment(response, "9954")
+    comment += "\n"
+    comment += "Address:\n"
+    for qcode in ["9982", "9981", "9980", "9979", "9978", "9977"]:
+        c = extract_data_0_0_3_comment(response, qcode)
+        if c != "":
+            comment += c + "\n"
 
-    return comment
+    return comment[:-1]

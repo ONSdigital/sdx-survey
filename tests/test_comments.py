@@ -90,29 +90,43 @@ class StoreCommentsTest(unittest.TestCase):
 
         self.assertEqual(comment, extract_berd_comment(Response(test_data, tx_id)))
 
-    def test_extract_bres_comment_081(self):
-        comment = "My Bres Comment!"
+    def test_extract_bres_comment(self):
         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_survey
         test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '221'
         test_data['data'] = {
             "answers": [
-                {
-                    "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
-                    "value": comment
-                }
+                {"answer_id": "answerccd2c97c-28cb-460c-8f76-3d9f04aa98d6",
+                 "value": "No, the business name is not correct"},
+                {"answer_id": "answerca3136ef-d9ef-4bb8-8496-840dc1ac46c6",
+                 "value": "corrected business name"},
+                {"answer_id": "answera74a8052-0257-4dc4-83a0-598ce7bedb81",
+                 "value": "No, the business address is not correct"},
+                {"answer_id": "answerfaf14e92-e81b-4759-801f-8c6a1623020f",
+                 "value": "address line1"},
+                {"answer_id": "answercdade785-1566-414c-be8c-c228bfa24e2d",
+                 "value": "address line2"},
+                {"answer_id": "answerbe073353-2972-4f21-8773-3a43decb6e34",
+                 "value": "AB12 3CD"}
             ],
-            "lists": [],
+            "lists": [
+                {"items": ["aGlfLb", "sZqslY"],
+                 "name": "local-units"}
+            ],
             "answer_codes": [
-                {
-                    "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
-                    "code": "081"
-                }
+                {"answer_id": "answerccd2c97c-28cb-460c-8f76-3d9f04aa98d6", "code": "9955"},
+                {"answer_id": "answerca3136ef-d9ef-4bb8-8496-840dc1ac46c6", "code": "9954"},
+                {"answer_id": "answera74a8052-0257-4dc4-83a0-598ce7bedb81", "code": "9953"},
+                {"answer_id": "answerfaf14e92-e81b-4759-801f-8c6a1623020f", "code": "9982"},
+                {"answer_id": "answercdade785-1566-414c-be8c-c228bfa24e2d", "code": "9981"},
+                {"answer_id": "answerbe073353-2972-4f21-8773-3a43decb6e34", "code": "9977"}
             ]
         }
 
-        self.assertEqual(comment, extract_bres_comment(Response(test_data, tx_id)))
+        expected = "Name:\ncorrected business name\nAddress:\naddress line1\naddress line2\nAB12 3CD"
+
+        self.assertEqual(expected, extract_bres_comment(Response(test_data, tx_id)))
 
     def test_extract_bres_comment_a081(self):
         comment = "My Bres Comment!"
