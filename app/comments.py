@@ -166,6 +166,12 @@ def extract_berd_comment(response: Response) -> str:
 
 
 def extract_bres_comment(response: Response) -> str:
+    """
+    Extract the comments for BRES
+
+    BRES has multiple comment questions relating to changes in name
+    and each address line. These are all concatenated into one comment.
+    """
     comment = "Name:\n"
     comment += extract_data_0_0_3_comment(response, "9954")
     comment += "\n"
