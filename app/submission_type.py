@@ -9,14 +9,14 @@ from app.response import Response, SurveyType, ResponseType, SchemaVersion, Deli
 logger = get_logger()
 
 # list of survey ids that target only DAP
-_DAP_SURVEYS = ["283", "738", "739", "740", "221"]
+_DAP_SURVEYS = ["283", "738", "739", "740"]
 
 # list of survey ids that target both DAP and Legacy
 _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
 
 # list of surveys that require a PCK file
 _PCK_SURVEYS = ['009', '017', '019', '066', '076', '073', '074', '127', '134', '139', '144', '160', '165', '169', '171',
-                '182', '183', '184', '185', '187', '202', '228']
+                '182', '183', '184', '185', '187', '202', '221', '228']
 
 # surveys that need to remain v1 submissions
 _V1_SURVEYS = ["283", "007", "009", "023", "134", "147"]
