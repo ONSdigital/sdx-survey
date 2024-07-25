@@ -61,6 +61,8 @@ def get_comment(response: Response) -> str:
         return extract_comment(response, '300')
     elif survey_id == '002':
         return extract_berd_comment(response)
+    elif survey_id == '221':
+        return extract_bres_comment(response)
     else:
         return extract_comment(response, '146')
 
@@ -140,6 +142,10 @@ def commit_to_datastore(comment: Comment):
 
 
 def extract_data_0_0_3_comment(response: Response, qcode: str) -> str:
+    """
+    Responses in data version 0.0.3 require matching the qcode
+    with the answer id to be able to extract the comment.
+    """
     try:
         if 'answer_codes' not in response.get_data():
             return extract_comment(response, qcode)
