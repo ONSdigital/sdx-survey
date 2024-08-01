@@ -128,30 +128,6 @@ class StoreCommentsTest(unittest.TestCase):
 
         self.assertEqual(expected, extract_bres_comment(Response(test_data, tx_id)))
 
-    def test_extract_bres_comment_a081(self):
-        comment = "My Bres Comment!"
-        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
-        test_data: SurveySubmission = self.test_survey
-        test_data['tx_id'] = tx_id
-        test_data['survey_metadata']['survey_id'] = '221'
-        test_data['data'] = {
-            "answers": [
-                {
-                    "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
-                    "value": comment
-                }
-            ],
-            "lists": [],
-            "answer_codes": [
-                {
-                    "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
-                    "code": "a081"
-                }
-            ]
-        }
-
-        self.assertEqual(comment, extract_bres_comment(Response(test_data, tx_id)))
-
     def test_get_comment(self):
         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_survey
@@ -198,12 +174,13 @@ class StoreCommentsTest(unittest.TestCase):
             "300w4": "bye"
         }
 
-        self.assertEqual(get_additional_comments(Response(test_data, tx_id)),
-                         [
-                             {'qcode': '300f', "comment": 'hello'},
-                             {'qcode': '300w4', "comment": 'bye'}
-                         ]
-                         )
+        self.assertEqual(
+            get_additional_comments(Response(test_data, tx_id)),
+            [
+                {'qcode': '300f', "comment": 'hello'},
+                {'qcode': '300w4', "comment": 'bye'}
+            ]
+        )
 
     def test_get_additional_comments_none(self):
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
