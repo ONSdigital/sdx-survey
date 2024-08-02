@@ -1,7 +1,5 @@
 # sdx-survey
 
-[![Build Status](https://github.com/ONSdigital/sdx-survey/workflows/Build/badge.svg)](https://github.com/ONSdigital/sdx-survey)
-
 The SDX-Survey service is used within the Office National for Statistics (ONS) for managing survey submissions in JSON
 format. These submissions come from EQ and require validation and additional processing depending on their destination downstream.
 
