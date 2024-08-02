@@ -13,7 +13,7 @@ logger = get_logger()
 END_POINT: Final = "pck"
 
 
-def call_transformer(response: Response, use_image_formatter: bool = False) -> bytes:
+def call_transformer(response: Response) -> bytes:
     logger.info("Calling sdx-transformer...")
     survey_data = json.dumps(response.get_data())
 
@@ -31,7 +31,7 @@ def call_transformer(response: Response, use_image_formatter: bool = False) -> b
             "form_type": response.get_form_type(),
             "period_start_date": response.get_period_start_date(),
             "period_end_date": response.get_period_end_date(),
-            "use_image_formatter": use_image_formatter,
+            "use_image_formatter": False,
             "data_version": response.get_data_version()
         }
     )

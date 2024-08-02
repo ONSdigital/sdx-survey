@@ -1,6 +1,6 @@
 steps:
 - id: 'Unit Tests'
-  name: 'eu.gcr.io/ons-sdx-ci/sdx-gcp:1.4.0'
+  name: 'eu.gcr.io/ons-sdx-ci/sdx-gcp:1.4.1'
   script: |
     #!/usr/bin/env bash
     pip install --upgrade pip
