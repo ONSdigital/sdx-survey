@@ -29,7 +29,7 @@ def get_image(response: Response) -> bytes:
     else:
         survey_json: str = response.to_json()
 
-    http_response = sdx_app.http_post(CONFIG.IMAGE_SERVICE_URL, "/image", survey_json)
+    http_response = sdx_app.http_post(CONFIG.IMAGE_SERVICE_URL, "image", survey_json)
     return http_response.content
 
 
