@@ -19,6 +19,7 @@ no additional processing is required and the `/deliver/feedback` endpoint on sdx
 **Note:** Refer to Collect.py
 
 ## Getting started
+
 Install pipenv:
 ```shell
 $ pip install pipenv
@@ -146,6 +147,6 @@ and each are stored in `DECRYPT_SURVEY_KEY`, `ENCRYPT_COMMENT_KEY` and `AUTHENTI
 
 ## License
 
-Copyright © 2016, Office for National Statistics (https://www.ons.gov.uk)
+Copyright © 2024, Office for National Statistics (https://www.ons.gov.uk)
 
 Released under MIT license, see [LICENSE](LICENSE) for details.
