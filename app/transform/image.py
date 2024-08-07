@@ -15,20 +15,7 @@ class ImageResponse(TypedDict):
 
 
 def get_image(response: Response) -> bytes:
-    if response.get_data_version() == "0.0.3":
-        image_data_bytes: bytes = call_transformer(response, use_image_formatter=True)
-        image_data: list[ImageResponse] = json.loads(image_data_bytes)
-        submission: dict[str, any] = response.get_submission()
-
-        submission["data"] = image_data
-        data = response.get_data()
-        if "supplementary_data" in data:
-            submission["supplementary_data"] = data["supplementary_data"]
-
-        survey_json: str = json.dumps(submission)
-    else:
-        survey_json: str = response.to_json()
-
+    survey_json: str = response.to_json()
     http_response = sdx_app.http_post(CONFIG.IMAGE_SERVICE_URL, "image", survey_json)
     return http_response.content
 
