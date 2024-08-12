@@ -12,7 +12,7 @@ END_POINT: Final = "pck"
 
 
 def get_contents(response: Response) -> bytes:
-    return call_transformer(response, use_image_formatter=False)
+    return call_transformer(response)
 
 
 def get_name(response: Response) -> str:
