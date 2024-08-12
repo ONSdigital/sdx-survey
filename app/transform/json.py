@@ -7,7 +7,7 @@ from app.transform.formatter import get_tx_code, split_ru_ref
 def get_contents(response: Response) -> bytes:
 
     if requires_json_transform(response):
-        return call_transformer(response, use_image_formatter=False)
+        return call_transformer(response)
 
     if requires_v1_conversion(response):
         r: str = response.to_v1_json()
