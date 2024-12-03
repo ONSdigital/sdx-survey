@@ -1,6 +1,6 @@
 # sdx-survey
 
-The SDX-Survey service is used within the Office National for Statistics (ONS) for managing survey submissions in JSON
+The SDX-Survey service is used within the Office for National Statistics (ONS) for managing survey submissions in JSON
 format. These submissions come from EQ and require validation and additional processing depending on their destination downstream.
 
 ## Process
