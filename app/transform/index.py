@@ -32,6 +32,5 @@ def get_contents(response: Response, image_name: str) -> bytes:
     x = image_name.split(".")[0]
 
     return bytes(
-        f"{long_time},{image_path}\\{image_name},{short_time},{x},{survey_id},{form_type},{ru_ref},{period},001,0",
-        'utf-8'
+        f"{long_time}, {image_path}\\{image_name}, {short_time}, {x}, {survey_id}, {form_type}, {ru_ref}, {period}, 001, 0", 'utf-8'
     )

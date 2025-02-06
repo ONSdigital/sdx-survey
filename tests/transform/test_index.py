@@ -45,8 +45,8 @@ class TestIndex(unittest.TestCase):
         mock_datetime.datetime.utcnow.return_value = datetime.datetime.strptime("2023-11-03", "%Y-%m-%d")
         image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"
         actual: bytes = index.get_contents(Response(self.submission, self.tx_id), image_name)
-        expected = (b'03/11/2023 00:00:00,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20231103,'
-                    b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,201605,001,0')
+        expected = (b'03/11/2023 00:00:00, \\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG, 20231103, '
+                    b'Sbefa5444749f407ab3a219f1d1c7324b_1, 202, 1801, 12346789012, 201605, 001, 0')
         self.assertEqual(expected, actual)
 
     @patch('app.transform.index.datetime')
@@ -56,8 +56,8 @@ class TestIndex(unittest.TestCase):
         submission: SurveySubmission = self.submission
         submission["survey_metadata"]["period_id"] = "2310"
         actual: bytes = index.get_contents(Response(self.submission, self.tx_id), image_name)
-        expected = (b'03/11/2023 00:00:00,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20231103,'
-                    b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,202310,001,0')
+        expected = (b'03/11/2023 00:00:00, \\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG, 20231103, '
+                    b'Sbefa5444749f407ab3a219f1d1c7324b_1, 202, 1801, 12346789012, 202310, 001, 0')
         self.assertEqual(expected, actual)
 
     def test_index_name(self):
