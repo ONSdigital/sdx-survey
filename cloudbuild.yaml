@@ -1,6 +1,6 @@
 steps:
 - id: 'Unit Tests'
-  name: 'europe-west2-docker.pkg.dev/ons-sdx-ci/sdx-apps/sdx-gcp:1.4.2'
+  name: 'europe-west2-docker.pkg.dev/ons-sdx-ci/sdx-apps/sdx-gcp:1.4.4'
   script: |
     #!/usr/bin/env bash
     pip install --upgrade pip
