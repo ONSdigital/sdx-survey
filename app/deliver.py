@@ -10,6 +10,7 @@ DAP = "dap"
 LEGACY = "legacy"
 HYBRID = "hybrid"
 FEEDBACK = "feedback"
+SPP = "spp"
 SUBMISSION_FILE = 'submission'
 TRANSFORMED_FILE = 'transformed'
 UTF8 = "utf-8"
@@ -48,6 +49,13 @@ def deliver_feedback(response: Response, version: str = V1):
     """deliver a feedback survey submission"""
     logger.info("Sending feedback submission")
     deliver(response, FEEDBACK, {}, version=version)
+
+
+def deliver_spp(response: Response, zip_file: bytes, version: str = V1):
+    """deliver a survey submission intended for the spp systems"""
+    logger.info("Sending survey submission")
+    files = {TRANSFORMED_FILE: zip_file}
+    deliver(response, SPP, files, version=version)
 
 
 def deliver(response: Response, output_type: str, files: dict[str, bytes], version: str = V1):

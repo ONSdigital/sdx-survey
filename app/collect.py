@@ -4,8 +4,9 @@ from sdx_gcp.app import get_logger
 from app import CONFIG, sdx_app
 from app.decrypt import decrypt_survey
 from app.definitions import SurveySubmission
-from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, HybridProcessor, \
-    SurveyProcessor
+from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, \
+    HybridProcessor, \
+    SurveyProcessor, SppProcessor
 from app.response import Response, SurveyType, ResponseType, DeliverTarget
 from app.submission_type import receipt_only_submission, get_deliver_target
 
@@ -65,6 +66,9 @@ def process(message: Message, tx_id: TX_ID):
 
     elif get_deliver_target(response) == DeliverTarget.HYBRID:
         processor = HybridProcessor(response)
+
+    elif get_deliver_target(response) == DeliverTarget.SPP:
+        processor = SppProcessor(response)
 
     else:
         processor = SurveyProcessor(response)

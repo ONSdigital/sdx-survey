@@ -33,6 +33,8 @@ _JSON_TRANSFORM = ["002"]
 # responses that will use the v2 schema for messaging Nifi
 _V2_NIFI_MESSAGE = ["009", "139", "228"]
 
+_SPP_SURVEYS = ["009", "139", "228"]
+
 
 def requires_v1_conversion(response: Response) -> bool:
     if response.get_response_type() == ResponseType.FEEDBACK:
@@ -73,6 +75,9 @@ def get_deliver_target(response: Response) -> DeliverTarget:
     if response.get_survey_type() == SurveyType.ADHOC:
         return DeliverTarget.DAP
 
+    if spp_submission(response):
+        return DeliverTarget.SPP
+
     survey_id = response.get_survey_id()
     if survey_id in _DAP_SURVEYS:
         return DeliverTarget.DAP
@@ -84,3 +89,7 @@ def get_deliver_target(response: Response) -> DeliverTarget:
 
 def v2_nifi_message_submission(response: Response) -> bool:
     return response.get_survey_id() in _V2_NIFI_MESSAGE
+
+
+def spp_submission(response: Response) -> bool:
+    return response.get_survey_id() in _SPP_SURVEYS
