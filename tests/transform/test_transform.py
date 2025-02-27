@@ -45,7 +45,17 @@ class TestTransform(unittest.TestCase):
     @patch("app.transform.transform.index")
     @patch("app.transform.transform.image")
     @patch("app.transform.transform.pck")
-    def test_transform(self, mock_pck, mock_image, mock_index, mock_idbr, mock_json, mock_create_zip: Mock):
+    @patch("app.transform.transform.v2_nifi_message_submission")
+    def test_transform(self,
+                       mock_message: Mock,
+                       mock_pck: Mock,
+                       mock_image: Mock,
+                       mock_index: Mock,
+                       mock_idbr: Mock,
+                       mock_json: Mock,
+                       mock_create_zip: Mock):
+
+        mock_message.return_value = False
 
         mock_pck.get_contents.return_value = "pck_contents"
         mock_pck.get_name.return_value = "pck_name"
@@ -82,7 +92,16 @@ class TestTransform(unittest.TestCase):
     @patch("app.transform.transform.index")
     @patch("app.transform.transform.image")
     @patch("app.transform.transform.pck")
-    def test_transform_with_no_survey_metadata(self, mock_pck, mock_image, mock_index, mock_idbr, mock_json, mock_create_zip: Mock):
+    @patch("app.transform.transform.v2_nifi_message_submission")
+    def test_transform_with_no_survey_metadata(self,
+                                               mock_message: Mock,
+                                               mock_pck: Mock,
+                                               mock_image: Mock,
+                                               mock_index: Mock,
+                                               mock_idbr: Mock,
+                                               mock_json: Mock,
+                                               mock_create_zip: Mock):
+        mock_message.return_value = False
 
         mock_pck.get_contents.return_value = "pck_contents"
         mock_pck.get_name.return_value = "pck_name"
@@ -104,3 +123,50 @@ class TestTransform(unittest.TestCase):
 
         with self.assertRaises(DataError):
             transform(Response(self.submission, self.tx_id))
+
+    @patch("app.transform.transform.create_zip")
+    @patch("app.transform.transform.json")
+    @patch("app.transform.transform.idbr")
+    @patch("app.transform.transform.index")
+    @patch("app.transform.transform.image")
+    @patch("app.transform.transform.pck")
+    @patch("app.transform.transform.v2_nifi_message_submission")
+    def test_transform_v2_message_survey(self,
+                                         mock_message: Mock,
+                                         mock_pck: Mock,
+                                         mock_image: Mock,
+                                         mock_index: Mock,
+                                         mock_idbr: Mock,
+                                         mock_json: Mock,
+                                         mock_create_zip: Mock):
+
+        mock_message.return_value = True
+
+        mock_pck.get_contents.return_value = "pck_contents"
+        mock_pck.get_name.return_value = "pck_name"
+
+        mock_image.get_image.return_value = "image_contents"
+        mock_image.get_name.return_value = "image_name"
+
+        mock_index.get_contents.return_value = "index_contents"
+        mock_index.get_name.return_value = "index_name"
+
+        mock_idbr.get_contents.return_value = "idbr_contents"
+        mock_idbr.get_name.return_value = "idbr_name"
+
+        mock_json.get_contents.return_value = "json_contents"
+        mock_json.get_name.return_value = "json_name"
+
+        expected_files = {
+            "pck_name": "pck_contents",
+            "image_name": "image_contents",
+            "index_name": "index_contents",
+            "idbr_name": "idbr_contents",
+            "json_name": "json_contents",
+        }
+
+        transform(Response(self.submission, self.tx_id))
+
+        mock_create_zip.assert_called_with(
+            expected_files
+        )

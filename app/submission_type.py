@@ -30,6 +30,9 @@ _JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 # json transformation
 _JSON_TRANSFORM = ["002"]
 
+# responses that will use the v2 schema for messaging Nifi
+_V2_NIFI_MESSAGE = ["009", "139", "228"]
+
 
 def requires_v1_conversion(response: Response) -> bool:
     if response.get_response_type() == ResponseType.FEEDBACK:
@@ -77,3 +80,7 @@ def get_deliver_target(response: Response) -> DeliverTarget:
         return DeliverTarget.HYBRID
     else:
         return DeliverTarget.LEGACY
+
+
+def v2_nifi_message_submission(response: Response) -> bool:
+    return response.get_survey_id() in _V2_NIFI_MESSAGE
