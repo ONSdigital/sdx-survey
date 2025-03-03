@@ -47,7 +47,7 @@ class TestTransform(unittest.TestCase):
     @patch("app.transform.transform.pck")
     @patch("app.transform.transform.v2_nifi_message_submission")
     def test_transform(self,
-                       mock_message: Mock,
+                       mock_is_v2_message: Mock,
                        mock_pck: Mock,
                        mock_image: Mock,
                        mock_index: Mock,
@@ -55,7 +55,7 @@ class TestTransform(unittest.TestCase):
                        mock_json: Mock,
                        mock_create_zip: Mock):
 
-        mock_message.return_value = False
+        mock_is_v2_message.return_value = False
 
         mock_pck.get_contents.return_value = "pck_contents"
         mock_pck.get_name.return_value = "pck_name"

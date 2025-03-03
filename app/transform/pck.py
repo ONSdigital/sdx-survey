@@ -1,19 +1,14 @@
-from typing import Final
-
 from sdx_gcp.app import get_logger
 
 from app.response import Response
-from app.submission_type import spp_submission
-from app.transform.call_transformer import call_transformer
+from app.transform.call_transformer import call_transformer_pck
 from app.transform.formatter import get_tx_code
 
 logger = get_logger()
 
-END_POINT: Final = "pck"
-
 
 def get_contents(response: Response) -> bytes:
-    return call_transformer(response)
+    return call_transformer_pck(response)
 
 
 def get_name(response: Response) -> str:
@@ -22,9 +17,6 @@ def get_name(response: Response) -> str:
 
     if survey_id == "202":
         survey_id = get_abs_survey_id(response.get_form_type())
-
-    if spp_submission(response):
-        return f"{survey_id}_{get_tx_code(tx_id)}.json"
 
     if survey_id in ["182", "183", "184", "185"]:
         survey_id = "181"

@@ -1,5 +1,6 @@
 from sdx_gcp.app import get_logger
 
+from app.period import Period
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
 
 """
@@ -33,7 +34,13 @@ _JSON_TRANSFORM = ["002"]
 # responses that will use the v2 schema for messaging Nifi
 _V2_NIFI_MESSAGE = ["009", "139", "228"]
 
-_SPP_SURVEYS = ["009", "139", "228"]
+# responses to target SPP using v2 nifi schema
+# Held as a dictionary of survey id to the period when it should start using SPP
+_SPP_SURVEYS: dict[str, str] = {
+    "009": "2507",
+    "139": "2507",
+    "228": "2507",
+}
 
 
 def requires_v1_conversion(response: Response) -> bool:
@@ -88,8 +95,28 @@ def get_deliver_target(response: Response) -> DeliverTarget:
 
 
 def v2_nifi_message_submission(response: Response) -> bool:
+    """
+    Returns True if this response is configured to use the v2 nifi message schema.
+    """
     return response.get_survey_id() in _V2_NIFI_MESSAGE
 
 
 def spp_submission(response: Response) -> bool:
-    return response.get_survey_id() in _SPP_SURVEYS
+    """
+    Returns True only if this response is to be sent to SPP
+    via the v2 nifi message schema.
+
+    In some cases this may be dependent on the period of
+    the received submission.
+    """
+
+    if not v2_nifi_message_submission(response):
+        return False
+    if response.get_survey_id() not in _SPP_SURVEYS.keys():
+        return False
+    period_to_start = _SPP_SURVEYS.get(response.get_survey_id())
+    if period_to_start is not None:
+        if Period(response.get_period()) >= Period(period_to_start):
+            return True
+
+    return False
