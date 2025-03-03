@@ -15,4 +15,4 @@ def get_name(response: Response) -> str:
     survey_id = response.get_survey_id()
     tx_id = response.get_tx_id()
 
-    return f"{survey_id}_{get_tx_code(tx_id)}"
+    return f"{survey_id}_{get_tx_code(tx_id)}.json"

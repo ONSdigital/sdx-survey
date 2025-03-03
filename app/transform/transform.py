@@ -42,13 +42,15 @@ def _create_zip_for_v2_message(response: Response) -> bytes:
     files[json.get_name(response)] = json.get_contents(response)
 
     # PCK or SPP
-    if requires_pck(response):
-        files[pck.get_name(response)] = pck.get_contents(response)
-    elif spp_submission(response):
+    # Note: we check for SPP first as it may be that the survey formerly required
+    # a pck file to be created and so would still return True for requires_pck.
+    if spp_submission(response):
         spp_contents = spp.get_contents(response)
         files[spp.get_name(response)] = spp_contents
         # Overwrite original json
         files[json.get_name(response)] = spp_contents
+    elif requires_pck(response):
+        files[pck.get_name(response)] = pck.get_contents(response)
 
     # Image
     image_name = image.get_name(response)
