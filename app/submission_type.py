@@ -13,7 +13,7 @@ logger = get_logger()
 _DAP_SURVEYS = ["283", "738", "739", "740"]
 
 # list of survey ids that target both DAP and Legacy
-_HYBRID_SURVEYS = ["002", "007", "023", "134", "147"]
+_HYBRID_SURVEYS = ["002", "007", "134", "147"]
 
 # list of surveys that require a PCK file
 _PCK_SURVEYS = ['009', '017', '019', '066', '076', '073', '074', '127', '134', '139', '144', '160', '165', '169', '171',
@@ -32,12 +32,13 @@ _JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 _JSON_TRANSFORM = ["002"]
 
 # responses that will use the v2 schema for messaging Nifi
-_V2_NIFI_MESSAGE = ["009", "139", "228"]
+_V2_NIFI_MESSAGE = ["009", "023", "139", "228"]
 
 # responses to target SPP using v2 nifi schema
 # Held as a dictionary of survey id to the period when it should start using SPP
 _SPP_SURVEYS: dict[str, str] = {
     "009": "2507",
+    "023": "2303",
     "139": "2507",
     "228": "2507",
 }
