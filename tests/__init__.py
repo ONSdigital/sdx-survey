@@ -1,5 +1,6 @@
 import json
 
+from app.definitions import SurveySubmission
 from app.response import Response
 
 responseTestDataMap = {
@@ -14,12 +15,18 @@ responseTestDataMap = {
 }
 
 
-def get_data(name: str) -> Response:
+def get_json(name: str) -> SurveySubmission:
     file = responseTestDataMap.get(name)
     if not file:
         raise ValueError
     path = f'tests/submissions/{file}'
     with open(path) as f:
         data = json.load(f)
-    # SHould probably pass in tx_id, but this will do
+
+    return data
+
+
+def get_response(name: str) -> Response:
+    data = get_json(name)
+    # Should probably pass in tx_id, but this will do
     return Response(data, "123")

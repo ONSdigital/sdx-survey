@@ -112,6 +112,7 @@ def spp_submission(response: Response) -> bool:
 
     if not v2_nifi_message_submission(response):
         return False
+
     if response.get_survey_id() not in _SPP_SURVEYS.keys():
         return False
     period_to_start = _SPP_SURVEYS.get(response.get_survey_id())
