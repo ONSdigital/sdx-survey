@@ -32,7 +32,7 @@ _JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 _JSON_TRANSFORM = ["002"]
 
 # responses that will use the v2 schema for messaging Nifi
-_V2_NIFI_MESSAGE = ["009", "023", "139", "228"]
+_V2_NIFI_MESSAGE = ["009", "023", "139", "228", "283"]
 
 # responses to target SPP using v2 nifi schema
 # Held as a dictionary of survey id to the period when it should start using SPP
