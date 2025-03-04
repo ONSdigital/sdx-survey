@@ -99,6 +99,8 @@ def v2_nifi_message_submission(response: Response) -> bool:
     """
     Returns True if this response is configured to use the v2 nifi message schema.
     """
+    if response.get_response_type() == ResponseType.FEEDBACK:
+        return True
     return response.get_survey_id() in _V2_NIFI_MESSAGE
 
 
