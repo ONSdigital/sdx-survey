@@ -2,9 +2,9 @@ import datetime
 import unittest
 from unittest.mock import patch
 
-from app.definitions import SurveySubmission
+from app.definitions.submission import SurveySubmission
 from app.response import Response
-from app.transform import index
+from app.transform.transforms import index
 
 
 class TestIndex(unittest.TestCase):
@@ -39,7 +39,7 @@ class TestIndex(unittest.TestCase):
             "submission_language_code": "en"
         }
 
-    @patch('app.transform.index.datetime')
+    @patch('app.transform.transforms.index.datetime')
     def test_index_contents(self, mock_datetime):
 
         mock_datetime.datetime.utcnow.return_value = datetime.datetime.strptime("2023-11-03", "%Y-%m-%d")
@@ -49,7 +49,7 @@ class TestIndex(unittest.TestCase):
                     b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,201605,001,0')
         self.assertEqual(expected, actual)
 
-    @patch('app.transform.index.datetime')
+    @patch('app.transform.transforms.index.datetime')
     def test_index_contents_4_digit_period(self, mock_datetime):
         mock_datetime.datetime.utcnow.return_value = datetime.datetime.strptime("2023-11-03", "%Y-%m-%d")
         image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"

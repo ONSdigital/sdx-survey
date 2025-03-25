@@ -4,6 +4,7 @@ from sdx_gcp.app import get_logger
 
 from app.response import Response
 from app.transform.call_transformer import call_transformer_spp
+from app.definitions.transform import Transform
 
 logger = get_logger()
 
@@ -26,3 +27,12 @@ def get_timestamp() -> str:
 
 def get_now() -> datetime:
     return datetime.now()
+
+
+class SPPTransform(Transform):
+
+    def get_file_name(self, response: Response) -> str:
+        return get_name(response)
+
+    def get_file_content(self, response: Response) -> bytes:
+        return get_contents(response)

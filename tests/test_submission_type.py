@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock
 from sdx_gcp.errors import DataError
 
 from app import submission_type
-from app.definitions import SurveySubmission
+from app.definitions.submission import SurveySubmission
 from app.response import get_safe_submission, SurveyType, ResponseType, SchemaVersion, Response
 from tests import get_response, get_json
 

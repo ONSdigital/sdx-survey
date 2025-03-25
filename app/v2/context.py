@@ -1,30 +1,11 @@
-from typing import TypedDict
-from enum import StrEnum
+from typing import TypedDict, NotRequired
 
-
-class SurveyType(StrEnum):
-    DAP = "dap"
-    LEGACY = "legacy"
-    SPP = "spp"
-    NS5 = "ns5"
-    FEEDBACK = "feedback"
-    SEFT = "seft"
-    ADHOC = "adhoc"
-    COMMENTS = "comments"
+from app.definitions.v2_survey_type import V2SurveyType
 
 
 class Context(TypedDict):
     tx_id: str
-    survey_type: SurveyType
-
-
-class BusinessSurveyContext(Context):
+    survey_type: V2SurveyType
     survey_id: str
-    period_id: str
-    ru_ref: str
-
-
-class AdhocSurveyContext(Context):
-    survey_id: str
-    title: str
-    label: str
+    period_id: NotRequired[str]
+    ru_ref: NotRequired[str]

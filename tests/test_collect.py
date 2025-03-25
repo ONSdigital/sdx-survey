@@ -30,9 +30,10 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
+    @patch('app.collect.v2_nifi_message_submission')
     @patch('app.processor.deliver_feedback')
     @patch('app.processor.send_receipt')
-    def test_process_feedback(self, send_receipt, deliver_feedback, decrypt, app):
+    def test_process_feedback(self, send_receipt, deliver_feedback, v2_nifi_message, decrypt, app):
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         feedback_response = {
             'tx_id': tx_id,
@@ -42,16 +43,18 @@ class TestCollect(unittest.TestCase):
 
         app.gcs_read.return_value = json.dumps(feedback_response).encode()
         decrypt.return_value = feedback_response
+        v2_nifi_message.return_value = False
         process(self.message, tx_id)
         deliver_feedback.assert_called_with(Response(feedback_response, tx_id), version=V2)
         send_receipt.assert_not_called()
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
+    @patch('app.collect.v2_nifi_message_submission')
     @patch('app.processor.store_comments')
     @patch('app.processor.deliver_dap')
     @patch('app.processor.send_receipt')
-    def test_process_dap_survey(self, send_receipt, deliver_dap, store_comments, decrypt, app):
+    def test_process_dap_survey(self, send_receipt, deliver_dap, store_comments, v2_nifi_message, decrypt, app):
 
         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
 
@@ -62,6 +65,8 @@ class TestCollect(unittest.TestCase):
         }
 
         dap_response_object = Response(dap_response, tx_id)
+
+        v2_nifi_message.return_value = False
 
         app.gcs_read.return_value = json.dumps(dap_response).encode()
         decrypt.return_value = dap_response

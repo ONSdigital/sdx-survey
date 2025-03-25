@@ -1,7 +1,7 @@
 import unittest
 
 from app.response import Response
-from app.transform import image
+from app.transform.transforms import image
 
 
 class TestImage(unittest.TestCase):

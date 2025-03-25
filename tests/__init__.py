@@ -1,6 +1,6 @@
 import json
 
-from app.definitions import SurveySubmission
+from app.definitions.submission import SurveySubmission
 from app.response import Response
 
 responseTestDataMap = {

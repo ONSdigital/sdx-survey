@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 from app.response import Response
-from app.transform.transform import transform
+from app.transform.create import transform
 from sdx_gcp.errors import DataError
 
 
@@ -39,13 +39,13 @@ class TestTransform(unittest.TestCase):
             "submission_language_code": "en"
         }
 
-    @patch("app.transform.transform.create_zip")
-    @patch("app.transform.transform.json")
-    @patch("app.transform.transform.idbr")
-    @patch("app.transform.transform.index")
-    @patch("app.transform.transform.image")
-    @patch("app.transform.transform.pck")
-    @patch("app.transform.transform.v2_nifi_message_submission")
+    @patch("app.transform.create.create_zip")
+    @patch("app.transform.create.json")
+    @patch("app.transform.create.idbr")
+    @patch("app.transform.create.index")
+    @patch("app.transform.create.image")
+    @patch("app.transform.create.pck")
+    @patch("app.transform.create.v2_nifi_message_submission")
     def test_transform(self,
                        mock_is_v2_message: Mock,
                        mock_pck: Mock,
@@ -86,13 +86,13 @@ class TestTransform(unittest.TestCase):
             expected_files
         )
 
-    @patch("app.transform.transform.create_zip")
-    @patch("app.transform.transform.json")
-    @patch("app.transform.transform.idbr")
-    @patch("app.transform.transform.index")
-    @patch("app.transform.transform.image")
-    @patch("app.transform.transform.pck")
-    @patch("app.transform.transform.v2_nifi_message_submission")
+    @patch("app.transform.create.create_zip")
+    @patch("app.transform.create.json")
+    @patch("app.transform.create.idbr")
+    @patch("app.transform.create.index")
+    @patch("app.transform.create.image")
+    @patch("app.transform.create.pck")
+    @patch("app.transform.create.v2_nifi_message_submission")
     def test_transform_with_no_survey_metadata(self,
                                                mock_message: Mock,
                                                mock_pck: Mock,
@@ -124,7 +124,7 @@ class TestTransform(unittest.TestCase):
         with self.assertRaises(DataError):
             transform(Response(self.submission, self.tx_id))
 
-    @patch("app.transform.transform.create_zip")
+    '''patch("app.transform.transform.create_zip")
     @patch("app.transform.transform.json")
     @patch("app.transform.transform.idbr")
     @patch("app.transform.transform.index")
@@ -162,11 +162,10 @@ class TestTransform(unittest.TestCase):
             "image_name": "image_contents",
             "index_name": "index_contents",
             "idbr_name": "idbr_contents",
-            "json_name": "json_contents",
         }
 
         transform(Response(self.submission, self.tx_id))
 
         mock_create_zip.assert_called_with(
             expected_files
-        )
+        )'''

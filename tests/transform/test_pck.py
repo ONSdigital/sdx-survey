@@ -1,8 +1,8 @@
 import unittest
 
-from app.definitions import SurveySubmission
+from app.definitions.submission import SurveySubmission
 from app.response import Response
-from app.transform import pck
+from app.transform.transforms import pck
 
 
 class TestPCK(unittest.TestCase):

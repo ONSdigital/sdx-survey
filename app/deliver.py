@@ -3,7 +3,6 @@ from sdx_gcp.app import get_logger
 
 from app import sdx_app, CONFIG
 from app.response import Response
-from app.submission_type import v2_nifi_message_submission
 
 # Constants used within the http request
 DAP = "dap"
@@ -20,7 +19,6 @@ TX_ID = "tx_id"
 V1 = "v1"
 V2 = "v2"
 ADHOC = "adhoc"
-MESSAGE_SCHEMA = "message_schema"
 
 logger = get_logger()
 
@@ -51,13 +49,6 @@ def deliver_feedback(response: Response, version: str = V1):
     deliver(response, FEEDBACK, {}, version=version)
 
 
-def deliver_spp(response: Response, zip_file: bytes, version: str = V1):
-    """deliver a survey submission intended for the spp systems"""
-    logger.info("Sending survey submission")
-    files = {TRANSFORMED_FILE: zip_file}
-    deliver(response, SPP, files, version=version)
-
-
 def deliver(response: Response, output_type: str, files: dict[str, bytes], version: str = V1):
     """
     Calls the sdx-deliver endpoint specified by the output_type parameter.
@@ -73,17 +64,12 @@ def deliver(response: Response, output_type: str, files: dict[str, bytes], versi
     else:
         submission_json = response.to_json()
 
-    if v2_nifi_message_submission(response):
-        message_schema = V2
-    else:
-        message_schema = V1
-
     files[SUBMISSION_FILE] = submission_json.encode(UTF8)
 
     endpoint = f"deliver/{output_type}"
     sdx_app.http_post(CONFIG.DELIVER_SERVICE_URL,
                       endpoint,
                       None,
-                      params={FILE_NAME: filename, VERSION: version, TX_ID: tx_id, MESSAGE_SCHEMA: message_schema},
+                      params={FILE_NAME: filename, VERSION: version, TX_ID: tx_id},
                       files=files)
     return True

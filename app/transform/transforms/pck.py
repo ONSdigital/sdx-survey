@@ -3,6 +3,7 @@ from sdx_gcp.app import get_logger
 from app.response import Response
 from app.transform.call_transformer import call_transformer_pck
 from app.transform.formatter import get_tx_code
+from app.definitions.transform import Transform
 
 logger = get_logger()
 
@@ -68,3 +69,12 @@ form_map = {'1802': '053',
 
 def get_abs_survey_id(formtype: str) -> str:
     return form_map.get(formtype)
+
+
+class PCKTransform(Transform):
+
+    def get_file_name(self, response: Response) -> str:
+        return get_name(response)
+
+    def get_file_content(self, response: Response) -> bytes:
+        return get_contents(response)

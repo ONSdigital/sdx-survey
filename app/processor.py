@@ -1,11 +1,11 @@
 from collections.abc import Callable
 
 from app.comments import store_comments
-from app.deliver import deliver_dap, V2, V1, deliver_feedback, ADHOC, deliver_survey, deliver_hybrid, deliver_spp
+from app.deliver import deliver_dap, V2, V1, deliver_feedback, ADHOC, deliver_survey, deliver_hybrid
 from app.receipt import send_receipt
 from app.submission_type import requires_v1_conversion
 from app.response import Response, SurveyType
-from app.transform.transform import transform
+from app.transform.create import transform
 
 """
     This file defines a set of classes
@@ -109,10 +109,3 @@ class ReceiptOnlyProcessor(SurveyProcessor):
 
     def deliver(self, version: str):
         pass
-
-
-class SppProcessor(SurveyProcessor):
-
-    def deliver(self, version: str):
-        zip_file = transform(self._response)
-        deliver_spp(self._response, zip_file, version=version)

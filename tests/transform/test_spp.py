@@ -2,9 +2,9 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch, Mock
 
-from app.definitions import SurveySubmission
+from app.definitions.submission import SurveySubmission
 from app.response import Response
-from app.transform import spp
+from app.transform.transforms import spp
 
 
 class TestPCK(unittest.TestCase):
@@ -39,7 +39,7 @@ class TestPCK(unittest.TestCase):
             "submission_language_code": "en"
         }
 
-    @patch("app.transform.spp.get_now")
+    @patch("app.transform.transforms.spp.get_now")
     def test_get_name(self, mock_get_now: Mock):
         mock_get_now.return_value = datetime.strptime("2023-09-29T09:30:21", "%Y-%m-%dT%H:%M:%S")
         actual: str = spp.get_name(Response(self.submission, self.tx_id))
