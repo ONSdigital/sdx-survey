@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 
+from app.definitions.v2_survey_type import V2SurveyType
 from app.response import Response
 from app.transform.create import transform
 from sdx_gcp.errors import DataError
@@ -124,6 +125,26 @@ class TestTransform(unittest.TestCase):
         with self.assertRaises(DataError):
             transform(Response(self.submission, self.tx_id))
 
+
+    # Possible unit test for v2 transform
+    # It is only to assert the right transformer is being called to run the create_zip method
+    @patch("app.transform.create.get_v2_survey_type")
+    @patch("app.transform.create.LegacyTransformer.create_zip")
+    @patch("app.transform.create.v2_nifi_message_submission")
+    def test_transform_v2_message_survey(self,
+                                        mock_message: Mock,
+                                        mock_transformer_create_zip: Mock,
+                                        mock_get_v2_survey_type: Mock,
+                                         ):
+        mock_message.return_value = True
+        mock_get_v2_survey_type.return_value = V2SurveyType.LEGACY
+
+        transform(Response(self.submission, self.tx_id))
+
+        mock_transformer_create_zip.assert_called_once()
+
+
+    # This unit test no longer work
     '''patch("app.transform.transform.create_zip")
     @patch("app.transform.transform.json")
     @patch("app.transform.transform.idbr")
