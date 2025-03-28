@@ -1,16 +1,18 @@
 from datetime import datetime
+from typing import Final
 
 from app.definitions.transform import Transform
 from app.response import Response
+from app.transform.formatter import get_datetime, format_date
 
 
-def get_current_time() -> str:
-    return datetime.today().strftime('%H-%M-%S_%d-%m-%Y')
+FEEDBACK_DATA_FORMAT: Final[str] = '%H-%M-%S_%d-%m-%Y'
 
 
 class FeedbackTransform(Transform):
     def get_file_name(self, response: Response) -> str:
-        postfix = get_current_time()
+        timestamp: datetime = get_datetime(response.get_submitted_at())
+        postfix: str = format_date(timestamp, FEEDBACK_DATA_FORMAT)
         tx_id = response.tx_id
         return f'{tx_id}-fb-{postfix}'
 

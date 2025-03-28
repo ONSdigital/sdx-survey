@@ -1,12 +1,16 @@
 from datetime import datetime
+from typing import Final
 
 from sdx_gcp.app import get_logger
 
 from app.response import Response
 from app.transform.call_transformer import call_transformer_spp
 from app.definitions.transform import Transform
+from app.transform.formatter import get_datetime, format_date
 
 logger = get_logger()
+
+SPP_DATA_FORMAT: Final[str] = "%Y-%m-%dT%H-%M-%S"
 
 
 def get_contents(response: Response) -> bytes:
@@ -16,17 +20,9 @@ def get_contents(response: Response) -> bytes:
 def get_name(response: Response) -> str:
     survey_id = response.get_survey_id()
     tx_id = response.get_tx_id()
-    timestamp = get_timestamp()
-
-    return f"{survey_id}_SDC_{timestamp}_{tx_id}.json"
-
-
-def get_timestamp() -> str:
-    return get_now().strftime("%Y-%m-%dT%H-%M-%S")
-
-
-def get_now() -> datetime:
-    return datetime.now()
+    timestamp: datetime = get_datetime(response.get_submitted_at())
+    postfix: str = format_date(timestamp, SPP_DATA_FORMAT)
+    return f"{survey_id}_SDC_{postfix}_{tx_id}.json"
 
 
 class SPPTransform(Transform):
