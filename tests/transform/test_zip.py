@@ -1,20 +1,8 @@
-from io import BytesIO
 import unittest
-import zipfile
+
 
 from app.transform.zip import create_zip
-
-
-def extract_zip(zip_bytes: bytes) -> dict:
-    z = zipfile.ZipFile(BytesIO(zip_bytes), "r")
-    files = {}
-    for filename in z.namelist():
-        file_bytes = z.read(filename)
-        files[filename] = file_bytes
-
-    z.close()
-
-    return files
+from tests import unzip
 
 
 class TestZip(unittest.TestCase):
@@ -28,6 +16,6 @@ class TestZip(unittest.TestCase):
 
         zip_archive: bytes = create_zip(my_files)
 
-        result = extract_zip(zip_archive)
+        result = unzip(zip_archive)
 
         self.assertDictEqual(my_files, {k: v for k, v in result.items()})

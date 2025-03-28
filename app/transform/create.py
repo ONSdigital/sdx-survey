@@ -39,7 +39,7 @@ def _create_zip_for_v1_message(response: Response) -> bytes:
     return create_zip(files)
 
 
-V2_transformer_map: dict[V2SurveyType, Transformer] = {
+v2_transformer_map: dict[V2SurveyType, Transformer] = {
     V2SurveyType.LEGACY: LegacyTransformer(),
     V2SurveyType.MATERIALS: MaterialsTransformer(),
     V2SurveyType.SPP: SPPTransformer(),
@@ -49,9 +49,13 @@ V2_transformer_map: dict[V2SurveyType, Transformer] = {
 }
 
 
+def _get_transformer(survey_type: V2SurveyType) -> Transformer:
+    return v2_transformer_map[survey_type]
+
+
 def _create_zip_for_v2_message(response: Response) -> bytes:
     v2_survey_type: V2SurveyType = get_v2_survey_type(response)
 
-    transformer = V2_transformer_map[v2_survey_type]
+    transformer = _get_transformer(v2_survey_type)
 
     return transformer.create_zip(response)
