@@ -1,5 +1,6 @@
 import json
 import unittest
+from datetime import datetime
 from unittest import mock
 from unittest.mock import patch
 from cryptography.fernet import Fernet
@@ -8,6 +9,7 @@ from app.comments import get_comment, get_additional_comments, get_boxes_selecte
     Comment, commit_to_datastore, extract_berd_comment, extract_bres_comment
 from app.definitions import SurveySubmission
 from app.response import Response
+from app.transform.formatter import get_datetime
 
 
 class StoreCommentsTest(unittest.TestCase):
@@ -267,7 +269,8 @@ class StoreCommentsTest(unittest.TestCase):
 
     @mock.patch('app.comments.sdx_app')
     def test_commmit_to_datastore(self, mock_app):
-        comment = Comment("123", "009_2020", b'my data')
+        comment_submitted_at = get_datetime("2019-04-01T14:10:26.933601")
+        comment = Comment("123", "009_2020", b'my data', comment_submitted_at)
         commit_to_datastore(comment)
         mock_app.datastore_write.assert_called()
 
