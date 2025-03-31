@@ -1,3 +1,4 @@
+import json
 from typing import Final
 
 from sdx_gcp.app import get_logger
@@ -25,12 +26,13 @@ def deliver_zip(tx_id: str, zipped_file: bytes, context: Context):
     """
 
     # filename will always be transaction id
-    filename = tx_id
-    endpoint = ENDPOINT
+    filename: str = tx_id
+    endpoint: str = ENDPOINT
+    context_json: str = json.dumps(context)
 
     sdx_app.http_post(CONFIG.DELIVER_SERVICE_URL,
                       endpoint,
                       None,
-                      params={FILE_NAME: filename, TX_ID: tx_id, CONTEXT: context},
+                      params={FILE_NAME: filename, TX_ID: tx_id, CONTEXT: context_json},
                       files={ZIP_FILE: zipped_file})
     return True
