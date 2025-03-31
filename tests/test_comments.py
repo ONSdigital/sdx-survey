@@ -1,6 +1,5 @@
 import json
 import unittest
-from datetime import datetime
 from unittest import mock
 from unittest.mock import patch
 from cryptography.fernet import Fernet
