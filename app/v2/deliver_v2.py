@@ -12,7 +12,7 @@ FILE_NAME: Final[str] = "filename"
 ZIP_FILE: Final[str] = 'zip_file'
 CONTEXT: Final[str] = 'context'
 TX_ID: Final[str] = 'tx_id'
-ENDPOINT: Final[str] = "/deliver/v2/survey"
+ENDPOINT: Final[str] = "deliver/v2/survey"
 
 
 logger = get_logger()
