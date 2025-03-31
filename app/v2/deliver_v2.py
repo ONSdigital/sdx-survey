@@ -18,7 +18,7 @@ ENDPOINT: Final[str] = "/deliver/v2/survey"
 logger = get_logger()
 
 
-def deliver(tx_id: str, zipped_file: bytes, context: Context):
+def deliver_zip(tx_id: str, zipped_file: bytes, context: Context):
     """
     Calls the sdx-deliver endpoint specified by the output_type parameter.
     Returns True or raises appropriate error on response.

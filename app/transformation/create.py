@@ -1,11 +1,11 @@
 from app.definitions.v2_survey_type import V2SurveyType
 from app.response import Response
 from app.submission_type import requires_pck, v2_nifi_message_submission
-from app.transform.transformers.transformer import Transformer, LegacyTransformer, MaterialsTransformer, SPPTransformer, \
+from app.transformation.transformers import Transformer, LegacyTransformer, MaterialsTransformer, SPPTransformer, \
     DAPTransformer, FeedbackTransformer, EnvironmentalTransformer
-from app.transform.transforms import idbr, image, index, json, pck
+from app.transformation.transforms import idbr, image, index, json, pck
 
-from app.transform.zip import create_zip
+from app.transformation.zip import create_zip
 from app.v2.submission_type_v2 import get_v2_survey_type
 
 

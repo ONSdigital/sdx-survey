@@ -1,15 +1,15 @@
 from app.definitions.transform import Transform
 from app.definitions.transformer import TransformerBase
 from app.response import Response
-from app.transform.transforms.feedback import FeedbackTransform
-from app.transform.transforms.idbr import IDBRTransform
-from app.transform.transforms.image import ImageTransform
-from app.transform.transforms.index import IndexTransform
-from app.transform.transforms.json import JsonTransform
-from app.transform.transforms.pck import PCKTransform
-from app.transform.transforms.spp import SPPTransform
-from app.transform.transforms.v1_json import V1JsonTransform
-from app.transform.zip import create_zip
+from app.transformation.transforms.feedback import FeedbackTransform
+from app.transformation.transforms.idbr import IDBRTransform
+from app.transformation.transforms.image import ImageTransform
+from app.transformation.transforms.index import IndexTransform
+from app.transformation.transforms.json import JsonTransform
+from app.transformation.transforms.pck import PCKTransform
+from app.transformation.transforms.spp import SPPTransform
+from app.transformation.transforms.v1_json import V1JsonTransform
+from app.transformation.zip import create_zip
 
 
 class Transformer(TransformerBase):

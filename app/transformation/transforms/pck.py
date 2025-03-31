@@ -1,8 +1,8 @@
 from sdx_gcp.app import get_logger
 
 from app.response import Response
-from app.transform.call_transformer import call_transformer_pck
-from app.transform.formatter import get_tx_code
+from app.transformation.call_transformer import call_transformer_pck
+from app.transformation.formatter import get_tx_code
 from app.definitions.transform import Transform
 
 logger = get_logger()

@@ -2,10 +2,10 @@ import unittest
 
 from app.definitions.submission import SurveySubmission
 from app.response import Response
-from app.transform.transforms.feedback import FeedbackTransform
+from app.transformation.transforms import spp
 
 
-class TestFeedback(unittest.TestCase):
+class TestSPP(unittest.TestCase):
 
     def setUp(self):
         self.tx_id = "befa5444-749f-407a-b3a2-19f1d1c7324b"
@@ -38,7 +38,6 @@ class TestFeedback(unittest.TestCase):
         }
 
     def test_get_name(self):
-        feedback_transform = FeedbackTransform()
-        actual: str = feedback_transform.get_file_name(Response(self.submission, self.tx_id))
-        expected = "befa5444-749f-407a-b3a2-19f1d1c7324b-fb-09-30-21_29-09-2023"
+        actual: str = spp.get_name(Response(self.submission, self.tx_id))
+        expected = "144_SDC_2023-09-29T09-30-21_befa5444-749f-407a-b3a2-19f1d1c7324b.json"
         self.assertEqual(expected, actual)

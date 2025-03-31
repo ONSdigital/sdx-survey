@@ -2,9 +2,9 @@ from app.comments import store_comments
 from app.definitions.v2_survey_type import V2SurveyType
 from app.processor import Processor, Action
 from app.receipt import send_receipt
-from app.transform.create import transform
+from app.transformation.create import transform
 from app.v2.context import Context
-from app.v2.deliver_v2 import deliver
+from app.v2.deliver_v2 import deliver_zip
 from app.v2.submission_type_v2 import get_v2_survey_type
 
 
@@ -22,7 +22,7 @@ class ProcessorV2(Processor):
             context["period_id"] = self._response.get_period()
             context["ru_ref"] = self._response.get_ru_ref()
 
-        deliver(self._response.tx_id, zip_file, context)
+        deliver_zip(self._response.tx_id, zip_file, context)
 
 
 class SurveyProcessorV2(ProcessorV2):

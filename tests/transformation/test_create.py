@@ -2,10 +2,11 @@ import unittest
 from unittest.mock import patch, Mock
 
 from app.definitions.transform import Transform
+from app.definitions.v2_survey_type import V2SurveyType
 from app.response import Response
-from app.transform.create import transform
+from app.transformation.create import transform
 
-from app.transform.transformers.transformer import Transformer
+from app.transformation.transformers import Transformer
 from tests import unzip
 
 
@@ -36,10 +37,12 @@ class MockTransformer(Transformer):
 
 class TestCreate(unittest.TestCase):
 
-    @patch("app.transform.create.v2_nifi_message_submission")
-    @patch("app.transform.create._get_transformer")
-    def test_transform_for_v2(self, mock_get_transformer: Mock, mock_is_v2_message: Mock):
+    @patch("app.transformation.create.v2_nifi_message_submission")
+    @patch("app.transformation.create._get_transformer")
+    @patch("app.transformation.create.get_v2_survey_type")
+    def test_transform_for_v2(self, mock_survey_type: Mock, mock_get_transformer: Mock, mock_is_v2_message: Mock):
         response: Response = Mock(spec=Response)
+        mock_survey_type.return_value = V2SurveyType.LEGACY
         mock_is_v2_message.return_value = True
         mock_get_transformer.return_value = MockTransformer()
         actual: dict[str, bytes] = unzip(transform(response))
@@ -49,13 +52,13 @@ class TestCreate(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
-    @patch("app.transform.create.json")
-    @patch("app.transform.create.idbr")
-    @patch("app.transform.create.index")
-    @patch("app.transform.create.image")
-    @patch("app.transform.create.pck")
-    @patch("app.transform.create.v2_nifi_message_submission")
-    @patch("app.transform.create.requires_pck")
+    @patch("app.transformation.create.json")
+    @patch("app.transformation.create.idbr")
+    @patch("app.transformation.create.index")
+    @patch("app.transformation.create.image")
+    @patch("app.transformation.create.pck")
+    @patch("app.transformation.create.v2_nifi_message_submission")
+    @patch("app.transformation.create.requires_pck")
     def test_transform_for_v1_with_pck(self,
                                        mock_requires_pck: Mock,
                                        mock_is_v2_message: Mock,
@@ -94,13 +97,13 @@ class TestCreate(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    @patch("app.transform.create.json")
-    @patch("app.transform.create.idbr")
-    @patch("app.transform.create.index")
-    @patch("app.transform.create.image")
-    @patch("app.transform.create.pck")
-    @patch("app.transform.create.v2_nifi_message_submission")
-    @patch("app.transform.create.requires_pck")
+    @patch("app.transformation.create.json")
+    @patch("app.transformation.create.idbr")
+    @patch("app.transformation.create.index")
+    @patch("app.transformation.create.image")
+    @patch("app.transformation.create.pck")
+    @patch("app.transformation.create.v2_nifi_message_submission")
+    @patch("app.transformation.create.requires_pck")
     def test_transform_for_v1_without_pck(self,
                                           mock_requires_pck: Mock,
                                           mock_is_v2_message: Mock,

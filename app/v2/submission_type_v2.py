@@ -1,4 +1,7 @@
+from sdx_gcp.errors import DataError
+
 from app.definitions.v2_survey_type import V2SurveyType
+from app.period import Period
 from app.response import Response, ResponseType
 
 DAP_SURVEY = ["283"]
@@ -10,10 +13,19 @@ ENVIRONMENTAL_SURVEY = ["007", "147"]
 MATERIALS_SURVEY = ["024", "068", "071", "194"]
 ADHOC_SURVEY = ["740"]
 
+TO_SPP_PERIOD: dict[str, str] = {
+    "009": "2507",
+    "139": "2507",
+    "228": "2507",
+}
+
 
 def get_v2_survey_type(response: Response) -> V2SurveyType:
     if response.get_response_type() == ResponseType.FEEDBACK:
         return V2SurveyType.FEEDBACK
+
+    if _spp_submission(response):
+        return V2SurveyType.SPP
 
     survey_id = response.get_survey_id()
 
@@ -23,9 +35,6 @@ def get_v2_survey_type(response: Response) -> V2SurveyType:
     if survey_id in LEGACY_SURVEY:
         return V2SurveyType.LEGACY
 
-    if survey_id in SPP_SURVEY:
-        return V2SurveyType.SPP
-
     if survey_id in ENVIRONMENTAL_SURVEY:
         return V2SurveyType.ENVIRONMENTAL
 
@@ -34,3 +43,17 @@ def get_v2_survey_type(response: Response) -> V2SurveyType:
 
     if survey_id in ADHOC_SURVEY:
         return V2SurveyType.ADHOC
+
+    raise DataError(f"Survey id {survey_id} not known!")
+
+
+def _spp_submission(response: Response) -> bool:
+    if response.get_survey_id() in TO_SPP_PERIOD.keys():
+        period_to_start = TO_SPP_PERIOD.get(response.get_survey_id())
+        if period_to_start is not None:
+            if Period(response.get_period()) >= Period(period_to_start):
+                return True
+    elif response.get_survey_id() in SPP_SURVEY:
+        return True
+
+    return False

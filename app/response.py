@@ -35,7 +35,6 @@ class DeliverTarget(Enum):
     DAP = 2
     HYBRID = 3
     FEEDBACK = 4
-    SPP = 5
 
 
 def get_field(submission: dict, *field_names: str) -> str:
