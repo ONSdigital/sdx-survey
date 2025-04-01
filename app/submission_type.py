@@ -1,5 +1,6 @@
 from sdx_gcp.app import get_logger
 
+from app import CONFIG
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
 
 """
@@ -31,7 +32,7 @@ _JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 _JSON_TRANSFORM = ["002"]
 
 # responses that will use the v2 schema for messaging Nifi
-_V2_NIFI_MESSAGE = ["009", "023", "139", "228"]
+_V2_NIFI_MESSAGE = ["002", "007", "009", "023", "068", "139", "228"]
 
 
 def requires_v1_conversion(response: Response) -> bool:
@@ -86,6 +87,9 @@ def v2_nifi_message_submission(response: Response) -> bool:
     """
     Returns True if this response is configured to use the v2 nifi message schema.
     """
+    if CONFIG.PROJECT_ID == "ons-sdx-prod":
+        return False
+
     if response.get_response_type() == ResponseType.FEEDBACK:
         return True
     return response.get_survey_id() in _V2_NIFI_MESSAGE
