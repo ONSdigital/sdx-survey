@@ -87,7 +87,7 @@ def v2_nifi_message_submission(response: Response) -> bool:
     """
     Returns True if this response is configured to use the v2 nifi message schema.
     """
-    if CONFIG.PROJECT_ID == "ons-sdx-prod":
+    if CONFIG.PROJECT_ID == "ons-sdx-prod" or CONFIG.PROJECT_ID == "ons-sdx-ci":
         return False
 
     if response.get_response_type() == ResponseType.FEEDBACK:
