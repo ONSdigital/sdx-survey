@@ -8,6 +8,7 @@ from cryptography.fernet import Fernet
 
 from app import sdx_app, CONFIG
 from app.response import Response
+from app.transform.formatter import get_datetime
 
 logger = get_logger()
 
@@ -31,10 +32,12 @@ def store_comments(response: Response):
 
     encrypted_data = encrypt_comment(data)
     kind = f'{survey_id}_{period}'
+    submitted_time = get_datetime(response.get_submitted_at())
 
     comment = Comment(transaction_id=transaction_id,
                       kind=kind,
-                      encrypted_data=encrypted_data)
+                      encrypted_data=encrypted_data,
+                      submitted_time=submitted_time)
 
     commit_to_datastore(comment)
 
@@ -124,11 +127,11 @@ def get_boxes_selected(response: Response) -> str:
 class Comment:
     """Class to define a comment entity"""
 
-    def __init__(self, transaction_id, kind, encrypted_data):
+    def __init__(self, transaction_id: str, kind: str, encrypted_data, submitted_time: datetime):
         self.transaction_id = transaction_id
         self.kind = kind
         self.encrypted_data = encrypted_data
-        self.created = datetime.now()
+        self.created = submitted_time
 
 
 def commit_to_datastore(comment: Comment):
