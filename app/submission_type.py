@@ -32,7 +32,7 @@ _JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 _JSON_TRANSFORM = ["002"]
 
 # responses that will use the v2 schema for messaging Nifi
-_V2_NIFI_MESSAGE = ["002", "007", "009", "023", "068", "139", "228"]
+_V2_NIFI_MESSAGE = []
 
 
 def requires_v1_conversion(response: Response) -> bool:
