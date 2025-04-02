@@ -21,6 +21,9 @@ def format_date(d: datetime, format_str: str):
 
 
 def get_datetime(iso_8601_str: str) -> datetime:
+    """
+    Convert a string format datetime into a datetime
+    """
     return datetime.fromisoformat(iso_8601_str)
 
 
