@@ -30,7 +30,7 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.v2_nifi_message_submission')
+    @patch('app.collect.is_v2_nifi_message_submission')
     @patch('app.processor.deliver_feedback')
     @patch('app.processor.send_receipt')
     def test_process_feedback(self, send_receipt, deliver_feedback, v2_nifi_message, decrypt, app):
@@ -50,7 +50,7 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.collect.v2_nifi_message_submission')
+    @patch('app.collect.is_v2_nifi_message_submission')
     @patch('app.processor.store_comments')
     @patch('app.processor.deliver_dap')
     @patch('app.processor.send_receipt')

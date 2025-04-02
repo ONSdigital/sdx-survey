@@ -83,7 +83,7 @@ def get_deliver_target(response: Response) -> DeliverTarget:
         return DeliverTarget.LEGACY
 
 
-def v2_nifi_message_submission(response: Response) -> bool:
+def is_v2_nifi_message_submission(response: Response) -> bool:
     """
     Returns True if this response is configured to use the v2 nifi message schema.
     """

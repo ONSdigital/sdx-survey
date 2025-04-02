@@ -37,7 +37,7 @@ class MockTransformer(Transformer):
 
 class TestCreate(unittest.TestCase):
 
-    @patch("app.transformation.create.v2_nifi_message_submission")
+    @patch("app.transformation.create.is_v2_nifi_message_submission")
     @patch("app.transformation.create._get_transformer")
     @patch("app.transformation.create.get_v2_survey_type")
     def test_transform_for_v2(self, mock_survey_type: Mock, mock_get_transformer: Mock, mock_is_v2_message: Mock):
@@ -57,7 +57,7 @@ class TestCreate(unittest.TestCase):
     @patch("app.transformation.create.index")
     @patch("app.transformation.create.image")
     @patch("app.transformation.create.pck")
-    @patch("app.transformation.create.v2_nifi_message_submission")
+    @patch("app.transformation.create.is_v2_nifi_message_submission")
     @patch("app.transformation.create.requires_pck")
     def test_transform_for_v1_with_pck(self,
                                        mock_requires_pck: Mock,
@@ -102,7 +102,7 @@ class TestCreate(unittest.TestCase):
     @patch("app.transformation.create.index")
     @patch("app.transformation.create.image")
     @patch("app.transformation.create.pck")
-    @patch("app.transformation.create.v2_nifi_message_submission")
+    @patch("app.transformation.create.is_v2_nifi_message_submission")
     @patch("app.transformation.create.requires_pck")
     def test_transform_for_v1_without_pck(self,
                                           mock_requires_pck: Mock,

@@ -1,6 +1,6 @@
 from app.definitions.v2_survey_type import V2SurveyType
 from app.response import Response
-from app.submission_type import requires_pck, v2_nifi_message_submission
+from app.submission_type import requires_pck, is_v2_nifi_message_submission
 from app.transformation.transformers import Transformer, LegacyTransformer, MaterialsTransformer, SPPTransformer, \
     DAPTransformer, FeedbackTransformer, EnvironmentalTransformer
 from app.transformation.transforms import idbr, image, index, json, pck
@@ -10,7 +10,7 @@ from app.v2.submission_type_v2 import get_v2_survey_type
 
 
 def transform(response: Response) -> bytes:
-    if v2_nifi_message_submission(response):
+    if is_v2_nifi_message_submission(response):
         return _create_zip_for_v2_message(response)
 
     return _create_zip_for_v1_message(response)

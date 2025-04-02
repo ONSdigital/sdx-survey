@@ -9,7 +9,7 @@ from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, Ad
     HybridProcessor, \
     SurveyProcessor
 from app.response import Response, SurveyType, ResponseType, DeliverTarget
-from app.submission_type import receipt_only_submission, get_deliver_target, v2_nifi_message_submission
+from app.submission_type import receipt_only_submission, get_deliver_target, is_v2_nifi_message_submission
 from app.v2.processor_v2 import FeedbackProcessorV2, AdhocProcessorV2, SurveyProcessorV2
 from app.v2.submission_type_v2 import get_v2_survey_type
 
@@ -55,7 +55,7 @@ def process(message: Message, tx_id: TX_ID):
     logger.info(f"Survey id: {response.get_survey_id()}")
 
     processor: Processor
-    if v2_nifi_message_submission(response):
+    if is_v2_nifi_message_submission(response):
         v2_survey_type = get_v2_survey_type(response)
         if v2_survey_type == V2SurveyType.FEEDBACK:
             processor = FeedbackProcessorV2(response)
