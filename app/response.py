@@ -5,7 +5,7 @@ from enum import Enum
 from sdx_gcp.app import get_logger
 from sdx_gcp.errors import DataError
 
-from app.definitions import SurveySubmission
+from app.definitions.submission import SurveySubmission
 
 """
     This file defines a wrapper for the submission.

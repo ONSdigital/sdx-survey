@@ -10,14 +10,22 @@ from app.response import Response
 
 logger = get_logger()
 
-END_POINT: Final = "pck"
+PCK_END_POINT: Final[str] = "pck"
+SPP_END_POINT: Final[str] = "spp"
 
 
-def call_transformer(response: Response) -> bytes:
+def call_transformer_pck(response: Response) -> bytes:
+    return _call_transformer(response, PCK_END_POINT)
+
+
+def call_transformer_spp(response: Response) -> bytes:
+    return _call_transformer(response, SPP_END_POINT)
+
+
+def _call_transformer(response: Response, endpoint: str) -> bytes:
     logger.info("Calling sdx-transformer...")
     survey_data = json.dumps(response.get_data())
 
-    endpoint = END_POINT
     tx_id = response.get_tx_id()
     response: RequestsResponse = sdx_app.http_post(
         CONFIG.TRANSFORMER_SERVICE_URL,

@@ -1,15 +1,7 @@
-from typing import TypedDict, NotRequired
-
 from app import sdx_app, CONFIG
 from app.response import Response
-from app.transform.formatter import get_tx_code
-
-
-class ImageResponse(TypedDict):
-    questioncode: str
-    response: str
-    instance: int
-    sd_identifier: NotRequired[str]
+from app.transformation.formatter import get_tx_code
+from app.definitions.transform import Transform
 
 
 def get_image(response: Response) -> bytes:
@@ -21,3 +13,12 @@ def get_image(response: Response) -> bytes:
 def get_name(response: Response) -> str:
     tx_id = response.get_tx_id()
     return f"S{get_tx_code(tx_id)}_1.JPG"
+
+
+class ImageTransform(Transform):
+
+    def get_file_name(self, response: Response) -> str:
+        return get_name(response)
+
+    def get_file_content(self, response: Response) -> bytes:
+        return get_image(response)

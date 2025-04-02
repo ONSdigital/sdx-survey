@@ -3,11 +3,15 @@ from sdx_gcp.app import get_logger
 
 from app import CONFIG, sdx_app
 from app.decrypt import decrypt_survey
-from app.definitions import SurveySubmission
-from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, HybridProcessor, \
+from app.definitions.submission import SurveySubmission
+from app.definitions.v2_survey_type import V2SurveyType
+from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, \
+    HybridProcessor, \
     SurveyProcessor
 from app.response import Response, SurveyType, ResponseType, DeliverTarget
-from app.submission_type import receipt_only_submission, get_deliver_target
+from app.submission_type import receipt_only_submission, get_deliver_target, is_v2_nifi_message_submission
+from app.v2.processor_v2 import FeedbackProcessorV2, AdhocProcessorV2, SurveyProcessorV2
+from app.v2.submission_type_v2 import get_v2_survey_type
 
 logger = get_logger()
 
@@ -51,22 +55,34 @@ def process(message: Message, tx_id: TX_ID):
     logger.info(f"Survey id: {response.get_survey_id()}")
 
     processor: Processor
-    if response.get_response_type() == ResponseType.FEEDBACK:
-        processor = FeedbackProcessor(response)
+    if is_v2_nifi_message_submission(response):
+        v2_survey_type = get_v2_survey_type(response)
+        if v2_survey_type == V2SurveyType.FEEDBACK:
+            processor = FeedbackProcessorV2(response)
 
-    elif receipt_only_submission(response):
-        processor = ReceiptOnlyProcessor(response)
+        elif v2_survey_type == V2SurveyType.ADHOC:
+            processor = AdhocProcessorV2(response)
 
-    elif response.get_survey_type() == SurveyType.ADHOC:
-        processor = AdhocProcessor(response)
-
-    elif get_deliver_target(response) == DeliverTarget.DAP:
-        processor = DapProcessor(response)
-
-    elif get_deliver_target(response) == DeliverTarget.HYBRID:
-        processor = HybridProcessor(response)
+        else:
+            processor = SurveyProcessorV2(response)
 
     else:
-        processor = SurveyProcessor(response)
+        if response.get_response_type() == ResponseType.FEEDBACK:
+            processor = FeedbackProcessor(response)
+
+        elif receipt_only_submission(response):
+            processor = ReceiptOnlyProcessor(response)
+
+        elif response.get_survey_type() == SurveyType.ADHOC:
+            processor = AdhocProcessor(response)
+
+        elif get_deliver_target(response) == DeliverTarget.DAP:
+            processor = DapProcessor(response)
+
+        elif get_deliver_target(response) == DeliverTarget.HYBRID:
+            processor = HybridProcessor(response)
+
+        else:
+            processor = SurveyProcessor(response)
 
     processor.run()

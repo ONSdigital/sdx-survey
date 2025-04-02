@@ -2,7 +2,9 @@ import datetime
 
 from app import CONFIG
 from app.response import Response
-from app.transform.formatter import format_date, get_tx_code, get_datetime, get_period, split_ru_ref
+from app.transformation.transforms import image
+from app.transformation.formatter import format_date, get_tx_code, get_datetime, get_period, split_ru_ref
+from app.definitions.transform import Transform
 
 
 def get_name(response: Response) -> str:
@@ -35,3 +37,13 @@ def get_contents(response: Response, image_name: str) -> bytes:
         f"{long_time},{image_path}\\{image_name},{short_time},{x},{survey_id},{form_type},{ru_ref},{period},001,0",
         'utf-8'
     )
+
+
+class IndexTransform(Transform):
+
+    def get_file_name(self, response: Response) -> str:
+        return get_name(response)
+
+    def get_file_content(self, response: Response) -> bytes:
+        image_name = image.get_name(response)
+        return get_contents(response, image_name)

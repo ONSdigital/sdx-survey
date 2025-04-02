@@ -5,3 +5,4 @@ exclude =
     lib,
     __pycache__,
     venv
+    .venv

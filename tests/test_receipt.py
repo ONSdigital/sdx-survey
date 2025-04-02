@@ -6,7 +6,7 @@ from sdx_gcp.errors import DataError
 
 from app.receipt import make_receipt, send_receipt, publish_data, make_srm_receipt
 from app.response import Response
-from tests import get_data
+from tests import get_response
 
 
 class TestReceipt(unittest.TestCase):
@@ -60,8 +60,8 @@ class TestReceipt(unittest.TestCase):
 
     def test_make_adhoc_receipt_valid(self):
         expected = json.dumps({"data": {"qid": "0130000000000300"}})
-        self.assertEqual(make_srm_receipt(get_data("survey_adhoc_001")), expected)
+        self.assertEqual(make_srm_receipt(get_response("survey_adhoc_001")), expected)
 
     @mock.patch('app.receipt.publish_data')
     def test_send_adhoc_receipt_good(self, mock_publish):
-        send_receipt(get_data("survey_adhoc_001"))
+        send_receipt(get_response("survey_adhoc_001"))

@@ -1,29 +1,27 @@
-from typing import Final
-
 from sdx_gcp.app import get_logger
 
 from app.response import Response
-from app.transform.call_transformer import call_transformer
-from app.transform.formatter import get_tx_code
+from app.transformation.call_transformer import call_transformer_pck
+from app.transformation.formatter import get_tx_code
+from app.definitions.transform import Transform
 
 logger = get_logger()
 
-END_POINT: Final = "pck"
-
 
 def get_contents(response: Response) -> bytes:
-    return call_transformer(response)
+    return call_transformer_pck(response)
 
 
 def get_name(response: Response) -> str:
     survey_id = response.get_survey_id()
+    tx_id = response.get_tx_id()
+
     if survey_id == "202":
         survey_id = get_abs_survey_id(response.get_form_type())
 
     if survey_id in ["182", "183", "184", "185"]:
         survey_id = "181"
 
-    tx_id = response.get_tx_id()
     return f"{survey_id}_{get_tx_code(tx_id)}"
 
 
@@ -71,3 +69,12 @@ form_map = {'1802': '053',
 
 def get_abs_survey_id(formtype: str) -> str:
     return form_map.get(formtype)
+
+
+class PCKTransform(Transform):
+
+    def get_file_name(self, response: Response) -> str:
+        return get_name(response)
+
+    def get_file_content(self, response: Response) -> bytes:
+        return get_contents(response)

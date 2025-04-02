@@ -9,6 +9,7 @@ DAP = "dap"
 LEGACY = "legacy"
 HYBRID = "hybrid"
 FEEDBACK = "feedback"
+SPP = "spp"
 SUBMISSION_FILE = 'submission'
 TRANSFORMED_FILE = 'transformed'
 UTF8 = "utf-8"

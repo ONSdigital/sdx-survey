@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from app.period import Period
+
 
 def split_ru_ref(ru_ref: str) -> tuple[str, str]:
     new_ref: str = ru_ref[0:-1] if ru_ref[-1].isalpha() else ru_ref
@@ -27,9 +29,4 @@ def get_datetime(iso_8601_str: str) -> datetime:
 
 def get_period(period: str) -> str:
     # ensure the period is 6 digits
-    if len(period) == 2:
-        period = "20" + period + "12"
-    elif len(period) == 4:
-        period = "20" + period
-
-    return period
+    return Period(period).convert_to_yyyymm()

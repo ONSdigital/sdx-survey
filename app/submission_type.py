@@ -1,5 +1,6 @@
 from sdx_gcp.app import get_logger
 
+from app import CONFIG
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
 
 """
@@ -12,7 +13,7 @@ logger = get_logger()
 _DAP_SURVEYS = ["283", "738", "739", "740"]
 
 # list of survey ids that target both DAP and Legacy
-_HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
+_HYBRID_SURVEYS = ["002", "007", "134", "147"]
 
 # list of surveys that require a PCK file
 _PCK_SURVEYS = ['009', '017', '019', '066', '076', '073', '074', '127', '134', '139', '144', '160', '165', '169', '171',
@@ -29,6 +30,9 @@ _JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 
 # json transformation
 _JSON_TRANSFORM = ["002"]
+
+# responses that will use the v2 schema for messaging Nifi
+_V2_NIFI_MESSAGE = ["002", "007", "009", "023", "068", "139", "228"]
 
 
 def requires_v1_conversion(response: Response) -> bool:
@@ -77,3 +81,15 @@ def get_deliver_target(response: Response) -> DeliverTarget:
         return DeliverTarget.HYBRID
     else:
         return DeliverTarget.LEGACY
+
+
+def is_v2_nifi_message_submission(response: Response) -> bool:
+    """
+    Returns True if this response is configured to use the v2 nifi message schema.
+    """
+    if CONFIG.PROJECT_ID == "ons-sdx-prod" or CONFIG.PROJECT_ID == "ons-sdx-ci":
+        return False
+
+    if response.get_response_type() == ResponseType.FEEDBACK:
+        return True
+    return response.get_survey_id() in _V2_NIFI_MESSAGE
