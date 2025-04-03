@@ -1,6 +1,5 @@
 from sdx_gcp.app import get_logger
 
-from app import CONFIG
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
 
 """

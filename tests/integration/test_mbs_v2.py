@@ -30,7 +30,11 @@ class TestMbs(unittest.TestCase):
     @patch('app.transformation.transforms.index.get_contents')
     @patch('app.transformation.transformers.create_zip')
     @patch('app.v2.processor_v2.deliver_zip')
+    @patch('app.collect.is_v2_nifi_message_submission')
+    @patch('app.transformation.create.is_v2_nifi_message_submission')
     def test_legacy(self,
+                    mock_is_nifi_message: Mock,
+                    mock_is_nifi_message_2: Mock,
                     mock_deliver: Mock,
                     mock_zip: Mock,
                     mock_index: Mock,
@@ -55,6 +59,8 @@ class TestMbs(unittest.TestCase):
         submission["survey_metadata"]["period_id"] = period_id
         submission["survey_metadata"]["ru_ref"] = ru_ref
 
+        mock_is_nifi_message.return_value = True
+        mock_is_nifi_message_2.return_value = True
         mock_app.gcs_read.return_value = json.dumps(submission).encode()
         mock_decrypt.return_value = submission
         mock_pck.return_value = pck_contents
@@ -93,7 +99,11 @@ class TestMbs(unittest.TestCase):
     @patch('app.transformation.transforms.index.get_contents')
     @patch('app.transformation.transformers.create_zip')
     @patch('app.v2.processor_v2.deliver_zip')
+    @patch('app.collect.is_v2_nifi_message_submission')
+    @patch('app.transformation.create.is_v2_nifi_message_submission')
     def test_spp(self,
+                 mock_is_nifi_message: Mock,
+                 mock_is_nifi_message_2: Mock,
                  mock_deliver: Mock,
                  mock_zip: Mock,
                  mock_index: Mock,
@@ -118,6 +128,8 @@ class TestMbs(unittest.TestCase):
         submission["survey_metadata"]["period_id"] = period_id
         submission["survey_metadata"]["ru_ref"] = ru_ref
 
+        mock_is_nifi_message.return_value = True
+        mock_is_nifi_message_2.return_value = True
         mock_app.gcs_read.return_value = json.dumps(submission).encode()
         mock_decrypt.return_value = submission
         mock_spp.return_value = spp_contents

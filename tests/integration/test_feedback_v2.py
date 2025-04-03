@@ -27,7 +27,11 @@ class TestFeedback(unittest.TestCase):
     @patch('app.v2.processor_v2.send_receipt')
     @patch('app.transformation.transformers.create_zip')
     @patch('app.v2.processor_v2.deliver_zip')
+    @patch('app.collect.is_v2_nifi_message_submission')
+    @patch('app.transformation.create.is_v2_nifi_message_submission')
     def test_feedback(self,
+                      mock_is_nifi_message: Mock,
+                      mock_is_nifi_message_2: Mock,
                       mock_deliver: Mock,
                       mock_zip: Mock,
                       _mock_receipt: Mock,
@@ -46,6 +50,8 @@ class TestFeedback(unittest.TestCase):
         submission["survey_metadata"]["period_id"] = period_id
         submission["survey_metadata"]["ru_ref"] = ru_ref
 
+        mock_is_nifi_message.return_value = True
+        mock_is_nifi_message_2.return_value = True
         mock_app.gcs_read.return_value = json.dumps(submission).encode()
         mock_decrypt.return_value = submission
         mock_zip.return_value = zip_bytes
