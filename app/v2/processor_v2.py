@@ -5,17 +5,20 @@ from app.receipt import send_receipt
 from app.transformation.create import transform
 from app.v2.context import Context
 from app.v2.deliver_v2 import deliver_zip
-from app.v2.submission_type_v2 import get_v2_survey_type
+from app.v2.submission_type_v2 import get_v2_survey_type, get_v2_context_type
 
 
 class ProcessorV2(Processor):
 
     def deliver(self, _version):
         zip_file = transform(self._response)
+        survey_type = get_v2_survey_type(self._response)
+        context_type = get_v2_context_type(survey_type)
         context: Context = {
             "tx_id": self._response.tx_id,
             "survey_id": self._response.get_survey_id(),
-            "survey_type": get_v2_survey_type(self._response)
+            "survey_type": survey_type,
+            "context_type": context_type,
         }
 
         if self._response.get_response_type() != V2SurveyType.ADHOC:

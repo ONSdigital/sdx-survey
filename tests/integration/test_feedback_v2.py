@@ -6,6 +6,7 @@ from sdx_gcp import Message
 
 from app.collect import process
 from app.definitions.submission import SurveySubmission
+from app.definitions.v2_context_type import V2ContextType
 from app.definitions.v2_survey_type import V2SurveyType
 from app.v2.context import Context
 from tests import get_json
@@ -70,7 +71,8 @@ class TestFeedback(unittest.TestCase):
             "survey_id": survey_id,
             "ru_ref": ru_ref,
             "survey_type": V2SurveyType.FEEDBACK,
-            "period_id": period_id
+            "period_id": period_id,
+            "context_type": V2ContextType.BUSINESS_SURVEY
         }
 
         mock_deliver.assert_called_with(tx_id, expected_zip, expected_context)
