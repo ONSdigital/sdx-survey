@@ -1,5 +1,6 @@
 from sdx_gcp.errors import DataError
 
+from app.definitions.v2_context_type import V2ContextType
 from app.definitions.v2_survey_type import V2SurveyType
 from app.period import Period
 from app.response import Response, ResponseType
@@ -45,6 +46,13 @@ def get_v2_survey_type(response: Response) -> V2SurveyType:
         return V2SurveyType.ADHOC
 
     raise DataError(f"Survey id {survey_id} not known!")
+
+
+def get_v2_context_type(survey_type: V2SurveyType) -> V2ContextType:
+    if survey_type == V2SurveyType.ADHOC:
+        return V2ContextType.ADHOC_SURVEY
+    else:
+        return V2ContextType.BUSINESS_SURVEY
 
 
 def _spp_submission(response: Response) -> bool:
