@@ -25,21 +25,10 @@ Install pipenv:
 $ pip install pipenv
 ```
 
-Create a virtualenv and install dependencies
-```shell
-$ make build
-```
-
 Testing:
 Install all test requirements and run tests:
 ```shell
 $ make test
-```
-
-Running:
-ensure you have installed all requirements with above `make build` command then:
-```shell
-$ make start
 ```
 
 ## GCP

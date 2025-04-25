@@ -5,7 +5,7 @@ from app.period import Period
 from app.response import Response, ResponseType
 
 DAP_SURVEY = ["283"]
-LEGACY_SURVEY = ["009", "017", "019", "066", "076", "073", "074", "127", "134",
+LEGACY_SURVEY = ["009", "017", "019", "066", "076", "073", "074", "127", "132", "134",
                  "139", "144", "160", "165", "169", "171", "182", "183", "184",
                  "185", "187", "202", "228"]
 SPP_SURVEY = ["002", "023"]
