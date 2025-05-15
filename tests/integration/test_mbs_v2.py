@@ -117,7 +117,7 @@ class TestMbs(unittest.TestCase):
                  mock_app: Mock):
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         survey_id = "009"
-        period_id = "2507"
+        period_id = "2510"
         ru_ref = "49900000001A"
         spp_contents = b'spp contents'
         image_contents = b'image contents'
@@ -145,7 +145,7 @@ class TestMbs(unittest.TestCase):
             '009_SDC_2016-05-21T16-37-56_0f534ffc-9442-414c-b39f-a756b4adc6cb.json': spp_contents,
             'S0f534ffc9442414c_1.JPG': image_contents,
             'EDC_009_20160521_0f534ffc9442414c.csv': index_contents,
-            'REC2105_0f534ffc9442414c.DAT': b'49900000001:A:009:202507'
+            'REC2105_0f534ffc9442414c.DAT': b'49900000001:A:009:202510'
         }
 
         mock_zip.assert_called_with(expected_files)
