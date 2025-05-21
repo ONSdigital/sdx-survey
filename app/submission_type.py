@@ -13,7 +13,7 @@ logger = get_logger()
 _DAP_SURVEYS = ["283", "738", "739", "740"]
 
 # list of survey ids that target both DAP and Legacy
-_HYBRID_SURVEYS = ["002", "007", "134", "147"]
+_HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
 
 # list of surveys that require a PCK file
 _PCK_SURVEYS = ['009', '017', '019', '066', '076', '073', '074', '127', '132', '134', '139', '144', '160', '165', '169', '171',
