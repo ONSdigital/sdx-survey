@@ -87,9 +87,12 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
     """
     Returns True if this response is configured to use the v2 nifi message schema.
     """
+
+    # DFTS-1053
+    if response.get_response_type() == ResponseType.FEEDBACK:
+        return True
+
     if CONFIG.PROJECT_ID == "ons-sdx-preprod" or CONFIG.PROJECT_ID == "ons-sdx-nifi":
-        if response.get_response_type() == ResponseType.FEEDBACK:
-            return True
         return response.get_survey_id() in _V2_NIFI_MESSAGE
 
     return False
