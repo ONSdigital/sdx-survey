@@ -90,7 +90,11 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
 
     # DFTS-1053
     if response.get_response_type() == ResponseType.FEEDBACK:
-        return True
+        # Adhoc feedback is not yet ready for v2 message!
+        if response.get_survey_type() == SurveyType.ADHOC:
+            return False
+        else:
+            return True
 
     if CONFIG.PROJECT_ID == "ons-sdx-preprod" or CONFIG.PROJECT_ID == "ons-sdx-nifi":
         return response.get_survey_id() in _V2_NIFI_MESSAGE
