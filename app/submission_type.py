@@ -96,6 +96,9 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
         else:
             return True
 
+    if response.get_survey_id() == "023":
+        return True
+
     if CONFIG.PROJECT_ID == "ons-sdx-preprod" or CONFIG.PROJECT_ID == "ons-sdx-nifi":
         return response.get_survey_id() in _V2_NIFI_MESSAGE
 
