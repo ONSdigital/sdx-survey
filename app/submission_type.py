@@ -2,6 +2,7 @@ from sdx_gcp.app import get_logger
 
 from app import CONFIG
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
+from app.v2.submission_type_v2 import LEGACY_SURVEY, SPP_SURVEY
 
 """
     This file defines a set of classifiers for the different submission types.
@@ -96,7 +97,7 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
         else:
             return True
 
-    if response.get_survey_id() in ["002", "023", "009", "228", "139"]:
+    if response.get_survey_id() in LEGACY_SURVEY or response.get_survey_id() in SPP_SURVEY:
         return True
 
     if CONFIG.PROJECT_ID == "ons-sdx-preprod" or CONFIG.PROJECT_ID == "ons-sdx-nifi":
