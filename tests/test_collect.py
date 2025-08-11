@@ -1,6 +1,6 @@
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 from sdx_gcp import Message
 from sdx_gcp.errors import DataError
@@ -79,11 +79,8 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.processor.store_comments')
-    @patch('app.processor.transform')
-    @patch('app.processor.deliver_survey')
-    @patch('app.processor.send_receipt')
-    def test_process_legacy_survey(self, send_receipt, deliver_survey, transform, store_comments, decrypt, app):
+    @patch('app.collect.SurveyProcessorV2')
+    def test_process_legacy_survey(self, processor_mock: Mock, decrypt: Mock, app: Mock):
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         legacy_response = {
             'tx_id': tx_id,
@@ -93,18 +90,11 @@ class TestCollect(unittest.TestCase):
 
         app.gcs_read.return_value = json.dumps(legacy_response).encode()
         decrypt.return_value = legacy_response
-        zip_bytes = b"zip bytes"
-        transform.return_value = zip_bytes
 
         process(self.message, tx_id)
 
-        response_object = Response(legacy_response, tx_id)
-
-        store_comments.assert_called_with(response_object)
-        deliver_survey.assert_called_with(response_object,
-                                          zip_bytes,
-                                          version=V2)
-        send_receipt.assert_called_with(response_object)
+        processor_mock.assert_called_once_with(Response(legacy_response, tx_id))
+        processor_mock.return_value.run.assert_called_once()
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
