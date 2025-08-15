@@ -98,11 +98,8 @@ class TestCollect(unittest.TestCase):
 
     @patch('app.collect.sdx_app')
     @patch('app.collect.decrypt_survey')
-    @patch('app.processor.store_comments')
-    @patch('app.processor.transform')
-    @patch('app.processor.deliver_hybrid')
-    @patch('app.processor.send_receipt')
-    def test_process_hybrid_survey(self, send_receipt, deliver_hybrid, transform, store_comments, decrypt, app):
+    @patch('app.collect.SurveyProcessorV2')
+    def test_process_environmental_survey(self, processor_mock: Mock, decrypt: Mock, app: Mock):
 
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         hybrid_response = {
@@ -113,15 +110,27 @@ class TestCollect(unittest.TestCase):
 
         app.gcs_read.return_value = json.dumps(hybrid_response).encode()
         decrypt.return_value = hybrid_response
-        zip_bytes = b"zip bytes"
-        transform.return_value = zip_bytes
 
         process(self.message, tx_id)
 
-        response_object = Response(hybrid_response, tx_id)
+        processor_mock.assert_called_once_with(Response(hybrid_response, tx_id))
+        processor_mock.return_value.run.assert_called_once()
 
-        store_comments.assert_called_with(response_object)
-        deliver_hybrid.assert_called_with(response_object,
-                                          zip_bytes,
-                                          version=V2)
-        send_receipt.assert_called_with(response_object)
+    @patch('app.collect.sdx_app')
+    @patch('app.collect.decrypt_survey')
+    @patch('app.collect.SurveyProcessorV2')
+    def test_process_materials_survey(self, processor_mock: Mock, decrypt: Mock, app: Mock):
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
+        material_response = {
+            'tx_id': tx_id,
+            'survey_id': '024',
+            'type': 'uk.gov.ons.edc.eq:surveyresponse'
+        }
+
+        app.gcs_read.return_value = json.dumps(material_response).encode()
+        decrypt.return_value = material_response
+
+        process(self.message, tx_id)
+
+        processor_mock.assert_called_once_with(Response(material_response, tx_id))
+        processor_mock.return_value.run.assert_called_once()
