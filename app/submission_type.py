@@ -17,7 +17,8 @@ _DAP_SURVEYS = ["283", "738", "739", "740"]
 _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
 
 # list of surveys that require a PCK file
-_PCK_SURVEYS = ['009', '017', '019', '061', '066', '076', '073', '074', '127', '132', '134', '139', '144', '160', '165', '169', '171',
+_PCK_SURVEYS = ['009', '017', '019', '061', '066', '076', '073', '074', '127', '132', '134', '139', '144', '160', '165',
+                '169', '171',
                 '182', '183', '184', '185', '187', '202', '221', '228']
 
 # surveys that need to remain v1 submissions
@@ -97,10 +98,13 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
         else:
             return True
 
-    if (response.get_survey_id() in LEGACY_SURVEY
-        or response.get_survey_id() in SPP_SURVEY
-        or response.get_survey_id() in MATERIALS_SURVEY
-        or response.get_survey_id() in ENVIRONMENTAL_SURVEY):
+    if (
+        response.get_survey_id() in LEGACY_SURVEY or
+        response.get_survey_id() in SPP_SURVEY or
+        response.get_survey_id() in MATERIALS_SURVEY or
+        response.get_survey_id() in ENVIRONMENTAL_SURVEY
+    ):
+
         return True
 
     if CONFIG.PROJECT_ID == "ons-sdx-preprod" or CONFIG.PROJECT_ID == "ons-sdx-nifi":
