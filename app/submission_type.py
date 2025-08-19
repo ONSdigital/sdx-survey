@@ -1,6 +1,5 @@
 from sdx_gcp.app import get_logger
 
-from app import CONFIG
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
 from app.v2.submission_type_v2 import ADHOC_SURVEY
 
@@ -33,9 +32,6 @@ _JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 
 # json transformation
 _JSON_TRANSFORM = ["002"]
-
-# responses that will use the v2 schema for messaging Nifi
-_V2_NIFI_MESSAGE = ["002", "007", "009", "023", "068", "139", "228"]
 
 
 def requires_v1_conversion(response: Response) -> bool:
@@ -101,8 +97,5 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
 
     if response.get_survey_id() not in ADHOC_SURVEY:
         return True
-
-    if CONFIG.PROJECT_ID == "ons-sdx-preprod" or CONFIG.PROJECT_ID == "ons-sdx-nifi":
-        return response.get_survey_id() in _V2_NIFI_MESSAGE
 
     return False
