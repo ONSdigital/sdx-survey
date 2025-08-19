@@ -2,7 +2,7 @@ from sdx_gcp.app import get_logger
 
 from app import CONFIG
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
-from app.v2.submission_type_v2 import LEGACY_SURVEY, SPP_SURVEY, MATERIALS_SURVEY, ENVIRONMENTAL_SURVEY
+from app.v2.submission_type_v2 import LEGACY_SURVEY, SPP_SURVEY, MATERIALS_SURVEY, ENVIRONMENTAL_SURVEY, DAP_SURVEY
 
 """
     This file defines a set of classifiers for the different submission types.
@@ -18,7 +18,7 @@ _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
 
 # list of surveys that require a PCK file
 _PCK_SURVEYS = ['009', '017', '019', '061', '066', '076', '073', '074', '127', '132', '134',
-                '139', '144', '160', '165','169', '171', '182', '183', '184', '185', '187', '202', '221', '228']
+                '139', '144', '160', '165', '169', '171', '182', '183', '184', '185', '187', '202', '221', '228']
 
 # surveys that need to remain v1 submissions
 _V1_SURVEYS = ["283", "007", "009", "023", "134", "147"]
@@ -107,6 +107,7 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
         return True
 
     if CONFIG.PROJECT_ID == "ons-sdx-preprod" or CONFIG.PROJECT_ID == "ons-sdx-nifi":
-        return response.get_survey_id() in _V2_NIFI_MESSAGE
+        if response.get_survey_id() in DAP_SURVEY:
+            return True
 
     return False
