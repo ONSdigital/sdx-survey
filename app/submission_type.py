@@ -86,16 +86,7 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
     """
     Returns True if this response is configured to use the v2 nifi message schema.
     """
+    if response.get_survey_type() == SurveyType.ADHOC:
+        return False
 
-    # DFTS-1053
-    if response.get_response_type() == ResponseType.FEEDBACK:
-        # Adhoc feedback is not yet ready for v2 message!
-        if response.get_survey_type() == SurveyType.ADHOC:
-            return False
-        else:
-            return True
-
-    if response.get_survey_id() not in ADHOC_SURVEY:
-        return True
-
-    return False
+    return True
