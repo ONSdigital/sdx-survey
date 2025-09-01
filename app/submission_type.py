@@ -1,7 +1,6 @@
 from sdx_gcp.app import get_logger
 
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
-from app.v2.submission_type_v2 import ADHOC_SURVEY
 
 """
     This file defines a set of classifiers for the different submission types.
