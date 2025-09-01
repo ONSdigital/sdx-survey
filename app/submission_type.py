@@ -1,8 +1,6 @@
 from sdx_gcp.app import get_logger
 
-from app import CONFIG
 from app.response import Response, SurveyType, ResponseType, SchemaVersion, DeliverTarget
-from app.v2.submission_type_v2 import LEGACY_SURVEY, SPP_SURVEY, MATERIALS_SURVEY, ENVIRONMENTAL_SURVEY, DAP_SURVEY
 
 """
     This file defines a set of classifiers for the different submission types.
@@ -17,8 +15,10 @@ _DAP_SURVEYS = ["283", "738", "739", "740"]
 _HYBRID_SURVEYS = ["002", "007", "009", "023", "134", "147"]
 
 # list of surveys that require a PCK file
-_PCK_SURVEYS = ['009', '017', '019', '061', '066', '076', '073', '074', '127', '132', '134',
-                '139', '144', '160', '165', '169', '171', '182', '183', '184', '185', '187', '202', '221', '228']
+_PCK_SURVEYS = [
+    '009', '017', '019', '061', '066', '076', '073', '074', '127', '132', '134', '139', '144',
+    '160', '165', '169', '171', '182', '183', '184', '185', '187', '202', '221', '228'
+]
 
 # surveys that need to remain v1 submissions
 _V1_SURVEYS = ["283", "007", "009", "023", "134", "147"]
@@ -31,9 +31,6 @@ _JSON_NAME_CHANGE = ["024", "068", "071", "194"]
 
 # json transformation
 _JSON_TRANSFORM = ["002"]
-
-# responses that will use the v2 schema for messaging Nifi
-_V2_NIFI_MESSAGE = ["002", "007", "009", "023", "068", "139", "228"]
 
 
 def requires_v1_conversion(response: Response) -> bool:
@@ -88,26 +85,7 @@ def is_v2_nifi_message_submission(response: Response) -> bool:
     """
     Returns True if this response is configured to use the v2 nifi message schema.
     """
+    if response.get_survey_type() == SurveyType.ADHOC:
+        return False
 
-    # DFTS-1053
-    if response.get_response_type() == ResponseType.FEEDBACK:
-        # Adhoc feedback is not yet ready for v2 message!
-        if response.get_survey_type() == SurveyType.ADHOC:
-            return False
-        else:
-            return True
-
-    if (
-        response.get_survey_id() in LEGACY_SURVEY or
-        response.get_survey_id() in SPP_SURVEY or
-        response.get_survey_id() in MATERIALS_SURVEY or
-        response.get_survey_id() in ENVIRONMENTAL_SURVEY
-    ):
-
-        return True
-
-    if CONFIG.PROJECT_ID == "ons-sdx-preprod" or CONFIG.PROJECT_ID == "ons-sdx-nifi":
-        if response.get_survey_id() in DAP_SURVEY:
-            return True
-
-    return False
+    return True
