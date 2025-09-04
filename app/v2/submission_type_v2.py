@@ -34,6 +34,9 @@ def get_v2_survey_type(response: Response) -> V2SurveyType:
     if survey_id in DAP_SURVEY:
         return V2SurveyType.DAP
 
+    if survey_id in DEXTA_SURVEY:
+        return V2SurveyType.DEXTA
+
     if survey_id in LEGACY_SURVEY:
         return V2SurveyType.LEGACY
 
