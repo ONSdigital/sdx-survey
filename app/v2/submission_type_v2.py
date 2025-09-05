@@ -6,9 +6,10 @@ from app.period import Period
 from app.response import Response, ResponseType
 
 DAP_SURVEY = ["283"]
-LEGACY_SURVEY = ["009", "017", "019", "061", "066", "073", "074", "076", "127", "132", "133", "134",
+LEGACY_SURVEY = ["009", "017", "019", "061", "127", "132", "133", "134",
                  "139", "144", "156", "160", "165", "169", "171", "182", "183", "184",
                  "185", "187", "202", "228"]
+DEXTA_SURVEY = ["066", "073", "074", "076"]
 SPP_SURVEY = ["002", "023"]
 ENVIRONMENTAL_SURVEY = ["007", "147"]
 MATERIALS_SURVEY = ["024", "068", "071", "194"]
@@ -32,6 +33,9 @@ def get_v2_survey_type(response: Response) -> V2SurveyType:
 
     if survey_id in DAP_SURVEY:
         return V2SurveyType.DAP
+
+    if survey_id in DEXTA_SURVEY:
+        return V2SurveyType.DEXTA
 
     if survey_id in LEGACY_SURVEY:
         return V2SurveyType.LEGACY
