@@ -46,6 +46,7 @@ v2_transformer_map: dict[V2SurveyType, Transformer] = {
     V2SurveyType.DAP: DAPTransformer(),
     V2SurveyType.FEEDBACK: FeedbackTransformer(),
     V2SurveyType.ENVIRONMENTAL: EnvironmentalTransformer(),
+    V2SurveyType.DEXTA: LegacyTransformer()
 }
 
 
