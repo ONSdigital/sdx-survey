@@ -9,3 +9,4 @@ class V2SurveyType(StrEnum):
     MATERIALS = "materials"
     FEEDBACK = "feedback"
     ADHOC = "adhoc"
+    DEXTA = "dexta"

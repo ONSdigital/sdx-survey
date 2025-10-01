@@ -126,3 +126,22 @@ class TestCollect(unittest.TestCase):
 
         processor_mock.assert_called_once_with(Response(material_response, tx_id))
         processor_mock.return_value.run.assert_called_once()
+
+    @patch('app.collect.sdx_app')
+    @patch('app.collect.decrypt_survey')
+    @patch('app.collect.SurveyProcessorV2')
+    def test_process_dexta_survey(self, processor_mock: Mock, decrypt: Mock, app: Mock):
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
+        dexta_response = {
+            'tx_id': tx_id,
+            'survey_id': '066',
+            'type': 'uk.gov.ons.edc.eq:surveyresponse'
+        }
+
+        app.gcs_read.return_value = json.dumps(dexta_response).encode()
+        decrypt.return_value = dexta_response
+
+        process(self.message, tx_id)
+
+        processor_mock.assert_called_once_with(Response(dexta_response, tx_id))
+        processor_mock.return_value.run.assert_called_once()
