@@ -1,12 +1,11 @@
 import json
 from typing import TypedDict, Optional
 
-from sdx_gcp.app import get_logger
 from datetime import datetime
 from string import ascii_lowercase
 from cryptography.fernet import Fernet
 
-from app import sdx_app, CONFIG
+from app import sdx_app, CONFIG, get_logger
 from app.response import Response
 from app.transformation.formatter import get_datetime
 

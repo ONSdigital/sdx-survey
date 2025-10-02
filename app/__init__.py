@@ -1,8 +1,13 @@
+import logging
 import os
+from logging import Logger
 
-from sdx_gcp.app import SdxApp
 
-from app.decrypt import add_keys
+def get_logger() -> Logger:
+    return logging.getLogger("sdx-survey")
+
+
+from app.services.decrypter import add_keys
 
 project_id = os.getenv('PROJECT_ID', 'ons-sdx-sandbox')
 receipt_topic_path = os.getenv('RECEIPT_TOPIC_PATH', 'projects/ons-sdx-sandbox/topics/receipt-topic')

@@ -1,4 +1,5 @@
 import binascii
+from typing import Final
 
 import yaml
 
@@ -6,15 +7,19 @@ from cryptography import exceptions
 from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
 from sdc.crypto.decrypter import decrypt as sdc_decrypt
-from sdx_gcp.app import get_logger
-from sdx_gcp.errors import RetryableError, DataError
+from sdx_base.errors.errors import DataError
+from sdx_base.errors.retryable import RetryableError
+
+from app import get_logger
 
 logger = get_logger()
+
+KEY_PURPOSE_SUBMISSION: Final[str] = 'submission'
 
 
 class Decrypter:
 
-    KEY_PURPOSE_SUBMISSION = 'submission'
+
     keys = {}
     key_store = KeyStore({"keys": keys})
 

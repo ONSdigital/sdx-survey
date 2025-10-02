@@ -10,7 +10,7 @@ from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
 from sdx_gcp.errors import DataError
 
-from app.decrypt import decrypt_survey, add_key, add_keys
+from app.services.decrypter import decrypt_survey, add_key, add_keys
 
 KEY_DIR = "keys"
 

@@ -1,10 +1,8 @@
 import json
 
-from sdx_gcp.app import get_logger
-from sdx_gcp.errors import DataError
-from sdx_gcp.pubsub import publish_message
+from sdx_base.errors.errors import DataError
 
-from app import CONFIG
+from app import CONFIG, get_logger
 from app.response import Response, SurveyType
 
 logger = get_logger()
@@ -46,7 +44,7 @@ def make_receipt(response: Response) -> str:
     except KeyError as e:
         raise DataError(f'Failed to make receipt: {str(e)}')
 
-    logger.info('Generated receipt', caseId=receipt_json['caseId'], partyId=receipt_json['partyId'])
+    logger.info('Generated receipt', extra={"caseId": receipt_json['caseId'], "partyId":receipt_json['partyId']})
     receipt_str = json.dumps(receipt_json)
     return receipt_str
 
@@ -63,6 +61,6 @@ def make_srm_receipt(response: Response) -> str:
     except KeyError as e:
         raise DataError(f'Failed to make receipt: {str(e)}')
 
-    logger.info('Generated SRM receipt', qid=receipt_json['data'])
+    logger.info('Generated SRM receipt', extra={"qid": receipt_json['data']})
     receipt_str = json.dumps(receipt_json)
     return receipt_str

@@ -1,8 +1,7 @@
-from sdx_gcp import Message, TX_ID, Request, get_message
-from sdx_gcp.app import get_logger
+from sdx_base.models.pubsub import Message
 
-from app import CONFIG, sdx_app
-from app.decrypt import decrypt_survey
+from app import CONFIG, sdx_app, get_logger
+from app.services.decrypter import decrypt_survey
 from app.definitions.submission import SurveySubmission
 from app.definitions.v2_survey_type import V2SurveyType
 from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, \
@@ -16,12 +15,7 @@ from app.v2.submission_type_v2 import get_v2_survey_type
 logger = get_logger()
 
 
-def get_tx_id_from_object_id(req: Request) -> TX_ID:
-    message: Message = get_message(req)
-    return message["attributes"]["objectId"]
-
-
-def process(message: Message, tx_id: TX_ID):
+def process(message: Message):
     """
     Orchestrates the required steps to read and process the encrypted json file
     from the filename received in the message.

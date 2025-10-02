@@ -1,10 +1,11 @@
 import copy
 import json
 from enum import Enum
+from typing import Any
 
-from sdx_gcp.app import get_logger
-from sdx_gcp.errors import DataError
+from sdx_base.errors.errors import DataError
 
+from app import get_logger
 from app.definitions.submission import SurveySubmission
 
 """
@@ -42,7 +43,7 @@ def get_field(submission: dict, *field_names: str) -> str:
     for key in field_names:
         current = current.get(key)
         if current is None:
-            logger.error(f'Missing field {key} from submission!', submission=get_safe_submission(submission))
+            logger.error(f'Missing field {key} from submission!', extra={"submission": get_safe_submission(submission)})
             raise DataError(f'Missing field {key} from submission!')
     return current
 
@@ -52,15 +53,15 @@ def get_optional(submission: dict, *field_names: str) -> str:
         return get_field(submission, *field_names)
 
     except DataError as e:
-        logger.warn(str(e))
+        logger.warning(str(e))
         return ""
 
 
 class Response:
 
-    def __init__(self, submission: SurveySubmission, tx_id: str):
+    def __init__(self, submission: SurveySubmission):
         self._submission = submission
-        self.tx_id = tx_id
+        self.tx_id = submission["tx_id"]
 
     def get_submission(self) -> SurveySubmission:
         return copy.deepcopy(self._submission)
@@ -144,7 +145,7 @@ class Response:
                 return SchemaVersion.V2
         return SchemaVersion.V1
 
-    def get_data(self) -> dict[str, str] | list[any]:
+    def get_data(self) -> dict[str, str] | list[Any]:
         return self._submission["data"]
 
     def get_data_version(self) -> str:
