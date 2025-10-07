@@ -2,7 +2,7 @@ from sdx_gcp.errors import DataError
 
 from app.definitions.v2_context_type import V2ContextType
 from app.definitions.v2_survey_type import V2SurveyType
-from app.period import Period
+from app.services.period import Period
 from app.response import Response, ResponseType
 
 DAP_SURVEY = ["283"]

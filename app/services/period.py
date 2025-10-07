@@ -1,9 +1,7 @@
-
-class PeriodFormatError(Exception):
-    pass
+from app.definitions.period import PeriodBase, PeriodFormatError
 
 
-class Period:
+class Period(PeriodBase):
 
     def __init__(self, period_id: str):
         self._period_id = period_id

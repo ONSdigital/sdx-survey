@@ -1,6 +1,6 @@
 import unittest
 
-from app.period import Period, PeriodFormatError
+from app.services.period import Period, PeriodFormatError
 
 
 class ComparePeriodTests(unittest.TestCase):

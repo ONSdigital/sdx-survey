@@ -4,7 +4,7 @@ from unittest import mock
 
 from sdx_gcp.errors import DataError
 
-from app.receipt import make_receipt, send_receipt, publish_data, make_srm_receipt
+from app.services.receipt import make_receipt, send_receipt, publish_data, make_srm_receipt
 from app.response import Response
 from tests import get_response
 

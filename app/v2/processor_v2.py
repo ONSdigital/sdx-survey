@@ -1,7 +1,9 @@
+from typing import Self
+
 from app.comments import store_comments
 from app.definitions.v2_survey_type import V2SurveyType
 from app.processor import Processor, Action
-from app.receipt import send_receipt
+from app.services.receipt import send_receipt
 from app.transformation.create import transform
 from app.v2.context import Context
 from app.v2.deliver_v2 import deliver_zip
@@ -10,7 +12,7 @@ from app.v2.submission_type_v2 import get_v2_survey_type, get_v2_context_type
 
 class ProcessorV2(Processor):
 
-    def deliver(self, _version):
+    def deliver(self: Self, _version):
         zip_file = transform(self._response)
         survey_type = get_v2_survey_type(self._response)
         context_type = get_v2_context_type(survey_type)

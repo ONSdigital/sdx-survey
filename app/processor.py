@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 from app.comments import store_comments
 from app.deliver import deliver_dap, V2, V1, deliver_feedback, ADHOC, deliver_survey, deliver_hybrid
-from app.receipt import send_receipt
+from app.services.receipt import send_receipt
 from app.submission_type import requires_v1_conversion
 from app.response import Response, SurveyType
 from app.transformation.create import transform
@@ -57,7 +57,6 @@ class Processor:
             return V2
 
     def deliver(self, version: str):
-
         pass
 
 

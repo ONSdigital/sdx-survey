@@ -1,5 +1,5 @@
 import binascii
-from typing import Final
+from typing import Final, Protocol, Any
 
 import yaml
 
@@ -9,26 +9,33 @@ from sdc.crypto.key_store import KeyStore
 from sdc.crypto.decrypter import decrypt as sdc_decrypt
 from sdx_base.errors.errors import DataError
 from sdx_base.errors.retryable import RetryableError
+from sdx_base.settings.service import SECRET
+from sdx_base.utilities.singleton import AbstractSingleton
 
 from app import get_logger
+from app.definitions.decrypter import DecryptionBase
 
 logger = get_logger()
 
 KEY_PURPOSE_SUBMISSION: Final[str] = 'submission'
 
 
-class Decrypter:
+class DecryptionKeys(Protocol):
+    sdx_private_jwt: SECRET
+    eq_public_signing: SECRET
+    eq_public_jws: SECRET
 
 
-    keys = {}
-    key_store = KeyStore({"keys": keys})
+class DecryptionService(DecryptionBase, metaclass=AbstractSingleton):
 
-    def add_key(self, k):
-        key = yaml.safe_load(k)
-        self.keys[key['keyid']] = key
-        self.key_store = KeyStore({"keys": self.keys})
+    def __init__(self, secret_keys: DecryptionKeys):
+        keys: dict[str, str] = {}
+        for k in [secret_keys.sdx_private_jwt, secret_keys.eq_public_signing, secret_keys.eq_public_jws]:
+            key = yaml.safe_load(k)
+            keys[key['keyid']] = key
+        self.key_store = KeyStore({"keys": keys})
 
-    def decrypt_survey(self, payload: str) -> dict:
+    def decrypt_survey(self, payload: str) -> dict[str, Any]:
         """
         Decrypts an encrypted json survey submission
 
@@ -43,7 +50,7 @@ class Decrypter:
         logger.info("Decrypting survey")
 
         try:
-            decrypted_dict = sdc_decrypt(payload, self.key_store, self.KEY_PURPOSE_SUBMISSION)
+            decrypted_dict = sdc_decrypt(payload, self.key_store, KEY_PURPOSE_SUBMISSION)
             logger.info("Successfully decrypted")
             return decrypted_dict
 
@@ -66,19 +73,3 @@ class Decrypter:
         except Exception as e:
             logger.exception(f"Unexpected exception occurred during decryption: {str(e)}")
             raise RetryableError(e)
-
-
-decrypter = Decrypter()
-
-
-def decrypt_survey(payload: str) -> dict:
-    return decrypter.decrypt_survey(payload)
-
-
-def add_key(key) -> None:
-    decrypter.add_key(key)
-
-
-def add_keys(keys: list) -> None:
-    for key in keys:
-        add_key(key)
