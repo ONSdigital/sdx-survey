@@ -1,11 +1,11 @@
 from typing import Self
 
-from app.comments import store_comments
-from app.definitions.v2_survey_type import V2SurveyType
+from app.services.comments import store_comments
+from app.definitions.survey_type import V2SurveyType
 from app.processor import Processor, Action
 from app.services.receipt import send_receipt
 from app.transformation.create import transform
-from app.v2.context import Context
+from app.definitions.context import Context
 from app.v2.deliver_v2 import deliver_zip
 from app.v2.submission_type_v2 import get_v2_survey_type, get_v2_context_type
 

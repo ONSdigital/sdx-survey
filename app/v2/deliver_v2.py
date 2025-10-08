@@ -6,7 +6,7 @@ from sdx_gcp.app import get_logger
 from app import sdx_app, CONFIG
 
 # Constants used within the http request
-from app.v2.context import Context
+from app.definitions.context import Context
 
 
 FILE_NAME: Final[str] = "filename"

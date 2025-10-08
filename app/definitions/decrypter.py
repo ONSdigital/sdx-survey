@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Any
+
+from app.definitions.submission import SurveySubmission
 
 
 class DecryptionBase(ABC):
 
     @abstractmethod
-    def decrypt_survey(self, payload: str) -> dict[str, Any]:
+    def decrypt_survey(self, payload: str) -> SurveySubmission:
         pass

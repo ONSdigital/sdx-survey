@@ -1,6 +1,6 @@
 from collections.abc import Callable
 
-from app.comments import store_comments
+from app.services.comments import store_comments
 from app.deliver import deliver_dap, V2, V1, deliver_feedback, ADHOC, deliver_survey, deliver_hybrid
 from app.services.receipt import send_receipt
 from app.submission_type import requires_v1_conversion

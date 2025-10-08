@@ -1,7 +1,7 @@
 from typing import TypedDict, NotRequired
 
-from app.definitions.v2_context_type import V2ContextType
-from app.definitions.v2_survey_type import V2SurveyType
+from app.definitions.context_type import V2ContextType
+from app.definitions.survey_type import V2SurveyType
 
 
 class Context(TypedDict):

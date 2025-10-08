@@ -14,6 +14,7 @@ from sdx_base.utilities.singleton import AbstractSingleton
 
 from app import get_logger
 from app.definitions.decrypter import DecryptionBase
+from app.definitions.submission import SurveySubmission
 
 logger = get_logger()
 
@@ -35,7 +36,7 @@ class DecryptionService(DecryptionBase, metaclass=AbstractSingleton):
             keys[key['keyid']] = key
         self.key_store = KeyStore({"keys": keys})
 
-    def decrypt_survey(self, payload: str) -> dict[str, Any]:
+    def decrypt_survey(self, payload: str) -> SurveySubmission:
         """
         Decrypts an encrypted json survey submission
 

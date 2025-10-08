@@ -4,7 +4,7 @@ from unittest import mock
 from unittest.mock import patch
 from cryptography.fernet import Fernet
 
-from app.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
+from app.services.comments import get_comment, get_additional_comments, get_boxes_selected, encrypt_comment, store_comments, \
     Comment, commit_to_datastore, extract_berd_comment, extract_bres_comment
 from app.definitions.submission import SurveySubmission
 from app.response import Response

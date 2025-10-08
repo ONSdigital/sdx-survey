@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 from app.definitions.transform import Transform
-from app.definitions.v2_survey_type import V2SurveyType
+from app.definitions.survey_type import V2SurveyType
 from app.response import Response
 from app.transformation.create import transform
 

@@ -1,9 +1,10 @@
 from sdx_base.models.pubsub import Message
 
-from app import CONFIG, sdx_app, get_logger
-from app.services.decrypter import decrypt_survey
+from app import get_logger
+from app.definitions.decrypter import DecryptionBase
+from app.definitions.gcp import GcpBase
 from app.definitions.submission import SurveySubmission
-from app.definitions.v2_survey_type import V2SurveyType
+from app.definitions.survey_type import V2SurveyType
 from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, \
     HybridProcessor, \
     SurveyProcessor
@@ -15,41 +16,46 @@ from app.v2.submission_type_v2 import get_v2_survey_type
 logger = get_logger()
 
 
-def process(message: Message):
-    """
-    Orchestrates the required steps to read and process the encrypted json file
-    from the filename received in the message.
-    The encrypted json can represent either a survey submission or survey feedback.
-    The steps include:
-        - decryption
-        - transformation
-        - comment persistence
-        - delivery
-        - receipting
-    and are dependent on the survey and type of the submission.
-    """
+class Survey:
 
-    logger.info(f"Survey triggered by PubSub with message: {message}")
-    attributes = message["attributes"]
-    filename = attributes['objectId']
+    def __init__(self, decryption_service: DecryptionBase, gcp_service: GcpBase):
+        self._decryption_service = decryption_service
+        self._gcp_service = gcp_service
 
-    data_bytes = sdx_app.gcs_read(filename, CONFIG.BUCKET_NAME)
+    def process(self, message: Message):
+        """
+        Orchestrates the required steps to read and process the encrypted json file
+        from the filename received in the message.
+        The encrypted json can represent either a survey submission or survey feedback.
+        The steps include:
+            - decryption
+            - transformation
+            - comment persistence
+            - delivery
+            - receipting
+        and are dependent on the survey and type of the submission.
+        """
 
-    # Sometimes duplicate messages cause the object to not be found.
-    # If this is the case then there is nothing to process
-    if data_bytes is None:
-        return
+        logger.info(f"Survey triggered by PubSub with message: {message}")
+        attributes = message["attributes"]
+        filename = attributes['objectId']
 
-    encrypted_message_str = data_bytes.decode('utf-8')
+        data_bytes = self._gcp_service.read_bucket(filename)
 
-    submission: SurveySubmission = decrypt_survey(encrypted_message_str)
+        # Sometimes duplicate messages cause the object to not be found.
+        # If this is the case then there is nothing to process
+        if data_bytes is None:
+            return
 
-    response: Response = Response(submission, tx_id)
+        encrypted_message_str = data_bytes.decode('utf-8')
 
-    logger.info(f"Survey id: {response.get_survey_id()}")
+        submission: SurveySubmission = self._decryption_service.decrypt_survey(encrypted_message_str)
 
-    processor: Processor
-    if is_v2_nifi_message_submission(response):
+        response: Response = Response(submission)
+
+        logger.info(f"Survey id: {response.get_survey_id()}")
+
+        processor: Processor
         v2_survey_type = get_v2_survey_type(response)
         if v2_survey_type == V2SurveyType.FEEDBACK:
             processor = FeedbackProcessorV2(response)
@@ -60,23 +66,4 @@ def process(message: Message):
         else:
             processor = SurveyProcessorV2(response)
 
-    else:
-        if response.get_response_type() == ResponseType.FEEDBACK:
-            processor = FeedbackProcessor(response)
-
-        elif receipt_only_submission(response):
-            processor = ReceiptOnlyProcessor(response)
-
-        elif response.get_survey_type() == SurveyType.ADHOC:
-            processor = AdhocProcessor(response)
-
-        elif get_deliver_target(response) == DeliverTarget.DAP:
-            processor = DapProcessor(response)
-
-        elif get_deliver_target(response) == DeliverTarget.HYBRID:
-            processor = HybridProcessor(response)
-
-        else:
-            processor = SurveyProcessor(response)
-
-    processor.run()
+        processor.run()

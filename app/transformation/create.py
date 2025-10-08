@@ -1,4 +1,4 @@
-from app.definitions.v2_survey_type import V2SurveyType
+from app.definitions.survey_type import V2SurveyType
 from app.response import Response
 from app.submission_type import requires_pck, is_v2_nifi_message_submission
 from app.transformation.transformers import Transformer, LegacyTransformer, MaterialsTransformer, SPPTransformer, \

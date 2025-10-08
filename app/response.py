@@ -9,9 +9,9 @@ from app import get_logger
 from app.definitions.submission import SurveySubmission
 
 """
-    This file defines a wrapper for the submission.
-    It provides a set of functions for retrieving common survey metadata
-    in a 'submission type' agnostic way.
+This file defines a wrapper for the submission.
+It provides a set of functions for retrieving common survey metadata
+in a 'submission type' agnostic way.
 """
 logger = get_logger()
 
@@ -38,17 +38,19 @@ class DeliverTarget(Enum):
     FEEDBACK = 4
 
 
-def get_field(submission: dict, *field_names: str) -> str:
-    current = submission
+def get_field(submission: SurveySubmission, *field_names: str) -> str:
+    current: dict[str, Any] = submission
     for key in field_names:
-        current = current.get(key)
-        if current is None:
+        result = current.get(key)
+        if result is None:
             logger.error(f'Missing field {key} from submission!', extra={"submission": get_safe_submission(submission)})
             raise DataError(f'Missing field {key} from submission!')
-    return current
+        else:
+            current = result
+    return result
 
 
-def get_optional(submission: dict, *field_names: str) -> str:
+def get_optional(submission: SurveySubmission, *field_names: str) -> str:
     try:
         return get_field(submission, *field_names)
 
