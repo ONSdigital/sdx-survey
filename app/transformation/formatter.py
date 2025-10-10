@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.services.period import Period
+from app.period import Period
 
 
 def split_ru_ref(ru_ref: str) -> tuple[str, str]:

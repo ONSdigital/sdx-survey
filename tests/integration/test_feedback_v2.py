@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock
 
 from sdx_gcp import Message
 
-from app.collect import process
+from app.survey import process
 from app.definitions.submission import SurveySubmission
 from app.definitions.context_type import V2ContextType
 from app.definitions.survey_type import V2SurveyType

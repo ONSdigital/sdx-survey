@@ -7,7 +7,7 @@ from cryptography.fernet import Fernet
 from sdx_base.settings.service import SECRET
 
 from app import get_logger
-from app.definitions.gcp import GcpBase
+from app.definitions.comments import CommentsBase
 from app.response import Response
 from app.transformation.formatter import get_datetime
 
@@ -30,15 +30,27 @@ class AdditionalComment(TypedDict):
 
 
 class CommentsSettings(Protocol):
+    project_id: str
     sdx_comment_key: SECRET
     srm_receipt_topic_path: str
 
 
-class CommentsService:
+class CommentsWriter(Protocol):
+    def commit_entity(self,
+                      data: dict[str, str],
+                      kind: str,
+                      tx_id: str,
+                      project_id: Optional[str] = None,
+                      exclude_from_indexes: Optional[str] = None):
+        ...
 
-    def __init__(self, settings: CommentsSettings, gcp_service: GcpBase):
+
+
+class CommentsService(CommentsBase):
+
+    def __init__(self, settings: CommentsSettings, comments_writer: CommentsWriter):
         self._settings = settings
-        self._gcp_service = gcp_service
+        self._comments_writer = comments_writer
 
     def store_comments(self, response: Response):
         """
@@ -152,9 +164,10 @@ class CommentsService:
             "created": comment.created,
             "encrypted_data": comment.encrypted_data
         }
-        self._gcp_service.datastore_write(data,
+        self._comments_writer.commit_entity(data,
                                           kind=comment.kind,
                                           tx_id=comment.transaction_id,
+                                          project_id=self._settings.project_id,
                                           exclude_from_indexes="encrypted_data")
 
     def extract_data_0_0_3_comment(self, response: Response, qcode: str) -> str:

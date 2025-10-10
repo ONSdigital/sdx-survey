@@ -1,5 +1,5 @@
 from app import sdx_app, setup_keys, CONFIG
-from app.collect import process, get_tx_id_from_object_id
+from app.survey import process, get_tx_id_from_object_id
 
 if __name__ == '__main__':
     setup_keys()

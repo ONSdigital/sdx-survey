@@ -5,7 +5,7 @@ from unittest.mock import patch, Mock
 from sdx_gcp import Message
 from sdx_gcp.errors import DataError
 
-from app.collect import process
+from app.survey import process
 from app.deliver import V2
 from app.response import Response
 

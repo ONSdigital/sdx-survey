@@ -1,26 +1,48 @@
+from typing import Protocol, Optional
+
 from sdx_base.models.pubsub import Message
 
 from app import get_logger
 from app.definitions.decrypter import DecryptionBase
-from app.definitions.gcp import GcpBase
+from app.definitions.processor import ProcessorBase
 from app.definitions.submission import SurveySubmission
 from app.definitions.survey_type import V2SurveyType
-from app.processor import Processor, FeedbackProcessor, ReceiptOnlyProcessor, AdhocProcessor, DapProcessor, \
-    HybridProcessor, \
-    SurveyProcessor
-from app.response import Response, SurveyType, ResponseType, DeliverTarget
-from app.submission_type import receipt_only_submission, get_deliver_target, is_v2_nifi_message_submission
-from app.v2.processor_v2 import FeedbackProcessorV2, AdhocProcessorV2, SurveyProcessorV2
-from app.v2.submission_type_v2 import get_v2_survey_type
+from app.response import Response
+from app.submission_type import get_v2_survey_type
 
 logger = get_logger()
 
 
+class SurveySettings(Protocol):
+    project_id: str
+    def get_bucket_name(self) -> str: ...
+
+
+class BucketReader(Protocol):
+    def read(self,
+             filename: str,
+             bucket_name: str,
+             sub_dir: Optional[str] = None,
+             project_id: Optional[str] = None) -> bytes:
+        ...
+
+
 class Survey:
 
-    def __init__(self, decryption_service: DecryptionBase, gcp_service: GcpBase):
+    def __init__(self,
+                 settings: SurveySettings,
+                 bucket_reader: BucketReader,
+                 decryption_service: DecryptionBase,
+                 survey_processor: ProcessorBase,
+                 adhoc_processor: ProcessorBase,
+                 feedback_processor: ProcessorBase):
+
+        self._settings = settings
+        self._bucket_reader = bucket_reader
         self._decryption_service = decryption_service
-        self._gcp_service = gcp_service
+        self._survey_processor = survey_processor
+        self._adhoc_processor = adhoc_processor
+        self._feedback_processor = feedback_processor
 
     def process(self, message: Message):
         """
@@ -40,7 +62,10 @@ class Survey:
         attributes = message["attributes"]
         filename = attributes['objectId']
 
-        data_bytes = self._gcp_service.read_bucket(filename)
+        bucket_name = self._settings.get_bucket_name()
+        data_bytes = self._bucket_reader.read(filename,
+                                              bucket_name=bucket_name,
+                                              project_id=self._settings.project_id)
 
         # Sometimes duplicate messages cause the object to not be found.
         # If this is the case then there is nothing to process
@@ -55,15 +80,15 @@ class Survey:
 
         logger.info(f"Survey id: {response.get_survey_id()}")
 
-        processor: Processor
+        processor: ProcessorBase
         v2_survey_type = get_v2_survey_type(response)
         if v2_survey_type == V2SurveyType.FEEDBACK:
-            processor = FeedbackProcessorV2(response)
+            processor = self._feedback_processor
 
         elif v2_survey_type == V2SurveyType.ADHOC:
-            processor = AdhocProcessorV2(response)
+            processor = self._adhoc_processor
 
         else:
-            processor = SurveyProcessorV2(response)
+            processor = self._survey_processor
 
-        processor.run()
+        processor.run(response)
