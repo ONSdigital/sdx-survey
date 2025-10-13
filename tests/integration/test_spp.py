@@ -2,6 +2,7 @@ import json
 import os
 import unittest
 from pathlib import Path
+from unittest.mock import Mock
 
 from fastapi import FastAPI
 from sdx_base.models.pubsub import Message
@@ -9,6 +10,7 @@ from sdx_base.run import run
 from sdx_base.server.server import RouterConfig
 from sdx_base.server.tx_id import txid_from_pubsub
 
+from app.definitions.decrypter import DecryptionBase
 from app.definitions.submission import SurveySubmission
 from app.definitions.context_type import V2ContextType
 from app.definitions.survey_type import SurveyType
@@ -46,12 +48,6 @@ class TestSpp(unittest.TestCase):
                            serve=lambda a, b: a
                            )
 
-        app.dependency_overrides[get_http_service] = get_mock_encryptor
-        app.dependency_overrides[get_pubsub_service] = get_mock_gcp
-        app.dependency_overrides[get_storage_service] = get_mock_encryptor
-        app.dependency_overrides[get_decryption_service] = get_mock_gcp
-
-
         survey_id = "023"
         submission_json = get_json("023.0102.json")
         tx_id = submission_json["tx_id"]
@@ -61,6 +57,16 @@ class TestSpp(unittest.TestCase):
             "message_id": "",
             "publish_time": ""
         }
+
+        mock_decryptor = Mock(spec=DecryptionBase)
+        mock_decryptor.decrypt_survey.return_value = submission_json
+        app.dependency_overrides[get_http_service] = get_mock_encryptor
+        app.dependency_overrides[get_pubsub_service] = get_mock_gcp
+        app.dependency_overrides[get_storage_service] = get_mock_encryptor
+        app.dependency_overrides[get_decryption_service] = get_mock_gcp
+
+
+
 
         spp_contents = b'spp contents'
         image_contents = b'image contents'
