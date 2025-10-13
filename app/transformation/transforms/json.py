@@ -1,6 +1,6 @@
 from app.response import Response
 from app.submission_type import requires_v1_conversion, requires_json_name_change, requires_json_transform
-from app.transformation.call_transformer import call_transformer_spp
+from app.transformation.transformer_poster import call_transformer_spp
 from app.transformation.formatter import get_tx_code, split_ru_ref
 from app.definitions.transform import Transform
 

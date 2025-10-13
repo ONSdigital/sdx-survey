@@ -6,9 +6,8 @@ from app import get_logger
 from app.definitions.decrypter import DecryptionBase
 from app.definitions.processor import ProcessorBase
 from app.definitions.submission import SurveySubmission
-from app.definitions.survey_type import V2SurveyType
+from app.definitions.survey_type import SurveyType
 from app.response import Response
-from app.submission_type import get_v2_survey_type
 
 logger = get_logger()
 
@@ -81,11 +80,11 @@ class Survey:
         logger.info(f"Survey id: {response.get_survey_id()}")
 
         processor: ProcessorBase
-        v2_survey_type = get_v2_survey_type(response)
-        if v2_survey_type == V2SurveyType.FEEDBACK:
+        v2_survey_type = response.get_survey_type()
+        if v2_survey_type == SurveyType.FEEDBACK:
             processor = self._feedback_processor
 
-        elif v2_survey_type == V2SurveyType.ADHOC:
+        elif v2_survey_type == SurveyType.ADHOC:
             processor = self._adhoc_processor
 
         else:

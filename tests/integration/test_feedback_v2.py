@@ -7,7 +7,7 @@ from sdx_gcp import Message
 from app.survey import process
 from app.definitions.submission import SurveySubmission
 from app.definitions.context_type import V2ContextType
-from app.definitions.survey_type import V2SurveyType
+from app.definitions.survey_type import SurveyType
 from app.definitions.context import Context
 from tests import get_json
 
@@ -70,7 +70,7 @@ class TestFeedback(unittest.TestCase):
             "tx_id": tx_id,
             "survey_id": survey_id,
             "ru_ref": ru_ref,
-            "survey_type": V2SurveyType.FEEDBACK,
+            "survey_type": SurveyType.FEEDBACK,
             "period_id": period_id,
             "context_type": V2ContextType.BUSINESS_SURVEY
         }

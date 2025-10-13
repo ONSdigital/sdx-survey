@@ -6,10 +6,10 @@ from app.definitions.context import Context
 from app.definitions.deliver import DeliverBase
 from app.definitions.processor import ProcessorBase
 from app.definitions.receipting import ReceiptServiceBase
-from app.definitions.survey_type import V2SurveyType
-from app.definitions.transform import TransformServiceBase
+from app.definitions.survey_type import SurveyType
+from app.definitions.transformer import TransformerBase
 from app.response import Response
-from app.submission_type import get_v2_survey_type, get_v2_context_type
+
 
 """
     This file defines a set of classes
@@ -53,7 +53,7 @@ class Processor(ProcessorBase):
 class ProcessorV2(Processor):
 
     def __init__(self,
-                 transformer_service: TransformServiceBase,
+                 transformer_service: TransformerBase,
                  deliver_service: DeliverBase,
                  receipt_service: ReceiptServiceBase,
                  comments_service: CommentsBase):
@@ -65,8 +65,8 @@ class ProcessorV2(Processor):
 
     def deliver(self: Self, response: Response):
         zip_file = self._transformer_service.transform(response)
-        survey_type = get_v2_survey_type(response)
-        context_type = get_v2_context_type(survey_type)
+        survey_type = response.get_survey_type()
+        context_type = response.get_context_type()
         context: Context = {
             "tx_id": response.tx_id,
             "survey_id": response.get_survey_id(),
@@ -74,7 +74,7 @@ class ProcessorV2(Processor):
             "context_type": context_type,
         }
 
-        if self._response.get_response_type() != V2SurveyType.ADHOC:
+        if self._response.get_response_type() != SurveyType.ADHOC:
             context["period_id"] = response.get_period()
             context["ru_ref"] = response.get_ru_ref()
 

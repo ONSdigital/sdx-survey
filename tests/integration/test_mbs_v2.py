@@ -7,7 +7,7 @@ from sdx_gcp import Message
 from app.survey import process
 from app.definitions.submission import SurveySubmission
 from app.definitions.context_type import V2ContextType
-from app.definitions.survey_type import V2SurveyType
+from app.definitions.survey_type import SurveyType
 from app.definitions.context import Context
 from tests import get_json
 
@@ -26,7 +26,7 @@ class TestMbs(unittest.TestCase):
     @patch('app.collect.decrypt_survey')
     @patch('app.v2.processor_v2.store_comments')
     @patch('app.v2.processor_v2.send_receipt')
-    @patch('app.transformation.transforms.pck.get_contents')
+    @patch('app.transformation.transforms.PCK.get_contents')
     @patch('app.transformation.transforms.image.get_image')
     @patch('app.transformation.transforms.index.get_contents')
     @patch('app.transformation.transformers.create_zip')
@@ -49,7 +49,7 @@ class TestMbs(unittest.TestCase):
         survey_id = "009"
         period_id = "2504"
         ru_ref = "49900000001A"
-        pck_contents = b'pck contents'
+        pck_contents = b'PCK contents'
         image_contents = b'image contents'
         index_contents = b'index contents'
         zip_bytes = b'the zip bytes'
@@ -85,7 +85,7 @@ class TestMbs(unittest.TestCase):
             "tx_id": tx_id,
             "survey_id": survey_id,
             "ru_ref": ru_ref,
-            "survey_type": V2SurveyType.LEGACY,
+            "survey_type": SurveyType.LEGACY,
             "period_id": period_id,
             "context_type": V2ContextType.BUSINESS_SURVEY
         }
@@ -155,7 +155,7 @@ class TestMbs(unittest.TestCase):
             "tx_id": tx_id,
             "survey_id": survey_id,
             "ru_ref": ru_ref,
-            "survey_type": V2SurveyType.SPP,
+            "survey_type": SurveyType.SPP,
             "period_id": period_id,
             "context_type": V2ContextType.BUSINESS_SURVEY
         }

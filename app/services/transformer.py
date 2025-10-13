@@ -1,28 +1,22 @@
-from app.definitions.survey_type import V2SurveyType
-from app.definitions.transform import TransformServiceBase
+from app.definitions.transformer import TransformerBase
 from app.response import Response
-from app.transformation.transformers import Transformer, LegacyTransformer, MaterialsTransformer, SPPTransformer, \
-    DAPTransformer, FeedbackTransformer, EnvironmentalTransformer
-from app.submission_type import get_v2_survey_type
+from app.transformation.selector import TransformSelector
+from app.transformation.zip import create_zip
 
 
-v2_transformer_map: dict[V2SurveyType, Transformer] = {
-    V2SurveyType.LEGACY: LegacyTransformer(),
-    V2SurveyType.MATERIALS: MaterialsTransformer(),
-    V2SurveyType.SPP: SPPTransformer(),
-    V2SurveyType.DAP: DAPTransformer(),
-    V2SurveyType.FEEDBACK: FeedbackTransformer(),
-    V2SurveyType.ENVIRONMENTAL: EnvironmentalTransformer(),
-    V2SurveyType.DEXTA: LegacyTransformer()
-}
+class TransformService(TransformerBase):
 
-
-class TransformService(TransformServiceBase):
+    def __init__(self, transform_selector: TransformSelector):
+        self._transform_selector = transform_selector
 
     def transform(self, response: Response) -> bytes:
-        v2_survey_type: V2SurveyType = get_v2_survey_type(response)
-        transformer = self._get_transformer(v2_survey_type)
-        return transformer.create_zip(response)
+        files: dict[str, bytes] = {}
+        transform_list = self._transform_selector.select(response.get_survey_type())
 
-    def _get_transformer(self, survey_type: V2SurveyType) -> Transformer:
-        return v2_transformer_map[survey_type]
+        for transform in transform_list:
+            name = transform.get_file_name(response)
+            content = transform.get_file_content(response)
+
+            files[name] = content
+
+        return create_zip(files)

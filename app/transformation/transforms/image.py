@@ -1,13 +1,7 @@
-from app import sdx_app, CONFIG
+from app.definitions.http import ImagePosterBase
 from app.response import Response
 from app.transformation.formatter import get_tx_code
 from app.definitions.transform import Transform
-
-
-def get_image(response: Response) -> bytes:
-    survey_json: str = response.to_json()
-    http_response = sdx_app.http_post(CONFIG.IMAGE_SERVICE_URL, "image", survey_json)
-    return http_response.content
 
 
 def get_name(response: Response) -> str:
@@ -17,8 +11,11 @@ def get_name(response: Response) -> str:
 
 class ImageTransform(Transform):
 
+    def __init__(self, image_poster: ImagePosterBase):
+        self._image_poster = image_poster
+
     def get_file_name(self, response: Response) -> str:
         return get_name(response)
 
     def get_file_content(self, response: Response) -> bytes:
-        return get_image(response)
+        return self._image_poster.call_image(response)

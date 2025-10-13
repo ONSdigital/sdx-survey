@@ -1,15 +1,10 @@
-from sdx_gcp.app import get_logger
-
+from app import get_logger
+from app.definitions.http import TransformPosterBase
 from app.response import Response
-from app.transformation.call_transformer import call_transformer_pck
 from app.transformation.formatter import get_tx_code
 from app.definitions.transform import Transform
 
 logger = get_logger()
-
-
-def get_contents(response: Response) -> bytes:
-    return call_transformer_pck(response)
 
 
 def get_name(response: Response) -> str:
@@ -73,8 +68,11 @@ def get_abs_survey_id(formtype: str) -> str:
 
 class PCKTransform(Transform):
 
+    def __init__(self, transformer_post: TransformPosterBase):
+        self._transformer_post = transformer_post
+
     def get_file_name(self, response: Response) -> str:
         return get_name(response)
 
     def get_file_content(self, response: Response) -> bytes:
-        return get_contents(response)
+        return self._transformer_post.call_transformer_pck(response)

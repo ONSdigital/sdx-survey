@@ -7,9 +7,10 @@ from sdx_base.services.storage import StorageService
 from app.definitions.comments import CommentsBase
 from app.definitions.decrypter import DecryptionBase
 from app.definitions.deliver import DeliverBase
+from app.definitions.http import TransformPosterBase, ImagePosterBase
 from app.definitions.processor import ProcessorBase
 from app.definitions.receipting import ReceiptServiceBase
-from app.definitions.transform import TransformServiceBase
+from app.definitions.transformer import TransformerBase
 from app.services.comments import CommentsService
 from app.services.decrypter import DecryptionService
 from app.services.deliver import DeliverService
@@ -18,6 +19,9 @@ from app.services.receipt import ReceiptService
 from app.services.transformer import TransformService
 from app.settings import Settings, get_instance
 from app.survey import BucketReader, Survey
+from app.transformation.image_poster import ImagePoster
+from app.transformation.selector import TransformSelector
+from app.transformation.transformer_poster import TransformPoster
 
 
 def get_settings() -> Settings:
@@ -59,25 +63,42 @@ def get_receipt_service(settings: Settings = Depends(get_settings),
     return ReceiptService(settings, publish)
 
 
-def get_transformer_service() -> TransformService:
-    return TransformService()
+def get_transform_poster(settings: Settings = Depends(get_settings),
+                        http_service: HttpService = Depends(get_http_service)) -> TransformPoster:
+    return TransformPoster(transformer_url=settings.transformer_service_url, http_service=http_service)
 
 
-def get_survey_processor(transformer_service: TransformServiceBase = Depends(get_transformer_service),
+def get_image_poster(settings: Settings = Depends(get_settings),
+                     http_service: HttpService = Depends(get_http_service)) -> ImagePoster:
+    return ImagePoster(image_url=settings.image_service_url, http_service=http_service)
+
+
+def get_transform_selector(transform_poster: TransformPosterBase = Depends(get_transform_poster),
+                           image_poster: ImagePosterBase = Depends(get_image_poster)) -> TransformSelector:
+    return TransformSelector(transform_poster=transform_poster, image_poster=image_poster)
+
+
+def get_transformer_service(
+    transform_selector: TransformSelector = Depends(get_transform_selector)
+) -> TransformService:
+    return TransformService(transform_selector)
+
+
+def get_survey_processor(transformer_service: TransformerBase = Depends(get_transformer_service),
                          deliver_service: DeliverBase = Depends(get_transformer_service),
                          receipt_service: ReceiptServiceBase = Depends(get_transformer_service),
                          comments_service: CommentsBase = Depends(get_transformer_service)) -> SurveyProcessorV2:
     return SurveyProcessorV2(transformer_service, deliver_service, receipt_service, comments_service)
 
 
-def get_adhoc_processor(transformer_service: TransformServiceBase = Depends(get_transformer_service),
+def get_adhoc_processor(transformer_service: TransformerBase = Depends(get_transformer_service),
                         deliver_service: DeliverBase = Depends(get_transformer_service),
                         receipt_service: ReceiptServiceBase = Depends(get_transformer_service),
                         comments_service: CommentsBase = Depends(get_transformer_service)) -> AdhocProcessorV2:
     return AdhocProcessorV2(transformer_service, deliver_service, receipt_service, comments_service)
 
 
-def get_feedback_processor(transformer_service: TransformServiceBase = Depends(get_transformer_service),
+def get_feedback_processor(transformer_service: TransformerBase = Depends(get_transformer_service),
                            deliver_service: DeliverBase = Depends(get_transformer_service),
                            receipt_service: ReceiptServiceBase = Depends(get_transformer_service),
                            comments_service: CommentsBase = Depends(get_transformer_service)) -> FeedbackProcessorV2:

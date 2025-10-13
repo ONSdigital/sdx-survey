@@ -2,11 +2,11 @@ import unittest
 from unittest.mock import patch, Mock
 
 from app.definitions.transform import Transform
-from app.definitions.survey_type import V2SurveyType
+from app.definitions.survey_type import SurveyType
 from app.response import Response
 from app.services.transformer import transform
 
-from app.transformation.transformers import Transformer
+from app.transformation.selector import Transformer
 from tests import unzip
 
 
@@ -42,7 +42,7 @@ class TestCreate(unittest.TestCase):
     @patch("app.transformation.create.get_v2_survey_type")
     def test_transform_for_v2(self, mock_survey_type: Mock, mock_get_transformer: Mock, mock_is_v2_message: Mock):
         response: Response = Mock(spec=Response)
-        mock_survey_type.return_value = V2SurveyType.LEGACY
+        mock_survey_type.return_value = SurveyType.LEGACY
         mock_is_v2_message.return_value = True
         mock_get_transformer.return_value = MockTransformer()
         actual: dict[str, bytes] = unzip(transform(response))
@@ -56,7 +56,7 @@ class TestCreate(unittest.TestCase):
     @patch("app.transformation.create.idbr")
     @patch("app.transformation.create.index")
     @patch("app.transformation.create.image")
-    @patch("app.transformation.create.pck")
+    @patch("app.transformation.create.PCK")
     @patch("app.transformation.create.is_v2_nifi_message_submission")
     @patch("app.transformation.create.requires_pck")
     def test_transform_for_v1_with_pck(self,
@@ -101,7 +101,7 @@ class TestCreate(unittest.TestCase):
     @patch("app.transformation.create.idbr")
     @patch("app.transformation.create.index")
     @patch("app.transformation.create.image")
-    @patch("app.transformation.create.pck")
+    @patch("app.transformation.create.PCK")
     @patch("app.transformation.create.is_v2_nifi_message_submission")
     @patch("app.transformation.create.requires_pck")
     def test_transform_for_v1_without_pck(self,

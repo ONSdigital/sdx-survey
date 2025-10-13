@@ -28,6 +28,6 @@ dev = [
 ]
 
 version-check = [
- "toml>=0.10.2",
- "tomlkit>=0.13.3",
+     "toml>=0.10.2",
+     "tomlkit>=0.13.3",
 ]
