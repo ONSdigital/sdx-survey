@@ -15,11 +15,12 @@ class TransformSelector:
 
     def __init__(self,
                  transform_poster: TransformPosterBase,
-                 image_poster: ImagePosterBase):
+                 image_poster: ImagePosterBase,
+                 ftp_path: str):
 
         pck_transform: Transform = PCKTransform(transform_poster)
         image_transform: Transform = ImageTransform(image_poster)
-        index_transform: Transform = IndexTransform()
+        index_transform: Transform = IndexTransform(ftp_path)
         idbr_transform: Transform = IDBRTransform()
         json_transform: Transform = JsonTransform()
         spp_transform: Transform = SPPTransform(transform_poster)

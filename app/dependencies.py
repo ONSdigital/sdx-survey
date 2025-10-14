@@ -74,8 +74,9 @@ def get_image_poster(settings: Settings = Depends(get_settings),
 
 
 def get_transform_selector(transform_poster: TransformPosterBase = Depends(get_transform_poster),
-                           image_poster: ImagePosterBase = Depends(get_image_poster)) -> TransformSelector:
-    return TransformSelector(transform_poster=transform_poster, image_poster=image_poster)
+                           image_poster: ImagePosterBase = Depends(get_image_poster),
+                           settings: Settings = Depends(get_settings)) -> TransformSelector:
+    return TransformSelector(transform_poster=transform_poster, image_poster=image_poster, ftp_path=settings.ftp_path)
 
 
 def get_transformer_service(
@@ -85,23 +86,23 @@ def get_transformer_service(
 
 
 def get_survey_processor(transformer_service: TransformerBase = Depends(get_transformer_service),
-                         deliver_service: DeliverBase = Depends(get_transformer_service),
-                         receipt_service: ReceiptServiceBase = Depends(get_transformer_service),
-                         comments_service: CommentsBase = Depends(get_transformer_service)) -> SurveyProcessorV2:
+                         deliver_service: DeliverBase = Depends(get_deliver_service),
+                         receipt_service: ReceiptServiceBase = Depends(get_receipt_service),
+                         comments_service: CommentsBase = Depends(get_comments_service)) -> SurveyProcessorV2:
     return SurveyProcessorV2(transformer_service, deliver_service, receipt_service, comments_service)
 
 
 def get_adhoc_processor(transformer_service: TransformerBase = Depends(get_transformer_service),
-                        deliver_service: DeliverBase = Depends(get_transformer_service),
-                        receipt_service: ReceiptServiceBase = Depends(get_transformer_service),
-                        comments_service: CommentsBase = Depends(get_transformer_service)) -> AdhocProcessorV2:
+                        deliver_service: DeliverBase = Depends(get_deliver_service),
+                        receipt_service: ReceiptServiceBase = Depends(get_receipt_service),
+                        comments_service: CommentsBase = Depends(get_comments_service)) -> AdhocProcessorV2:
     return AdhocProcessorV2(transformer_service, deliver_service, receipt_service, comments_service)
 
 
 def get_feedback_processor(transformer_service: TransformerBase = Depends(get_transformer_service),
-                           deliver_service: DeliverBase = Depends(get_transformer_service),
-                           receipt_service: ReceiptServiceBase = Depends(get_transformer_service),
-                           comments_service: CommentsBase = Depends(get_transformer_service)) -> FeedbackProcessorV2:
+                           deliver_service: DeliverBase = Depends(get_deliver_service),
+                           receipt_service: ReceiptServiceBase = Depends(get_receipt_service),
+                           comments_service: CommentsBase = Depends(get_comments_service)) -> FeedbackProcessorV2:
     return FeedbackProcessorV2(transformer_service, deliver_service, receipt_service, comments_service)
 
 

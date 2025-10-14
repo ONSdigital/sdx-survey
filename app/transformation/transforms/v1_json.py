@@ -13,5 +13,4 @@ class V1JsonTransform(Transform):
 
     def get_file_content(self, response: Response) -> bytes:
         r: str = response.to_v1_json()
-
         return bytes(r, 'utf-8')

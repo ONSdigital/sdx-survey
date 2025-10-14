@@ -12,7 +12,6 @@ logger = get_logger()
 SPP_DATA_FORMAT: Final[str] = "%Y-%m-%dT%H-%M-%S"
 
 
-
 def get_name(response: Response) -> str:
     survey_id = response.get_survey_id()
     tx_id = response.get_tx_id()

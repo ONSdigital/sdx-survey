@@ -39,7 +39,7 @@ class Processor(ProcessorBase):
     def run(self: Self, response: Response):
         """
         The method that processes
-        the survey, extract version, run actions
+        the survey, by running the actions
         and deliver
         """
         for action in self._actions:
@@ -57,11 +57,12 @@ class ProcessorV2(Processor):
                  deliver_service: DeliverBase,
                  receipt_service: ReceiptServiceBase,
                  comments_service: CommentsBase):
-        super().__init__()
+
         self._transformer_service = transformer_service
         self._deliver_service = deliver_service
         self._receipt_service = receipt_service
         self._comments_service = comments_service
+        super().__init__()
 
     def deliver(self: Self, response: Response):
         zip_file = self._transformer_service.transform(response)
@@ -74,7 +75,7 @@ class ProcessorV2(Processor):
             "context_type": context_type,
         }
 
-        if self._response.get_response_type() != SurveyType.ADHOC:
+        if response.get_survey_type() != SurveyType.ADHOC:
             context["period_id"] = response.get_period()
             context["ru_ref"] = response.get_ru_ref()
 
