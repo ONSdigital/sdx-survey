@@ -1,6 +1,7 @@
 from app.definitions.http import TransformPosterBase, ImagePosterBase
 from app.definitions.survey_type import SurveyType
 from app.definitions.transform import Transform
+from app.transformation.transforms.adhoc import AdhocTransform
 from app.transformation.transforms.feedback import FeedbackTransform
 from app.transformation.transforms.idbr import IDBRTransform
 from app.transformation.transforms.image import ImageTransform
@@ -26,6 +27,7 @@ class TransformSelector:
         spp_transform: Transform = SPPTransform(transform_poster)
         feedback_transform: Transform = FeedbackTransform()
         v1_json_transform: Transform = V1JsonTransform()
+        adhoc_transform: Transform = AdhocTransform()
 
         self._mapping: dict[SurveyType, list[Transform]] = {
             SurveyType.LEGACY: [pck_transform, image_transform, index_transform, idbr_transform],
@@ -34,6 +36,7 @@ class TransformSelector:
             SurveyType.SPP: [spp_transform, image_transform, index_transform, idbr_transform],
             SurveyType.DAP: [v1_json_transform],
             SurveyType.FEEDBACK: [feedback_transform],
+            SurveyType.ADHOC: [adhoc_transform]
         }
 
     def select(self, survey_type: SurveyType) -> list[Transform]:

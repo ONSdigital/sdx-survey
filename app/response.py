@@ -175,9 +175,6 @@ class Response:
         return self._submission["survey_metadata"]["ru_ref"]
 
     def get_period(self) -> str:
-        if self.get_survey_type() == SurveyType.ADHOC:
-            raise DataError("Adhoc surveys do not have period field")
-
         return self._submission["survey_metadata"]["period_id"]
 
     def get_case_id(self) -> str:
