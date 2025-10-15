@@ -5,7 +5,7 @@ from typing import Any
 from sdx_base.errors.errors import DataError
 
 from app import get_logger
-from app.definitions.context_type import V2ContextType
+from app.definitions.context_type import ContextType
 from app.definitions.submission import SurveySubmission, BusinessSurveyMetadata
 from app.definitions.survey_type import SurveyType
 from app.period import Period
@@ -43,11 +43,11 @@ class Response:
     def get_submission(self) -> SurveySubmission:
         return copy.deepcopy(self._submission)
 
-    def get_context_type(self) -> V2ContextType:
+    def get_context_type(self) -> ContextType:
         if self.get_survey_id() in ADHOC_SURVEY:
-            return V2ContextType.ADHOC_SURVEY
+            return ContextType.ADHOC_SURVEY
         else:
-            return V2ContextType.BUSINESS_SURVEY
+            return ContextType.BUSINESS_SURVEY
 
     def get_survey_type(self) -> SurveyType:
         if self.is_feedback():

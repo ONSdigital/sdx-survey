@@ -3,7 +3,7 @@ from typing import Self
 
 from app.definitions.comments import CommentsBase
 from app.definitions.context import Context
-from app.definitions.context_type import V2ContextType
+from app.definitions.context_type import ContextType
 from app.definitions.deliver import DeliverBase
 from app.definitions.processor import ProcessorBase
 from app.definitions.receipting import ReceiptServiceBase
@@ -75,7 +75,7 @@ class ProcessorV2(Processor):
             "context_type": context_type,
         }
 
-        if response.get_context_type() != V2ContextType.ADHOC_SURVEY:
+        if response.get_context_type() != ContextType.ADHOC_SURVEY:
             context["period_id"] = response.get_period()
             context["ru_ref"] = response.get_ru_ref()
 

@@ -19,7 +19,7 @@ from sdx_base.services.pubsub import PubsubService
 from sdx_base.services.storage import StorageService
 
 from app.definitions.context import Context
-from app.definitions.context_type import V2ContextType
+from app.definitions.context_type import ContextType
 from app.definitions.decrypter import DecryptionBase
 from app.definitions.submission import SurveySubmission
 from app.definitions.survey_type import SurveyType
@@ -154,7 +154,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.LEGACY,
-            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "009",
             "period_id": "1605",
             "ru_ref": "12346789012A"
@@ -199,7 +199,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.SPP,
-            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "009",
             "period_id": "2512",
             "ru_ref": "12346789012A"
@@ -242,7 +242,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.SPP,
-            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "023",
             "period_id": "1604",
             "ru_ref": "12345678901A"
@@ -282,7 +282,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.ADHOC,
-            "context_type": V2ContextType.ADHOC_SURVEY,
+            "context_type": ContextType.ADHOC_SURVEY,
             "survey_id": "740",
         }
 
@@ -317,7 +317,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.DAP,
-            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "283",
             'period_id': '201605',
             'ru_ref': '11842491738S',
@@ -354,7 +354,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.FEEDBACK,
-            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "139",
             'period_id': '1706',
             'ru_ref': '11110000002H',
@@ -391,7 +391,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.FEEDBACK,
-            "context_type": V2ContextType.ADHOC_SURVEY,
+            "context_type": ContextType.ADHOC_SURVEY,
             "survey_id": "740",
         }
 
@@ -429,7 +429,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.ENVIRONMENTAL,
-            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "007",
             "period_id": "201605",
             "ru_ref": "15339216474W"
@@ -473,7 +473,7 @@ class TestRun(unittest.TestCase):
         expected_context: Context = {
             "tx_id": tx_id,
             "survey_type": SurveyType.MATERIALS,
-            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "024",
             "period_id": "201605",
             "ru_ref": "08449838140O"

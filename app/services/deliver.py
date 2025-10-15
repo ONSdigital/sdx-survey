@@ -5,7 +5,7 @@ import requests
 
 from app import get_logger
 from app.definitions.context import Context
-from app.definitions.context_type import V2ContextType
+from app.definitions.context_type import ContextType
 from app.definitions.deliver import DeliverBase
 
 # Constants used within the http request
@@ -44,7 +44,7 @@ class DeliverService(DeliverBase):
         # filename will always be transaction id
         filename: str = tx_id
         endpoint: str = BUSINESS_ENDPOINT
-        if context["context_type"] == V2ContextType.ADHOC_SURVEY:
+        if context["context_type"] == ContextType.ADHOC_SURVEY:
             endpoint = ADHOC_ENDPOINT
 
         context_json: str = json.dumps(context)
