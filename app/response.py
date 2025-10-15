@@ -44,7 +44,7 @@ class Response:
         return copy.deepcopy(self._submission)
 
     def get_context_type(self) -> V2ContextType:
-        if self.get_survey_type() == SurveyType.ADHOC:
+        if self.get_survey_id() in ADHOC_SURVEY:
             return V2ContextType.ADHOC_SURVEY
         else:
             return V2ContextType.BUSINESS_SURVEY

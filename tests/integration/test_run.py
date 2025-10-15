@@ -92,7 +92,6 @@ class TestRun(unittest.TestCase):
         self.spp_contents = b'spp contents'
         self.image_contents = b'image contents'
 
-
         self.deliver_posted_files: dict[str, bytes] = {}
         self.deliver_posted_params: dict[str, str] = {}
 
@@ -119,11 +118,11 @@ class TestRun(unittest.TestCase):
             response._content = contents
             return response
 
+        self.mock_http = Mock(spec=HttpService)
+        self.mock_http.post.side_effect = post_side_effect
         self.mock_storage = Mock(spec=StorageService)
         self.mock_storage.read.return_value = b'submission bytes'
         self.mock_decryptor = Mock(spec=DecryptionBase)
-        self.mock_http = Mock(spec=HttpService)
-        self.mock_http.post.side_effect = post_side_effect
         self.mock_pubsub = Mock(spec=PubsubService)
         self.mock_datastore = Mock(spec=DatastoreService)
 
@@ -165,12 +164,17 @@ class TestRun(unittest.TestCase):
         actual_context: Context = json.loads(self.deliver_posted_params[CONTEXT])
 
         self.assertTrue(resp.is_success)
+        # check call to deliver
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
         self.assertEqual(self.image_contents, actual_files[expected_image_filename])
         self.assertTrue(expected_index_filename in actual_files)
         self.assertTrue(expected_receipt_filename in actual_files)
         self.assertEqual(4, len(actual_files))
         self.assertEqual(expected_context, actual_context)
+        # check receipt was sent
+        self.mock_pubsub.publish_message.assert_called()
+        # check comments were stored
+        self.mock_datastore.commit_entity.assert_called()
 
     def test_mbs_spp(self):
         submission_json = get_json("009.0106.json")
@@ -211,6 +215,10 @@ class TestRun(unittest.TestCase):
         self.assertTrue(expected_receipt_filename in actual_files)
         self.assertEqual(4, len(actual_files))
         self.assertEqual(expected_context, actual_context)
+        # check receipt was sent
+        self.mock_pubsub.publish_message.assert_called()
+        # check comments were stored
+        self.mock_datastore.commit_entity.assert_called()
 
     def test_rsi_spp(self):
         submission_json = get_json("023.0102.json")
@@ -250,6 +258,10 @@ class TestRun(unittest.TestCase):
         self.assertTrue(expected_receipt_filename in actual_files)
         self.assertEqual(4, len(actual_files))
         self.assertEqual(expected_context, actual_context)
+        # check receipt was sent
+        self.mock_pubsub.publish_message.assert_called()
+        # check comments were stored
+        self.mock_datastore.commit_entity.assert_called()
 
     def test_adhoc(self):
         submission_json = get_json("740.0001.json")
@@ -281,6 +293,10 @@ class TestRun(unittest.TestCase):
         self.assertTrue(expected_filename in actual_files)
         self.assertEqual(1, len(actual_files))
         self.assertEqual(expected_context, actual_context)
+        # check receipt was sent
+        self.mock_pubsub.publish_message.assert_called()
+        # check comments were not stored
+        self.mock_datastore.commit_entity.assert_not_called()
 
     def test_dap(self):
         submission_json = get_json("283.0001.json")
@@ -314,9 +330,13 @@ class TestRun(unittest.TestCase):
         self.assertTrue(expected_filename in actual_files)
         self.assertEqual(1, len(actual_files))
         self.assertEqual(expected_context, actual_context)
+        # check receipt was sent
+        self.mock_pubsub.publish_message.assert_called()
+        # check comments were stored
+        self.mock_datastore.commit_entity.assert_called()
 
     def test_feedback(self):
-        submission_json = get_json("139.0001.json")
+        submission_json = get_json("139.fb.json")
         tx_id = submission_json["tx_id"]
         self.message["attributes"]["objectId"] = tx_id
         self.mock_decryptor.decrypt_survey.return_value = submission_json
@@ -347,3 +367,44 @@ class TestRun(unittest.TestCase):
         self.assertTrue(expected_filename in actual_files)
         self.assertEqual(1, len(actual_files))
         self.assertEqual(expected_context, actual_context)
+        # check no receipt was sent
+        self.mock_pubsub.publish_message.assert_not_called()
+        # check comments were not stored
+        self.mock_datastore.commit_entity.assert_not_called()
+
+    def test_adhoc_feedback(self):
+        submission_json = get_json("740.fb.json")
+        tx_id = submission_json["tx_id"]
+        self.message["attributes"]["objectId"] = tx_id
+        self.mock_decryptor.decrypt_survey.return_value = submission_json
+
+        resp = self.client.post("/", json=self.envelope)
+
+        # expected files
+        expected_filename = 'ea82c224-0f80-41cc-b877-8a7804b56c26-fb-16-37-56_21-05-2016'
+
+        # actual files
+        actual_zip_file = self.deliver_posted_files[ZIP_FILE]
+        actual_files = read_zip(actual_zip_file)
+
+        print(actual_files)
+
+        # expected context
+        expected_context: Context = {
+            "tx_id": tx_id,
+            "survey_type": SurveyType.FEEDBACK,
+            "context_type": V2ContextType.ADHOC_SURVEY,
+            "survey_id": "740",
+        }
+
+        # actual context
+        actual_context: Context = json.loads(self.deliver_posted_params[CONTEXT])
+
+        self.assertTrue(resp.is_success)
+        self.assertTrue(expected_filename in actual_files)
+        self.assertEqual(1, len(actual_files))
+        self.assertEqual(expected_context, actual_context)
+        # check no receipt was sent
+        self.mock_pubsub.publish_message.assert_not_called()
+        # check comments were not stored
+        self.mock_datastore.commit_entity.assert_not_called()
