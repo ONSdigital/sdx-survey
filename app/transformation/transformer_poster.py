@@ -4,8 +4,7 @@ from typing import Final
 import requests
 
 from app import get_logger
-from app.definitions.gcp_protocols import Http
-from app.definitions.http import TransformPosterBase
+from app.definitions.http import TransformPosterBase, Http
 from app.response import Response
 
 logger = get_logger()
