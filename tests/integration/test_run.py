@@ -387,8 +387,6 @@ class TestRun(unittest.TestCase):
         actual_zip_file = self.deliver_posted_files[ZIP_FILE]
         actual_files = read_zip(actual_zip_file)
 
-        print(actual_files)
-
         # expected context
         expected_context: Context = {
             "tx_id": tx_id,
@@ -408,3 +406,91 @@ class TestRun(unittest.TestCase):
         self.mock_pubsub.publish_message.assert_not_called()
         # check comments were not stored
         self.mock_datastore.commit_entity.assert_not_called()
+
+    def test_environmental(self):
+        submission_json = get_json("007.0009.json")
+        tx_id = submission_json["tx_id"]
+        self.message["attributes"]["objectId"] = tx_id
+        self.mock_decryptor.decrypt_survey.return_value = submission_json
+
+        resp = self.client.post("/", json=self.envelope)
+
+        # expected files
+        expected_json_filename = '007_837e9fe2eab84909.json'
+        expected_image_filename = 'S837e9fe2eab84909_1.JPG'
+        expected_index_filename = 'EDC_007_20210203_837e9fe2eab84909.csv'
+        expected_receipt_filename = 'REC0302_837e9fe2eab84909.DAT'
+
+        # actual files
+        actual_zip_file = self.deliver_posted_files[ZIP_FILE]
+        actual_files = read_zip(actual_zip_file)
+
+        # expected context
+        expected_context: Context = {
+            "tx_id": tx_id,
+            "survey_type": SurveyType.ENVIRONMENTAL,
+            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "survey_id": "007",
+            "period_id": "201605",
+            "ru_ref": "15339216474W"
+        }
+
+        # actual context
+        actual_context: Context = json.loads(self.deliver_posted_params[CONTEXT])
+
+        self.assertTrue(resp.is_success)
+        # check call to deliver
+        self.assertTrue(expected_json_filename in actual_files)
+        self.assertEqual(self.image_contents, actual_files[expected_image_filename])
+        self.assertTrue(expected_index_filename in actual_files)
+        self.assertTrue(expected_receipt_filename in actual_files)
+        self.assertEqual(4, len(actual_files))
+        self.assertEqual(expected_context, actual_context)
+        # check receipt was sent
+        self.mock_pubsub.publish_message.assert_called()
+        # check comments were stored
+        self.mock_datastore.commit_entity.assert_called()
+
+    def test_materials(self):
+        submission_json = get_json("024.0002.json")
+        tx_id = submission_json["tx_id"]
+        self.message["attributes"]["objectId"] = tx_id
+        self.mock_decryptor.decrypt_survey.return_value = submission_json
+
+        resp = self.client.post("/", json=self.envelope)
+
+        # expected files
+        expected_json_filename = '024_08449838140_201605.json'
+        expected_image_filename = 'S0d21ffe7dcb04d4e_1.JPG'
+        expected_index_filename = 'EDC_024_20220315_0d21ffe7dcb04d4e.csv'
+        expected_receipt_filename = 'REC1503_0d21ffe7dcb04d4e.DAT'
+
+        # actual files
+        actual_zip_file = self.deliver_posted_files[ZIP_FILE]
+        actual_files = read_zip(actual_zip_file)
+
+        # expected context
+        expected_context: Context = {
+            "tx_id": tx_id,
+            "survey_type": SurveyType.MATERIALS,
+            "context_type": V2ContextType.BUSINESS_SURVEY,
+            "survey_id": "024",
+            "period_id": "201605",
+            "ru_ref": "08449838140O"
+        }
+
+        # actual context
+        actual_context: Context = json.loads(self.deliver_posted_params[CONTEXT])
+
+        self.assertTrue(resp.is_success)
+        # check call to deliver
+        self.assertTrue(expected_json_filename in actual_files)
+        self.assertEqual(self.image_contents, actual_files[expected_image_filename])
+        self.assertTrue(expected_index_filename in actual_files)
+        self.assertTrue(expected_receipt_filename in actual_files)
+        self.assertEqual(4, len(actual_files))
+        self.assertEqual(expected_context, actual_context)
+        # check receipt was sent
+        self.mock_pubsub.publish_message.assert_called()
+        # check comments were stored
+        self.mock_datastore.commit_entity.assert_called()
