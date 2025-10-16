@@ -9,6 +9,7 @@ from unittest.mock import Mock
 import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from sdx_base.errors.retryable import RetryableError
 from sdx_base.models.pubsub import Message, Envelope
 from sdx_base.run import run
 from sdx_base.server.server import RouterConfig
@@ -23,7 +24,7 @@ from app.definitions.decrypter import DecryptionBase
 from app.definitions.submission import SurveySubmission
 from app.dependencies import get_http_service, get_pubsub_service, get_storage_service, get_decryption_service, \
     get_datastore_service
-from app.routes import router
+from app.routes import router, unrecoverable_error_handler
 from app.services import deliver
 from app.services.deliver import ZIP_FILE, CONTEXT
 from app.settings import Settings
@@ -64,7 +65,9 @@ class TestBase(unittest.TestCase):
         os.environ["PROJECT_ID"] = "ons-sdx-sandbox"
         proj_root = Path(__file__).parent.parent.parent  # sdx-survey dir
 
-        router_config = RouterConfig(router, tx_id_getter=txid_from_pubsub)
+        router_config = RouterConfig(router,
+                                     tx_id_getter=txid_from_pubsub,
+                                     on_unrecoverable_handler=unrecoverable_error_handler)
         app: FastAPI = run(Settings,
                            routers=[router_config],
                            proj_root=proj_root,
@@ -141,6 +144,7 @@ class TestBase(unittest.TestCase):
         app.dependency_overrides[get_http_service] = lambda: self.mock_http
         app.dependency_overrides[get_pubsub_service] = lambda: self.mock_pubsub
         app.dependency_overrides[get_datastore_service] = lambda: self.mock_datastore
+        self.app = app
 
     def set_survey_submission(self, tx_id: str, survey_submission: SurveySubmission):
         self.message["attributes"]["objectId"] = tx_id
@@ -161,3 +165,26 @@ class TestBase(unittest.TestCase):
 
     def was_receipt_called(self) -> bool:
         return self.receipt_called
+
+    def simulate_retryable_error_on_post(self):
+        def retryable_side_effect(domain: str,
+                             endpoint: str,
+                             json_data: str | None = None,
+                             params: dict[str, str] | None = None,
+                             files: dict[str, bytes] | None = None) -> requests.Response:
+            raise RetryableError()
+
+        self.mock_http.post.side_effect = retryable_side_effect
+
+    def simulate_data_error_on_post(self):
+        def data_side_effect(_domain: str,
+                             endpoint: str,
+                             _json_data: str | None = None,
+                             params: dict[str, str] | None = None,
+                             files: dict[str, bytes] | None = None) -> requests.Response:
+            response = requests.Response()
+            response.status_code = 400
+            response._content = b""
+            return response
+
+        self.mock_http.post.side_effect = data_side_effect
