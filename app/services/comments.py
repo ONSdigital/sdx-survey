@@ -14,6 +14,18 @@ from app.transformation.formatter import get_datetime
 logger = get_logger()
 
 
+class AdditionalComment(TypedDict):
+    qcode: str
+    comment: Optional[str]
+
+
+class CommentData(TypedDict):
+    ru_ref: str
+    boxes_selected: str
+    comment: str
+    additional: list[AdditionalComment]
+
+
 class Comment:
     """Class to define a comment entity"""
 
@@ -22,11 +34,6 @@ class Comment:
         self.kind = kind
         self.encrypted_data = encrypted_data
         self.created = submitted_time
-
-
-class AdditionalComment(TypedDict):
-    qcode: str
-    comment: Optional[str]
 
 
 class CommentsSettings(Protocol):
@@ -64,7 +71,7 @@ class CommentsService(CommentsBase):
         transaction_id = response.get_tx_id()
         period = response.get_period()
         survey_id = response.get_survey_id()
-        data = {"ru_ref": response.get_ru_ref(),
+        data: CommentData = {"ru_ref": response.get_ru_ref(),
                 "boxes_selected": self.get_boxes_selected(response),
                 "comment": self.get_comment(response),
                 "additional": self.get_additional_comments(response)}
@@ -81,7 +88,7 @@ class CommentsService(CommentsBase):
         self.commit_to_datastore(comment)
 
 
-    def encrypt_comment(self, data: dict) -> str:
+    def encrypt_comment(self, data: CommentData) -> str:
         logger.info('Encrypting comments')
         comment_str = json.dumps(data)
         f = Fernet(self._settings.sdx_comment_key)
