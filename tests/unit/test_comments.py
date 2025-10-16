@@ -1,17 +1,13 @@
 import json
 import unittest
-from datetime import datetime
-from typing import Optional, TypedDict, Final
-from unittest import mock
-from unittest.mock import patch
+from typing import Optional, Final
+
 from cryptography.fernet import Fernet
 from sdx_base.settings.service import SECRET
 
 from app.definitions.submission import SurveySubmission
 from app.response import Response
-from app.services.comments import CommentsWriter, CommentsSettings, CommentsService, CommentData
-from app.transformation.formatter import get_datetime
-
+from app.services.comments import CommentsSettings, CommentsService, CommentData
 
 COMMENT_KEY: Final[str] = "Pk_eTrrXIaiEv62A6w5qwerYCxR4060Xo1j5pJO_J2c="
 
@@ -25,7 +21,7 @@ def decrypt_comment(comment_token: str) -> dict:
 class MockCommentsWriter:
 
     def __init__(self):
-        self._data: dict[str, str]
+        self._data: dict[str, str] = {}
         self._kind: str = ""
 
     def commit_entity(self,
@@ -173,7 +169,6 @@ class StoreCommentsTest(unittest.TestCase):
         test_data: SurveySubmission = self.test_submission
         test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '187'
-        test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
         test_data["data"] = {
             "500": "Im the des comment",
             "300": "Im the mwss comment",
@@ -198,7 +193,6 @@ class StoreCommentsTest(unittest.TestCase):
             test_data: SurveySubmission = self.test_submission
             test_data['tx_id'] = tx_id
             test_data['survey_metadata']['survey_id'] = '134'
-            test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
             test_data["data"] = {
                 "500": "Im the des comment",
                 "300": "Im the mwss comment",
@@ -223,7 +217,6 @@ class StoreCommentsTest(unittest.TestCase):
         test_data: SurveySubmission = self.test_submission
         test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '134'
-        test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
         test_data["data"] = {
             "300": "Im the mwss main comment",
             "300w": "300w",
@@ -248,7 +241,7 @@ class StoreCommentsTest(unittest.TestCase):
 
     def test_get_additional_comments_2(self):
         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
-        test_data: SurveySubmission = self.test_survey
+        test_data: SurveySubmission = self.test_submission
         test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '134'
         test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
@@ -257,115 +250,158 @@ class StoreCommentsTest(unittest.TestCase):
             "300w4": "bye"
         }
 
-        self.assertEqual(
-            get_additional_comments(Response(test_data, tx_id)),
-            [
+        self.comments_service.store_comments(Response(test_data))
+
+        expected: CommentData = {
+            'ru_ref': '15162882666F',
+            'boxes_selected': '',
+            'comment': None,
+            'additional': [
                 {'qcode': '300f', "comment": 'hello'},
                 {'qcode': '300w4', "comment": 'bye'}
             ]
-        )
-#
-#     def test_get_additional_comments_none(self):
-#         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
-#         test_data: SurveySubmission = self.test_survey
-#         test_data['tx_id'] = tx_id
-#         test_data['survey_metadata']['survey_id'] = '134'
-#         test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
-#         test_data["data"] = {
-#             "300a": "300w",
-#             "300b": "300m",
-#             "300c": "300w5"
-#         }
-#
-#         self.assertEqual(get_additional_comments(Response(test_data, tx_id)), [])
-#
-#     def test_get_boxes_selected(self):
-#         tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
-#         test_data: SurveySubmission = self.test_survey
-#         test_data['tx_id'] = tx_id
-#         test_data['survey_metadata']['survey_id'] = '134'
-#         test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
-#         test_data["data"] = {
-#             "91w": "Yes",
-#             "94w2": "Yes",
-#             "192w42": "Yes",
-#             "197w4": "Yes"
-#         }
-#
-#         self.assertEqual("91w, 94w2, 192w42, 197w4, ", get_boxes_selected(Response(test_data, tx_id)))
-#
-#     def test_get_boxes_selected_2(self):
-#         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
-#         test_data: SurveySubmission = self.test_survey
-#         test_data['tx_id'] = tx_id
-#         test_data['survey_metadata']['survey_id'] = '009'
-#         test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
-#         test_data["data"] = {
-#             "146a": "Yes"
-#         }
-#
-#         self.assertEqual("146a ", get_boxes_selected(Response(test_data, tx_id)))
-#
-#     def test_get_boxes_selected_none(self):
-#         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
-#         test_data: SurveySubmission = self.test_survey
-#         test_data['tx_id'] = tx_id
-#         test_data['survey_metadata']['survey_id'] = '134'
-#         test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
-#         test_data["data"] = {
-#             "91w123": "Yes",
-#             "94w2123": "Yes",
-#             "192w42123": "Yes",
-#             "197w4123": "Yes"
-#         }
-#
-#         self.assertEqual(get_boxes_selected(Response(test_data, tx_id)), "")
-#
+        }
 
+        actual = self.comments_writer.get_comment_data()
+        self.assertEqual(expected, actual)
+        self.assertEqual("134_201904", self.comments_writer.get_kind())
+
+
+    def test_get_additional_comments_none(self):
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
+        test_data: SurveySubmission = self.test_submission
+        test_data['tx_id'] = tx_id
+        test_data['survey_metadata']['survey_id'] = '134'
+        test_data["data"] = {
+            "300a": "300w",
+            "300b": "300m",
+            "300c": "300w5"
+        }
+
+        self.comments_service.store_comments(Response(test_data))
+
+        expected: CommentData = {
+            'ru_ref': '15162882666F',
+            'boxes_selected': '',
+            'comment': None,
+            'additional': []
+        }
+
+        actual = self.comments_writer.get_comment_data()
+        self.assertEqual(expected, actual)
+
+    def test_get_boxes_selected(self):
+        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
+        test_data: SurveySubmission = self.test_submission
+        test_data['tx_id'] = tx_id
+        test_data['survey_metadata']['survey_id'] = '134'
+        test_data["data"] = {
+            "91w": "Yes",
+            "94w2": "Yes",
+            "192w42": "Yes",
+            "197w4": "Yes"
+        }
+
+        self.comments_service.store_comments(Response(test_data))
+
+        expected: CommentData = {
+            'ru_ref': '15162882666F',
+            'boxes_selected': "91w, 94w2, 192w42, 197w4, ",
+            'comment': None,
+            'additional': []
+        }
+
+        actual = self.comments_writer.get_comment_data()
+        self.assertEqual(expected, actual)
 #
+    def test_get_boxes_selected_2(self):
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
+        test_data: SurveySubmission = self.test_submission
+        test_data['tx_id'] = tx_id
+        test_data['survey_metadata']['survey_id'] = '009'
+        test_data["data"] = {
+            "146a": "Yes"
+        }
+
+        self.comments_service.store_comments(Response(test_data))
+
+        expected: CommentData = {
+            'ru_ref': '15162882666F',
+            'boxes_selected': "146a ",
+            'comment': None,
+            'additional': []
+        }
+
+        actual = self.comments_writer.get_comment_data()
+        self.assertEqual(expected, actual)
+
+    def test_get_boxes_selected_none(self):
+        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
+        test_data: SurveySubmission = self.test_submission
+        test_data['tx_id'] = tx_id
+        test_data['survey_metadata']['survey_id'] = '134'
+        test_data["data"] = {
+            "91w123": "Yes",
+            "94w2123": "Yes",
+            "192w42123": "Yes",
+            "197w4123": "Yes"
+        }
+
+        self.comments_service.store_comments(Response(test_data))
+
+        expected: CommentData = {
+            'ru_ref': '15162882666F',
+            'boxes_selected': "",
+            'comment': None,
+            'additional': []
+        }
+
+        actual = self.comments_writer.get_comment_data()
+        self.assertEqual(expected, actual)
+
 # def test_extract_bres_comment(self):
-    #     tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
-    #     test_data: SurveySubmission = self.test_submission
-    #     test_data['tx_id'] = tx_id
-    #     test_data['survey_metadata']['survey_id'] = '221'
-    #     test_data['data'] = {
-    #         "answers": [
-    #             {"answer_id": "answerccd2c97c-28cb-460c-8f76-3d9f04aa98d6",
-    #              "value": "No, the business name is not correct"},
-    #             {"answer_id": "answerca3136ef-d9ef-4bb8-8496-840dc1ac46c6",
-    #              "value": "corrected business name"},
-    #             {"answer_id": "answera74a8052-0257-4dc4-83a0-598ce7bedb81",
-    #              "value": "No, the business address is not correct"},
-    #             {"answer_id": "answerfaf14e92-e81b-4759-801f-8c6a1623020f",
-    #              "value": "address line1"},
-    #             {"answer_id": "answercdade785-1566-414c-be8c-c228bfa24e2d",
-    #              "value": "address line2"},
-    #             {"answer_id": "answerbe073353-2972-4f21-8773-3a43decb6e34",
-    #              "value": "AB12 3CD"}
-    #         ],
-    #         "lists": [
-    #             {"items": ["aGlfLb", "sZqslY"],
-    #              "name": "local-units"}
-    #         ],
-    #         "answer_codes": [
-    #             {"answer_id": "answerccd2c97c-28cb-460c-8f76-3d9f04aa98d6", "code": "9955"},
-    #             {"answer_id": "answerca3136ef-d9ef-4bb8-8496-840dc1ac46c6", "code": "9954"},
-    #             {"answer_id": "answera74a8052-0257-4dc4-83a0-598ce7bedb81", "code": "9953"},
-    #             {"answer_id": "answerfaf14e92-e81b-4759-801f-8c6a1623020f", "code": "9982"},
-    #             {"answer_id": "answercdade785-1566-414c-be8c-c228bfa24e2d", "code": "9981"},
-    #             {"answer_id": "answerbe073353-2972-4f21-8773-3a43decb6e34", "code": "9977"}
-    #         ]
-    #     }
-    #
-    #     self.comments_service.store_comments(Response(test_data))
-    #
-    #     expected: CommentData = {
-    #         'ru_ref': '15162882666F',
-    #         'boxes_selected': '',
-    #         'comment': "Name:\ncorrected business name\nAddress:\naddress line1\naddress line2\nAB12 3CD",
-    #         'additional': []
-    #     }
-    #
-    #     actual = self.comments_writer.get_comment_data()
-    #     self.assertEqual(expected, actual)
-    #     self.assertEqual("221_201904", self.comments_writer.get_kind())
+#         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
+#         test_data: SurveySubmission = self.test_submission
+#         test_data['tx_id'] = tx_id
+#         test_data['survey_metadata']['survey_id'] = '221'
+#         test_data['data'] = {
+#             "answers": [
+#                 {"answer_id": "answerccd2c97c-28cb-460c-8f76-3d9f04aa98d6",
+#                  "value": "No, the business name is not correct"},
+#                 {"answer_id": "answerca3136ef-d9ef-4bb8-8496-840dc1ac46c6",
+#                  "value": "corrected business name"},
+#                 {"answer_id": "answera74a8052-0257-4dc4-83a0-598ce7bedb81",
+#                  "value": "No, the business address is not correct"},
+#                 {"answer_id": "answerfaf14e92-e81b-4759-801f-8c6a1623020f",
+#                  "value": "address line1"},
+#                 {"answer_id": "answercdade785-1566-414c-be8c-c228bfa24e2d",
+#                  "value": "address line2"},
+#                 {"answer_id": "answerbe073353-2972-4f21-8773-3a43decb6e34",
+#                  "value": "AB12 3CD"}
+#             ],
+#             "lists": [
+#                 {"items": ["aGlfLb", "sZqslY"],
+#                  "name": "local-units"}
+#             ],
+#             "answer_codes": [
+#                 {"answer_id": "answerccd2c97c-28cb-460c-8f76-3d9f04aa98d6", "code": "9955"},
+#                 {"answer_id": "answerca3136ef-d9ef-4bb8-8496-840dc1ac46c6", "code": "9954"},
+#                 {"answer_id": "answera74a8052-0257-4dc4-83a0-598ce7bedb81", "code": "9953"},
+#                 {"answer_id": "answerfaf14e92-e81b-4759-801f-8c6a1623020f", "code": "9982"},
+#                 {"answer_id": "answercdade785-1566-414c-be8c-c228bfa24e2d", "code": "9981"},
+#                 {"answer_id": "answerbe073353-2972-4f21-8773-3a43decb6e34", "code": "9977"}
+#             ]
+#         }
+#
+#         self.comments_service.store_comments(Response(test_data))
+#
+#         expected: CommentData = {
+#             'ru_ref': '15162882666F',
+#             'boxes_selected': '',
+#             'comment': "Name:\ncorrected business name\nAddress:\naddress line1\naddress line2\nAB12 3CD",
+#             'additional': []
+#         }
+#
+#         actual = self.comments_writer.get_comment_data()
+#         self.assertEqual(expected, actual)
+#         self.assertEqual("221_201904", self.comments_writer.get_kind())
