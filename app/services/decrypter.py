@@ -1,5 +1,5 @@
 import binascii
-from typing import Final, Protocol, Any
+from typing import Final, Protocol
 
 import yaml
 

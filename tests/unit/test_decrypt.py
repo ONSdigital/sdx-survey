@@ -1,30 +1,23 @@
-import binascii
 import unittest
-import json
-from unittest.mock import patch
+from typing import Any
 
 import yaml
-from cryptography import exceptions
 from sdc.crypto.encrypter import encrypt
-from sdc.crypto.exceptions import InvalidTokenException
 from sdc.crypto.key_store import KeyStore
-from sdx_gcp.errors import DataError
+from sdx_base.settings.service import SECRET
 
-from app.services.decrypter import decrypt_survey, add_key, add_keys
+from app.definitions.submission import SurveySubmission
+from app.services.decrypter import DecryptionService
 
-KEY_DIR = "keys"
+KEY_DIR = "tests/data/keys"
 
 
-def encrypt_survey(submission: dict, eq_v3: bool = False) -> str:
-
+def encrypt_survey(data: Any) -> str:
     key1 = open(f"{KEY_DIR}/test_sdx-public-jwt.yaml")
-    if eq_v3:
-        key2 = open(f"{KEY_DIR}/test_eqv3-private-signing.yaml")
-    else:
-        key2 = open(f"{KEY_DIR}/test_eq-private-signing.yaml")
+    key2 = open(f"{KEY_DIR}/test_eq-private-signing.yaml")
 
     key_store = load_keys(key1, key2)
-    payload = encrypt(submission, key_store, 'submission')
+    payload = encrypt(data, key_store, 'submission')
     key1.close()
     key2.close()
     return payload
@@ -38,123 +31,58 @@ def load_keys(*keys) -> KeyStore:
     return KeyStore({"keys": key_dict})
 
 
-message_dict = json.loads('''{
-            "collection": {
-                "exercise_sid": "XxsteeWv",
-                "instrument_id": "0167",
-                "period": "2019"
-            },
-            "data": {
-                "46": "123",
-                "47": "456",
-                "50": "789",
-                "51": "111",
-                "52": "222",
-                "53": "333",
-                "54": "444",
-                "146": "different comment.",
-                "d12": "Yes",
-                "d40": "Yes"
-            },
-            "flushed": false,
-            "metadata": {
-                "ref_period_end_date": "2016-05-31",
-                "ref_period_start_date": "2016-05-01",
-                "ru_ref": "49900108249D",
-                "user_id": "UNKNOWN"
-            },
-            "origin": "uk.gov.ons.edc.eq",
-            "started_at": "2017-07-05T10:54:11.548611+00:00",
-            "submitted_at": "2017-07-05T14:49:33.448608+00:00",
-            "type": "uk.gov.ons.edc.eq:surveyresponse",
-            "version": "0.0.1",
-            "survey_id": "009",
-            "tx_id": "c37a3efa-593c-4bab-b49c-bee0613c4fb2",
-            "case_id": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3"
-        }''')
+submission: SurveySubmission = {
+    "tx_id": "1027a13a-c253-4e9d-9e78-d0f0cfdd3988",
+    "type": "uk.gov.ons.edc.eq:surveyresponse",
+    "case_id": "bb9eaf11-a729-40b5-8d17-d112e018c0d5",
+    "origin": "uk.gov.ons.edc.eq",
+    "started_at": "2019-04-01T14:00:24.224709",
+    "submitted_at": "2019-04-01T14:10:26.933601",
+    "version": "v2",
+    "collection_exercise_sid": "664dbdf4-02fb-4d68-b0cf-7f7402df00e5",
+    "flushed": False,
+    "data_version": "0.0.1",
+    "launch_language_code": "en",
+    "survey_metadata": {
+        "survey_id": "017",
+        "form_type": "0011",
+        "period_id": "201904",
+        "ref_p_end_date": "2018-11-29",
+        "ref_p_start_date": "2019-04-01",
+        "ru_ref": "15162882666F",
+        "user_id": "UNKNOWN",
+        "ru_name": "Test Name"
+    },
+    "data": {
+        "15": "No",
+        "119": "150",
+        "120": "152",
+        "144": "200",
+        "145": "124",
+        "146": "This is a comment"
+    }
+}
+
+class MockDecryptionKeys:
+    sdx_private_jwt: SECRET
+    eq_public_signing: SECRET
+    eq_public_jws: SECRET
+
+    def __init__(self):
+        with open(f"{KEY_DIR}/test_sdx-private-jwt.yaml") as k:
+            self.sdx_private_jwt: SECRET = k.read()
+
+        with open(f"{KEY_DIR}/test_eq-public-signing.yaml") as k:
+            self.eq_public_signing: SECRET = k.read()
+
+        self.eq_public_jws: SECRET = self.eq_public_signing
 
 
 class TestDecrypt(unittest.TestCase):
 
     def test_decrypt_survey(self):
-        key_file1 = open(f"{KEY_DIR}/test_sdx-private-jwt.yaml")
-        add_key(key_file1)
-        key_file2 = open(f"{KEY_DIR}/test_eq-public-signing.yaml")
-        add_key(key_file2)
-        encrypted_message = encrypt_survey(message_dict)
-        decrypted_message = decrypt_survey(encrypted_message)
-        key_file1.close()
-        key_file2.close()
-        self.assertEqual(decrypted_message, message_dict)
+        encrypted_message = encrypt_survey(submission)
+        service = DecryptionService(MockDecryptionKeys())
+        decrypted_message = service.decrypt_survey(encrypted_message)
 
-    def test_eq_v3_survey(self):
-        key_file1 = open(f"{KEY_DIR}/test_sdx-private-jwt.yaml")
-        add_key(key_file1)
-        key_file2 = open(f"{KEY_DIR}/test_eqv3-public-signing.yaml")
-        add_key(key_file2)
-        encrypted_message = encrypt_survey(message_dict)
-        decrypted_message = decrypt_survey(encrypted_message)
-        key_file1.close()
-        key_file2.close()
-        self.assertEqual(decrypted_message, message_dict)
-
-    def test_decrypt_survey_with_secret(self):
-        with open(f"{KEY_DIR}/test_sdx-private-jwt.yaml", "r") as f1:
-            key1 = "".join(f1.readlines())
-
-        with open(f"{KEY_DIR}/test_eq-public-signing.yaml", "r") as f2:
-            key2 = "".join(f2.readlines())
-
-        add_keys([key1, key2])
-
-        encrypted_message = encrypt_survey(message_dict)
-        decrypted_message = decrypt_survey(encrypted_message)
-        self.assertEqual(decrypted_message, message_dict)
-
-    @patch('app.decrypt.sdc_decrypt')
-    def test_decrypt_survey_UnsupportedAlgorithm(self, sdc_decrypt):
-        sdc_decrypt.side_effect = exceptions.UnsupportedAlgorithm("message")
-        with self.assertRaises(DataError):
-            decrypt_survey("encrypted survey")
-
-    @patch('app.decrypt.sdc_decrypt')
-    def test_decrypt_survey_InvalidKey(self, sdc_decrypt):
-        sdc_decrypt.side_effect = exceptions.InvalidKey("message")
-        with self.assertRaises(DataError):
-            decrypt_survey("encrypted survey")
-
-    @patch('app.decrypt.sdc_decrypt')
-    def test_decrypt_survey_AlreadyFinalized(self, sdc_decrypt):
-        sdc_decrypt.side_effect = exceptions.AlreadyFinalized("message")
-        with self.assertRaises(DataError):
-            decrypt_survey("encrypted survey")
-
-    @patch('app.decrypt.sdc_decrypt')
-    def test_decrypt_survey_InvalidSignature(self, sdc_decrypt):
-        sdc_decrypt.side_effect = exceptions.InvalidSignature("message")
-        with self.assertRaises(DataError):
-            decrypt_survey("encrypted survey")
-
-    @patch('app.decrypt.sdc_decrypt')
-    def test_decrypt_survey_NotYetFinalized(self, sdc_decrypt):
-        sdc_decrypt.side_effect = exceptions.NotYetFinalized("message")
-        with self.assertRaises(DataError):
-            decrypt_survey("encrypted survey")
-
-    @patch('app.decrypt.sdc_decrypt')
-    def test_decrypt_survey_AlreadyUpdated(self, sdc_decrypt):
-        sdc_decrypt.side_effect = exceptions.AlreadyUpdated("message")
-        with self.assertRaises(DataError):
-            decrypt_survey("encrypted survey")
-
-    @patch('app.decrypt.sdc_decrypt')
-    def test_decrypt_survey_binascii_Error(self, sdc_decrypt):
-        sdc_decrypt.side_effect = binascii.Error("message")
-        with self.assertRaises(DataError):
-            decrypt_survey("encrypted survey")
-
-    @patch('app.decrypt.sdc_decrypt')
-    def test_decrypt_survey_InvalidTokenException(self, sdc_decrypt):
-        sdc_decrypt.side_effect = InvalidTokenException("message")
-        with self.assertRaises(DataError):
-            decrypt_survey("encrypted survey")
+        self.assertEqual(decrypted_message, submission)

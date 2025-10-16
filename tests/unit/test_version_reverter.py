@@ -195,7 +195,7 @@ class TestVersionReverter(unittest.TestCase):
             "submission_language_code": "en"
         }
 
-        actual = Response(data, "006ac9de-c25d-4fb1-bc01-8369a0ca6d31").to_v1_json()
+        actual = Response(data).to_v1_json()
         expected = json.dumps(expected)
 
         self.assertEqual(expected, actual)
