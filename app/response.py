@@ -118,7 +118,7 @@ class Response:
             "launch_language_code": submission["launch_language_code"],
             "data": submission["data"],
             "form_type": metadata["form_type"],
-            "started_at": ["started_at"],
+            "started_at": submission["started_at"],
             "submission_language_code": submission["submission_language_code"]
         }
 
