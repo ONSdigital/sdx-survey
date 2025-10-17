@@ -1,6 +1,4 @@
-import datetime
 import unittest
-from unittest.mock import patch
 
 from app.definitions.submission import SurveySubmission
 from app.response import Response
@@ -37,26 +35,21 @@ class TestIndex(unittest.TestCase):
             "started_at": "2023-09-29T09:07:10.640686+00:00",
             "submission_language_code": "en"
         }
-        self.ftp_path = "\\"
 
-    @patch('app.transformation.transforms.index.datetime')
-    def test_index_contents(self, mock_datetime):
-
-        mock_datetime.datetime.utcnow.return_value = datetime.datetime.strptime("2023-11-03", "%Y-%m-%d")
+    def test_index_contents(self):
         image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"
-        actual: bytes = index.get_contents(Response(self.submission), image_name, self.ftp_path)
-        expected = (b'03/11/2023 00:00:00,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20231103,'
+        expected = (b'29/09/2023 09:30:21,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20230929,'
                     b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,201605,001,0')
+
+        actual: bytes = index.get_contents(Response(self.submission), image_name, ftp_path="\\")
         self.assertEqual(expected, actual)
 
-    @patch('app.transformation.transforms.index.datetime')
-    def test_index_contents_4_digit_period(self, mock_datetime):
-        mock_datetime.datetime.utcnow.return_value = datetime.datetime.strptime("2023-11-03", "%Y-%m-%d")
+    def test_index_contents_4_digit_period(self):
         image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"
         submission: SurveySubmission = self.submission
         submission["survey_metadata"]["period_id"] = "2310"
-        actual: bytes = index.get_contents(Response(self.submission), image_name, self.ftp_path)
-        expected = (b'03/11/2023 00:00:00,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20231103,'
+        actual: bytes = index.get_contents(Response(self.submission), image_name, ftp_path="\\")
+        expected = (b'29/09/2023 09:30:21,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20230929,'
                     b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,202310,001,0')
         self.assertEqual(expected, actual)
 

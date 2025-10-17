@@ -1,5 +1,3 @@
-import datetime
-
 from app.response import Response
 from app.transformation.transforms import image
 from app.transformation.formatter import format_date, get_tx_code, get_datetime, get_period, split_ru_ref
@@ -17,10 +15,10 @@ def get_name(response: Response) -> str:
 def get_contents(response: Response, image_name: str, ftp_path: str) -> bytes:
     """Builds the contents of the index file"""
 
-    now = datetime.datetime.now(datetime.UTC)
+    submission_date = get_datetime(response.get_submitted_at())
 
-    short_time = format_date(now, "%Y%m%d")
-    long_time = format_date(now, '%d/%m/%Y %H:%M:%S')
+    short_time = format_date(submission_date, "%Y%m%d")
+    long_time = format_date(submission_date, '%d/%m/%Y %H:%M:%S')
 
     survey_id = response.get_survey_id()
     form_type = response.get_form_type()
