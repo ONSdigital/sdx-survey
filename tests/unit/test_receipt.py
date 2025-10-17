@@ -1,67 +1,96 @@
 import json
 import unittest
-from unittest import mock
 
-from sdx_gcp.errors import DataError
-
-from app.services.receipt import make_receipt, send_receipt, publish_data, make_srm_receipt
+from app.definitions.submission import SurveySubmission
 from app.response import Response
-from tests import get_response
+from app.services.receipt import ReceiptService
+
+
+class MockReceiptPublisher:
+
+    def __init__(self):
+        self.receipt: dict[str, str] = {}
+        self.receipt_topic: str = ""
+
+    def publish_message(self, topic_path: str, message: str, attributes: dict[str, str]) -> str:
+        self.receipt = json.loads(message)
+        self.receipt_topic = topic_path
+        return ""
+
+
+class MockReceiptSettings:
+    receipt_topic_path: str
+    srm_receipt_topic_path: str
+
+    def __init__(self):
+        self.receipt_topic_path = "receipt_topic_path"
+        self.srm_receipt_topic_path = "srm_receipt_topic_path"
 
 
 class TestReceipt(unittest.TestCase):
 
     def setUp(self):
-        self.test_data = {
-            "case_id": "123",
-            "survey_id": "survey_id",
-            "tx_id": "tx_id",
-            "collection": {
-                "exercise_sid": "exercise_sid"
+
+        self.test_submission: SurveySubmission = {
+            "tx_id": "1027a13a-c253-4e9d-9e78-d0f0cfdd3988",
+            "type": "uk.gov.ons.edc.eq:surveyresponse",
+            "case_id": "bb9eaf11-a729-40b5-8d17-d112e018c0d5",
+            "origin": "uk.gov.ons.edc.eq",
+            "started_at": "2019-04-01T14:00:24.224709",
+            "submitted_at": "2019-04-01T14:10:26.933601",
+            "version": "v2",
+            "collection_exercise_sid": "664dbdf4-02fb-4d68-b0cf-7f7402df00e5",
+            "flushed": False,
+            "data_version": "0.0.1",
+            "launch_language_code": "en",
+            "survey_metadata": {
+                "survey_id": "017",
+                "form_type": "0011",
+                "period_id": "201904",
+                "ref_p_end_date": "2018-11-29",
+                "ref_p_start_date": "2019-04-01",
+                "ru_ref": "15162882666F",
+                "user_id": "123456",
+                "ru_name": "Test Name"
             },
-            "metadata": {
-                "ru_ref": "ru_ref",
-                "user_id": "user_id"
+            "data": {
+                "15": "No",
+                "119": "150",
+                "120": "152",
+                "144": "200",
+                "145": "124",
+                "146": "This is a comment"
             }
         }
 
-    def test_make_receipt_valid(self):
-        expected = json.dumps({"caseId": "123", "partyId": "user_id"})
-        self.assertEqual(make_receipt(Response(self.test_data, "123")), expected)
+    def test_send_receipt(self):
+        mock_publisher = MockReceiptPublisher()
+        mock_settings = MockReceiptSettings()
+        rs = ReceiptService(mock_settings, mock_publisher)
+        rs.send_receipt(Response(self.test_submission))
 
-    @mock.patch('app.receipt.publish_data')
-    @mock.patch('app.receipt.make_receipt')
-    def test_send_receipt_no_case_id(self, mock_publish, mock_make):
-        self.test_data.pop('tx_id')
-        mock_make(self.test_data)
-        self.assertRaises(KeyError)
+        expected_receipt = {
+                'caseId': "bb9eaf11-a729-40b5-8d17-d112e018c0d5",
+                'partyId': "123456"
+            }
 
-    @mock.patch('app.receipt.publish_data')
-    def test_send_receipt_good(self, mock_publish):
-        send_receipt(Response(self.test_data, "123"))
+        self.assertEqual(expected_receipt, mock_publisher.receipt)
+        self.assertEqual(mock_settings.receipt_topic_path, mock_publisher.receipt_topic)
 
-    def test_make_receipt_bad(self):
-        data = self.test_data
-        del data["case_id"]
-        with self.assertRaises(DataError):
-            make_receipt(Response(data, "123"))
+    def test_send_adhoc_receipt(self):
+        mock_publisher = MockReceiptPublisher()
+        mock_settings = MockReceiptSettings()
+        rs = ReceiptService(mock_settings, mock_publisher)
+        submission = self.test_submission
+        submission["survey_metadata"]["survey_id"] = "740"
+        submission["survey_metadata"]["qid"] = "0130000001408548"
+        rs.send_receipt(Response(self.test_submission))
 
-    @mock.patch('app.receipt.CONFIG')
-    @mock.patch('app.receipt.publish_message')
-    def test_publish_data(self, mock_publish, mock_config):
-        receipt_topic = "receipt_topic"
-        receipt = "my_receipt"
-        tx_id = "123"
+        expected_receipt = {
+                'data': {
+                    'qid': "0130000001408548"
+                }
+            }
 
-        mock_config.RECEIPT_TOPIC_PATH = receipt_topic
-        publish_data(receipt, tx_id, receipt_topic)
-
-        mock_publish.assert_called_with(receipt_topic, receipt, {"tx_id": tx_id})
-
-    def test_make_adhoc_receipt_valid(self):
-        expected = json.dumps({"data": {"qid": "0130000000000300"}})
-        self.assertEqual(make_srm_receipt(get_response("survey_adhoc_001")), expected)
-
-    @mock.patch('app.receipt.publish_data')
-    def test_send_adhoc_receipt_good(self, mock_publish):
-        send_receipt(get_response("survey_adhoc_001"))
+        self.assertEqual(expected_receipt, mock_publisher.receipt)
+        self.assertEqual(mock_settings.srm_receipt_topic_path, mock_publisher.receipt_topic)

@@ -88,10 +88,6 @@ class StoreCommentsTest(unittest.TestCase):
         }
 
     def test_get_comment_from_146(self):
-        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
-        test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
-
         self.comments_service.store_comments(Response(self.test_submission))
 
         expected: CommentData = {
@@ -107,9 +103,7 @@ class StoreCommentsTest(unittest.TestCase):
 
     def test_extract_berd_comment(self):
         comment = "My BERD Comment!"
-        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '002'
         test_data['data'] = {
             "answers": [
@@ -142,9 +136,7 @@ class StoreCommentsTest(unittest.TestCase):
 
     def test_extract_berd_comment_short_form(self):
         comment = "My short BERD Comment!"
-        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '002'
         test_data["data"] = {
             "123": "answer1",
@@ -165,9 +157,7 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual("002_201904", self.comments_writer.get_kind())
 
     def test_get_des_comments(self):
-        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '187'
         test_data["data"] = {
             "500": "Im the des comment",
@@ -189,9 +179,7 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual("187_201904", self.comments_writer.get_kind())
 
     def test_get_mwss_comments(self):
-            tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
             test_data: SurveySubmission = self.test_submission
-            test_data['tx_id'] = tx_id
             test_data['survey_metadata']['survey_id'] = '134'
             test_data["data"] = {
                 "500": "Im the des comment",
@@ -213,9 +201,7 @@ class StoreCommentsTest(unittest.TestCase):
             self.assertEqual("134_201904", self.comments_writer.get_kind())
 
     def test_get_additional_comments(self):
-        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '134'
         test_data["data"] = {
             "300": "Im the mwss main comment",
@@ -240,9 +226,7 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual("134_201904", self.comments_writer.get_kind())
 
     def test_get_additional_comments_2(self):
-        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '134'
         test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
         test_data["data"] = {
@@ -268,9 +252,7 @@ class StoreCommentsTest(unittest.TestCase):
 
 
     def test_get_additional_comments_none(self):
-        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '134'
         test_data["data"] = {
             "300a": "300w",
@@ -291,9 +273,7 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_get_boxes_selected(self):
-        tx_id = '0f534ffc-9442-414c-b39f-a756b4adc6cb'
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '134'
         test_data["data"] = {
             "91w": "Yes",
@@ -315,9 +295,7 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 #
     def test_get_boxes_selected_2(self):
-        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '009'
         test_data["data"] = {
             "146a": "Yes"
@@ -336,9 +314,7 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_get_boxes_selected_none(self):
-        tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"
         test_data: SurveySubmission = self.test_submission
-        test_data['tx_id'] = tx_id
         test_data['survey_metadata']['survey_id'] = '134'
         test_data["data"] = {
             "91w123": "Yes",
