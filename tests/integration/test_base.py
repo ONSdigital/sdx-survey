@@ -4,9 +4,11 @@ import os
 import unittest
 import zipfile
 from pathlib import Path
+from typing import Final, Optional
 from unittest.mock import Mock
 
 import requests
+from cryptography.fernet import Fernet
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sdx_base.errors.retryable import RetryableError
@@ -35,7 +37,10 @@ from app.services.deliver import ZIP_FILE, CONTEXT
 from app.settings import Settings
 
 
-def get_json(file_name: str) -> SurveySubmission:
+COMMENT_KEY: Final[str] = "Pk_eTrrXIaiEv62A6w5qwerYCxR4060Xo1j5pJO_J2c="
+
+
+def _get_json(file_name: str) -> SurveySubmission:
     path = f"tests/data/{file_name}"
     with open(path) as f:
         data = json.load(f)
@@ -43,7 +48,7 @@ def get_json(file_name: str) -> SurveySubmission:
     return data
 
 
-def read_zip(zip_bytes: bytes) -> dict[str, bytes]:
+def _read_zip(zip_bytes: bytes) -> dict[str, bytes]:
     result: dict[str, bytes] = {}
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         for name in zf.namelist():
@@ -54,12 +59,17 @@ def read_zip(zip_bytes: bytes) -> dict[str, bytes]:
     return result
 
 
+def _decrypt_comment(comment_token: str) -> dict:
+    f = Fernet(COMMENT_KEY)
+    comment_bytes = f.decrypt(comment_token.encode())
+    return json.loads(comment_bytes.decode())
+
+
 class MockSecretReader:
-    _test_comment_key: str = "Pk_eTrrXIaiEv62A6w5qwerYCxR4060Xo1j5pJO_J2c="
 
     def get_secret(self, _project_id: str, secret_id: str) -> str:
         if secret_id == "sdx-comment-key":
-            return self._test_comment_key
+            return COMMENT_KEY
         return secret_id
 
 
@@ -132,6 +142,21 @@ class TestBase(unittest.TestCase):
             self.receipt_called = True
             return ""
 
+        self._commit_comments_called: bool = False
+        self._data: dict[str, str] = {}
+        self._kind: str = ""
+
+        def commit_side_effect(
+            data: dict[str, str],
+            kind: str,
+            tx_id: str,
+            project_id: Optional[str] = None,
+            exclude_from_indexes: Optional[str] = None
+        ):
+            self._commit_comments_called = True
+            self._data = data
+            self._kind = kind
+
         self.mock_http = Mock(spec=HttpService)
         self.mock_http.post.side_effect = post_side_effect
         self.mock_storage = Mock(spec=StorageService)
@@ -140,6 +165,7 @@ class TestBase(unittest.TestCase):
         self.mock_pubsub = Mock(spec=PubsubService)
         self.mock_pubsub.publish_message = publish_side_effect
         self.mock_datastore = Mock(spec=DatastoreService)
+        self.mock_datastore.commit_entity.side_effect = commit_side_effect
 
         app.dependency_overrides[get_storage_service] = lambda: self.mock_storage
         app.dependency_overrides[get_decryption_service] = lambda: self.mock_decryptor
@@ -148,13 +174,15 @@ class TestBase(unittest.TestCase):
         app.dependency_overrides[get_datastore_service] = lambda: self.mock_datastore
         self.app = app
 
-    def set_survey_submission(self, tx_id: str, survey_submission: SurveySubmission):
+    def set_survey_submission(self, filename: str):
+        submission_json = _get_json(filename)
+        tx_id = submission_json["tx_id"]
         self.message["attributes"]["objectId"] = tx_id
-        self.mock_decryptor.decrypt_survey.return_value = survey_submission
+        self.mock_decryptor.decrypt_survey.return_value = submission_json
 
     def get_zip_contents(self) -> dict[str, bytes]:
         actual_zip_file = self.deliver_posted_files[ZIP_FILE]
-        return read_zip(actual_zip_file)
+        return _read_zip(actual_zip_file)
 
     def get_context(self) -> Context:
         return json.loads(self.deliver_posted_params[CONTEXT])
@@ -167,6 +195,15 @@ class TestBase(unittest.TestCase):
 
     def was_receipt_called(self) -> bool:
         return self.receipt_called
+
+    def get_comment_data(self) -> dict[str, str]:
+        return _decrypt_comment(self._data["encrypted_data"])
+
+    def get_comment_kind(self) -> str:
+        return self._kind
+
+    def were_comments_stored(self) -> bool:
+        return self._commit_comments_called
 
     def simulate_retryable_error_on_post(self):
         def retryable_side_effect(
@@ -182,9 +219,9 @@ class TestBase(unittest.TestCase):
 
     def simulate_data_error_on_post(self):
         def data_side_effect(
-            _domain: str,
+            domain: str,
             endpoint: str,
-            _json_data: str | None = None,
+            json_data: str | None = None,
             params: dict[str, str] | None = None,
             files: dict[str, bytes] | None = None,
         ) -> requests.Response:
