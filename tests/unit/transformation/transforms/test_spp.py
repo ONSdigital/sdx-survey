@@ -8,10 +8,9 @@ from app.transformation.transforms import spp
 class TestSPP(unittest.TestCase):
 
     def setUp(self):
-        self.tx_id = "befa5444-749f-407a-b3a2-19f1d1c7324b"
         self.submission: SurveySubmission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
-            "tx_id": self.tx_id,
+            "tx_id": "befa5444-749f-407a-b3a2-19f1d1c7324b",
             "type": "uk.gov.ons.edc.eq:surveyresponse",
             "version": "v2",
             "data_version": "0.0.1",
@@ -38,6 +37,6 @@ class TestSPP(unittest.TestCase):
         }
 
     def test_get_name(self):
-        actual: str = spp.get_name(Response(self.submission, self.tx_id))
+        actual: str = spp.get_name(Response(self.submission))
         expected = "144_SDC_2023-09-29T09-30-21_befa5444-749f-407a-b3a2-19f1d1c7324b.json"
         self.assertEqual(expected, actual)

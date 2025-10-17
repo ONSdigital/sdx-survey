@@ -8,7 +8,6 @@ from app.transformation.transforms import pck
 class TestPCK(unittest.TestCase):
 
     def setUp(self):
-        self.tx_id = "befa5444-749f-407a-b3a2-19f1d1c7324b"
         self.submission: SurveySubmission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
             "tx_id": "befa5444-749f-407a-b3a2-19f1d1c7324b",
@@ -38,7 +37,7 @@ class TestPCK(unittest.TestCase):
         }
 
     def test_get_name(self):
-        actual: str = pck.get_name(Response(self.submission, self.tx_id))
+        actual: str = pck.get_name(Response(self.submission))
         expected = "144_befa5444749f407a"
         self.assertEqual(expected, actual)
 
@@ -47,6 +46,6 @@ class TestPCK(unittest.TestCase):
         submission["survey_metadata"]["survey_id"] = "202"
         submission["survey_metadata"]["form_type"] = "1802"
 
-        actual = pck.get_name(Response(submission, self.tx_id))
+        actual = pck.get_name(Response(submission))
         expected = "053_befa5444749f407a"
         self.assertEqual(expected, actual)

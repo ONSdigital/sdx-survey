@@ -1,5 +1,6 @@
 import unittest
 
+from app.definitions.submission import SurveySubmission
 from app.response import Response
 from app.transformation.transforms import idbr
 
@@ -7,8 +8,7 @@ from app.transformation.transforms import idbr
 class TestIdbr(unittest.TestCase):
 
     def setUp(self):
-        self.tx_id = "befa5444-749f-407a-b3a2-19f1d1c7324b"
-        self.submission = {
+        self.submission: SurveySubmission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
             "tx_id": "befa5444-749f-407a-b3a2-19f1d1c7324b",
             "type": "uk.gov.ons.edc.eq:surveyresponse",
@@ -37,26 +37,26 @@ class TestIdbr(unittest.TestCase):
         }
 
     def test_idbr_receipt(self):
-        actual: bytes = idbr.get_contents(Response(self.submission, self.tx_id))
+        actual: bytes = idbr.get_contents(Response(self.submission))
         expected: bytes = b'12346789012:A:202:201605'
 
         self.assertEqual(expected, actual)
 
     def test_idbr_receipt_four_digit_period(self):
         self.submission['survey_metadata']['period_id'] = '1605'
-        actual: bytes = idbr.get_contents(Response(self.submission, self.tx_id))
+        actual: bytes = idbr.get_contents(Response(self.submission))
         expected: bytes = b'12346789012:A:202:201605'
 
         self.assertEqual(expected, actual)
 
     def test_idbr_receipt_two_digit_period(self):
         self.submission['survey_metadata']['period_id'] = '16'
-        actual: bytes = idbr.get_contents(Response(self.submission, self.tx_id))
+        actual: bytes = idbr.get_contents(Response(self.submission))
         expected: bytes = b'12346789012:A:202:201612'
 
         self.assertEqual(expected, actual)
 
     def test_get_idbr_name(self):
-        actual: str = idbr.get_name(Response(self.submission, self.tx_id))
+        actual: str = idbr.get_name(Response(self.submission))
         expected = "REC2909_befa5444749f407a.DAT"
         self.assertEqual(expected, actual)

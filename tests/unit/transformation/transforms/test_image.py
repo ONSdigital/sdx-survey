@@ -1,5 +1,6 @@
 import unittest
 
+from app.definitions.submission import SurveySubmission
 from app.response import Response
 from app.transformation.transforms import image
 
@@ -7,8 +8,7 @@ from app.transformation.transforms import image
 class TestImage(unittest.TestCase):
 
     def setUp(self):
-        self.tx_id = "befa5444-749f-407a-b3a2-19f1d1c7324b"
-        self.submission = {
+        self.submission: SurveySubmission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
             "tx_id": "befa5444-749f-407a-b3a2-19f1d1c7324b",
             "type": "uk.gov.ons.edc.eq:surveyresponse",
@@ -37,6 +37,6 @@ class TestImage(unittest.TestCase):
         }
 
     def test_get_name(self):
-        actual: str = image.get_name(Response(self.submission, self.tx_id))
+        actual: str = image.get_name(Response(self.submission))
         expected = "Sbefa5444749f407a_1.JPG"
         self.assertEqual(expected, actual)

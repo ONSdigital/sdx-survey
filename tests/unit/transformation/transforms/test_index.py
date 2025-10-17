@@ -10,8 +10,7 @@ from app.transformation.transforms import index
 class TestIndex(unittest.TestCase):
 
     def setUp(self):
-        self.tx_id = "befa5444-749f-407a-b3a2-19f1d1c7324b"
-        self.submission = {
+        self.submission: SurveySubmission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
             "tx_id": "befa5444-749f-407a-b3a2-19f1d1c7324b",
             "type": "uk.gov.ons.edc.eq:surveyresponse",
@@ -38,13 +37,14 @@ class TestIndex(unittest.TestCase):
             "started_at": "2023-09-29T09:07:10.640686+00:00",
             "submission_language_code": "en"
         }
+        self.ftp_path = "\\"
 
     @patch('app.transformation.transforms.index.datetime')
     def test_index_contents(self, mock_datetime):
 
         mock_datetime.datetime.utcnow.return_value = datetime.datetime.strptime("2023-11-03", "%Y-%m-%d")
         image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"
-        actual: bytes = index.get_contents(Response(self.submission, self.tx_id), image_name)
+        actual: bytes = index.get_contents(Response(self.submission), image_name, self.ftp_path)
         expected = (b'03/11/2023 00:00:00,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20231103,'
                     b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,201605,001,0')
         self.assertEqual(expected, actual)
@@ -55,12 +55,12 @@ class TestIndex(unittest.TestCase):
         image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"
         submission: SurveySubmission = self.submission
         submission["survey_metadata"]["period_id"] = "2310"
-        actual: bytes = index.get_contents(Response(self.submission, self.tx_id), image_name)
+        actual: bytes = index.get_contents(Response(self.submission), image_name, self.ftp_path)
         expected = (b'03/11/2023 00:00:00,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20231103,'
                     b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,202310,001,0')
         self.assertEqual(expected, actual)
 
     def test_index_name(self):
-        actual: str = index.get_name(Response(self.submission, self.tx_id))
+        actual: str = index.get_name(Response(self.submission))
         expected = "EDC_202_20230929_befa5444749f407a.csv"
         self.assertEqual(expected, actual)
