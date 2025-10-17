@@ -19,17 +19,18 @@ def decrypt_comment(comment_token: str) -> dict:
 
 
 class MockCommentsWriter:
-
     def __init__(self):
         self._data: dict[str, str] = {}
         self._kind: str = ""
 
-    def commit_entity(self,
-                      data: dict[str, str],
-                      kind: str,
-                      tx_id: str,
-                      project_id: Optional[str] = None,
-                      exclude_from_indexes: Optional[str] = None):
+    def commit_entity(
+        self,
+        data: dict[str, str],
+        kind: str,
+        tx_id: str,
+        project_id: Optional[str] = None,
+        exclude_from_indexes: Optional[str] = None,
+    ):
         self._data = data
         self._kind = kind
 
@@ -41,15 +42,13 @@ class MockCommentsWriter:
 
 
 class MockSettings:
-
     def __init__(self):
         self.project_id: str = "ons-sdx-sandbox"
         self.sdx_comment_key: SECRET = COMMENT_KEY
-        self.srm_receipt_topic_path: str = 'projects/ons-sdx-sandbox/topics/srm-receipt-topic'
+        self.srm_receipt_topic_path: str = "projects/ons-sdx-sandbox/topics/srm-receipt-topic"
 
 
 class StoreCommentsTest(unittest.TestCase):
-
     def setUp(self):
         self.comments_writer: MockCommentsWriter = MockCommentsWriter()
         self.comments_settings: CommentsSettings = MockSettings()
@@ -75,26 +74,19 @@ class StoreCommentsTest(unittest.TestCase):
                 "ref_p_start_date": "2019-04-01",
                 "ru_ref": "15162882666F",
                 "user_id": "UNKNOWN",
-                "ru_name": "Test Name"
+                "ru_name": "Test Name",
             },
-            "data": {
-                "15": "No",
-                "119": "150",
-                "120": "152",
-                "144": "200",
-                "145": "124",
-                "146": "This is a comment"
-            }
+            "data": {"15": "No", "119": "150", "120": "152", "144": "200", "145": "124", "146": "This is a comment"},
         }
 
     def test_get_comment_from_146(self):
         self.comments_service.store_comments(Response(self.test_submission))
 
         expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': '',
-            'comment': 'This is a comment',
-            'additional': []
+            "ru_ref": "15162882666F",
+            "boxes_selected": "",
+            "comment": "This is a comment",
+            "additional": [],
         }
 
         actual = self.comments_writer.get_comment_data()
@@ -104,30 +96,20 @@ class StoreCommentsTest(unittest.TestCase):
     def test_extract_berd_comment(self):
         comment = "My BERD Comment!"
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '002'
-        test_data['data'] = {
-            "answers": [
-                {
-                    "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
-                    "value": comment
-                }
-            ],
+        test_data["survey_metadata"]["survey_id"] = "002"
+        test_data["data"] = {
+            "answers": [{"answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39", "value": comment}],
             "lists": [],
-            "answer_codes": [
-                {
-                    "answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39",
-                    "code": "712"
-                }
-            ]
+            "answer_codes": [{"answer_id": "answerbd37d516-40be-4b5d-a657-823eb7c12e39", "code": "712"}],
         }
 
         self.comments_service.store_comments(Response(test_data))
 
         expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': '',
-            'comment': 'My BERD Comment!',
-            'additional': []
+            "ru_ref": "15162882666F",
+            "boxes_selected": "",
+            "comment": "My BERD Comment!",
+            "additional": [],
         }
 
         actual = self.comments_writer.get_comment_data()
@@ -137,19 +119,16 @@ class StoreCommentsTest(unittest.TestCase):
     def test_extract_berd_comment_short_form(self):
         comment = "My short BERD Comment!"
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '002'
-        test_data["data"] = {
-            "123": "answer1",
-            "712": comment
-        }
+        test_data["survey_metadata"]["survey_id"] = "002"
+        test_data["data"] = {"123": "answer1", "712": comment}
 
         self.comments_service.store_comments(Response(test_data))
 
         expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': '',
-            'comment': 'My short BERD Comment!',
-            'additional': []
+            "ru_ref": "15162882666F",
+            "boxes_selected": "",
+            "comment": "My short BERD Comment!",
+            "additional": [],
         }
 
         actual = self.comments_writer.get_comment_data()
@@ -158,7 +137,7 @@ class StoreCommentsTest(unittest.TestCase):
 
     def test_get_des_comments(self):
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '187'
+        test_data["survey_metadata"]["survey_id"] = "187"
         test_data["data"] = {
             "500": "Im the des comment",
             "300": "Im the mwss comment",
@@ -168,10 +147,10 @@ class StoreCommentsTest(unittest.TestCase):
         self.comments_service.store_comments(Response(test_data))
 
         expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': '',
-            'comment': "Im the des comment",
-            'additional': []
+            "ru_ref": "15162882666F",
+            "boxes_selected": "",
+            "comment": "Im the des comment",
+            "additional": [],
         }
 
         actual = self.comments_writer.get_comment_data()
@@ -179,46 +158,43 @@ class StoreCommentsTest(unittest.TestCase):
         self.assertEqual("187_201904", self.comments_writer.get_kind())
 
     def test_get_mwss_comments(self):
-            test_data: SurveySubmission = self.test_submission
-            test_data['survey_metadata']['survey_id'] = '134'
-            test_data["data"] = {
-                "500": "Im the des comment",
-                "300": "Im the mwss comment",
-                "146": "Im the wrong comment",
-            }
-
-            self.comments_service.store_comments(Response(test_data))
-
-            expected: CommentData = {
-                'ru_ref': '15162882666F',
-                'boxes_selected': '',
-                'comment': "Im the mwss comment",
-                'additional': []
-            }
-
-            actual = self.comments_writer.get_comment_data()
-            self.assertEqual(expected, actual)
-            self.assertEqual("134_201904", self.comments_writer.get_kind())
-
-    def test_get_additional_comments(self):
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '134'
+        test_data["survey_metadata"]["survey_id"] = "134"
         test_data["data"] = {
-            "300": "Im the mwss main comment",
-            "300w": "300w",
-            "300m": "300m",
-            "300w5": "300w5"
+            "500": "Im the des comment",
+            "300": "Im the mwss comment",
+            "146": "Im the wrong comment",
         }
 
         self.comments_service.store_comments(Response(test_data))
 
         expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': '',
-            'comment': "Im the mwss main comment",
-            'additional':  [{'qcode': '300w', "comment": '300w'},
-                          {'qcode': '300m', "comment": '300m'},
-                          {'qcode': '300w5', "comment": '300w5'}]
+            "ru_ref": "15162882666F",
+            "boxes_selected": "",
+            "comment": "Im the mwss comment",
+            "additional": [],
+        }
+
+        actual = self.comments_writer.get_comment_data()
+        self.assertEqual(expected, actual)
+        self.assertEqual("134_201904", self.comments_writer.get_kind())
+
+    def test_get_additional_comments(self):
+        test_data: SurveySubmission = self.test_submission
+        test_data["survey_metadata"]["survey_id"] = "134"
+        test_data["data"] = {"300": "Im the mwss main comment", "300w": "300w", "300m": "300m", "300w5": "300w5"}
+
+        self.comments_service.store_comments(Response(test_data))
+
+        expected: CommentData = {
+            "ru_ref": "15162882666F",
+            "boxes_selected": "",
+            "comment": "Im the mwss main comment",
+            "additional": [
+                {"qcode": "300w", "comment": "300w"},
+                {"qcode": "300m", "comment": "300m"},
+                {"qcode": "300w5", "comment": "300w5"},
+            ],
         }
 
         actual = self.comments_writer.get_comment_data()
@@ -227,113 +203,77 @@ class StoreCommentsTest(unittest.TestCase):
 
     def test_get_additional_comments_2(self):
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '134'
-        test_data['type'] = 'uk.gov.ons.edc.eq:feedback'
-        test_data["data"] = {
-            "300f": "hello",
-            "300w4": "bye"
-        }
+        test_data["survey_metadata"]["survey_id"] = "134"
+        test_data["type"] = "uk.gov.ons.edc.eq:feedback"
+        test_data["data"] = {"300f": "hello", "300w4": "bye"}
 
         self.comments_service.store_comments(Response(test_data))
 
         expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': '',
-            'comment': None,
-            'additional': [
-                {'qcode': '300f', "comment": 'hello'},
-                {'qcode': '300w4', "comment": 'bye'}
-            ]
+            "ru_ref": "15162882666F",
+            "boxes_selected": "",
+            "comment": None,
+            "additional": [{"qcode": "300f", "comment": "hello"}, {"qcode": "300w4", "comment": "bye"}],
         }
 
         actual = self.comments_writer.get_comment_data()
         self.assertEqual(expected, actual)
         self.assertEqual("134_201904", self.comments_writer.get_kind())
 
-
     def test_get_additional_comments_none(self):
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '134'
-        test_data["data"] = {
-            "300a": "300w",
-            "300b": "300m",
-            "300c": "300w5"
-        }
+        test_data["survey_metadata"]["survey_id"] = "134"
+        test_data["data"] = {"300a": "300w", "300b": "300m", "300c": "300w5"}
 
         self.comments_service.store_comments(Response(test_data))
 
-        expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': '',
-            'comment': None,
-            'additional': []
-        }
+        expected: CommentData = {"ru_ref": "15162882666F", "boxes_selected": "", "comment": None, "additional": []}
 
         actual = self.comments_writer.get_comment_data()
         self.assertEqual(expected, actual)
 
     def test_get_boxes_selected(self):
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '134'
-        test_data["data"] = {
-            "91w": "Yes",
-            "94w2": "Yes",
-            "192w42": "Yes",
-            "197w4": "Yes"
-        }
+        test_data["survey_metadata"]["survey_id"] = "134"
+        test_data["data"] = {"91w": "Yes", "94w2": "Yes", "192w42": "Yes", "197w4": "Yes"}
 
         self.comments_service.store_comments(Response(test_data))
 
         expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': "91w, 94w2, 192w42, 197w4, ",
-            'comment': None,
-            'additional': []
+            "ru_ref": "15162882666F",
+            "boxes_selected": "91w, 94w2, 192w42, 197w4, ",
+            "comment": None,
+            "additional": [],
         }
 
         actual = self.comments_writer.get_comment_data()
         self.assertEqual(expected, actual)
-#
+
+    #
     def test_get_boxes_selected_2(self):
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '009'
-        test_data["data"] = {
-            "146a": "Yes"
-        }
+        test_data["survey_metadata"]["survey_id"] = "009"
+        test_data["data"] = {"146a": "Yes"}
 
         self.comments_service.store_comments(Response(test_data))
 
-        expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': "146a ",
-            'comment': None,
-            'additional': []
-        }
+        expected: CommentData = {"ru_ref": "15162882666F", "boxes_selected": "146a ", "comment": None, "additional": []}
 
         actual = self.comments_writer.get_comment_data()
         self.assertEqual(expected, actual)
 
     def test_get_boxes_selected_none(self):
         test_data: SurveySubmission = self.test_submission
-        test_data['survey_metadata']['survey_id'] = '134'
-        test_data["data"] = {
-            "91w123": "Yes",
-            "94w2123": "Yes",
-            "192w42123": "Yes",
-            "197w4123": "Yes"
-        }
+        test_data["survey_metadata"]["survey_id"] = "134"
+        test_data["data"] = {"91w123": "Yes", "94w2123": "Yes", "192w42123": "Yes", "197w4123": "Yes"}
 
         self.comments_service.store_comments(Response(test_data))
 
-        expected: CommentData = {
-            'ru_ref': '15162882666F',
-            'boxes_selected': "",
-            'comment': None,
-            'additional': []
-        }
+        expected: CommentData = {"ru_ref": "15162882666F", "boxes_selected": "", "comment": None, "additional": []}
 
         actual = self.comments_writer.get_comment_data()
         self.assertEqual(expected, actual)
+
 
 # def test_extract_bres_comment(self):
 #         tx_id = "0f534ffc-9442-414c-b39f-a756b4adc6cb"

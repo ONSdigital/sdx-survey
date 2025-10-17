@@ -18,7 +18,7 @@ from app.definitions.submission import SurveySubmission
 
 logger = get_logger()
 
-KEY_PURPOSE_SUBMISSION: Final[str] = 'submission'
+KEY_PURPOSE_SUBMISSION: Final[str] = "submission"
 
 
 class DecryptionKeys(Protocol):
@@ -28,12 +28,11 @@ class DecryptionKeys(Protocol):
 
 
 class DecryptionService(DecryptionBase, metaclass=AbstractSingleton):
-
     def __init__(self, secret_keys: DecryptionKeys):
         keys: dict[str, str] = {}
         for k in [secret_keys.sdx_private_jwt, secret_keys.eq_public_signing, secret_keys.eq_public_jws]:
             key = yaml.safe_load(k)
-            keys[key['keyid']] = key
+            keys[key["keyid"]] = key
         self.key_store = KeyStore({"keys": keys})
 
     def decrypt_survey(self, payload: str) -> SurveySubmission:
@@ -56,13 +55,13 @@ class DecryptionService(DecryptionBase, metaclass=AbstractSingleton):
             return decrypted_dict
 
         except (
-                exceptions.UnsupportedAlgorithm,
-                exceptions.InvalidKey,
-                exceptions.AlreadyFinalized,
-                exceptions.InvalidSignature,
-                exceptions.NotYetFinalized,
-                exceptions.AlreadyUpdated) as e:
-
+            exceptions.UnsupportedAlgorithm,
+            exceptions.InvalidKey,
+            exceptions.AlreadyFinalized,
+            exceptions.InvalidSignature,
+            exceptions.NotYetFinalized,
+            exceptions.AlreadyUpdated,
+        ) as e:
             logger.exception(f"Decryption Failure: {e}")
             raise DataError(e)
         except binascii.Error as e:

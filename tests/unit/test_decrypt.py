@@ -17,7 +17,7 @@ def encrypt_survey(data: Any) -> str:
     key2 = open(f"{KEY_DIR}/test_eq-private-signing.yaml")
 
     key_store = load_keys(key1, key2)
-    payload = encrypt(data, key_store, 'submission')
+    payload = encrypt(data, key_store, "submission")
     key1.close()
     key2.close()
     return payload
@@ -27,7 +27,7 @@ def load_keys(*keys) -> KeyStore:
     key_dict = {}
     for k in keys:
         key = yaml.safe_load(k)
-        key_dict[key['keyid']] = key
+        key_dict[key["keyid"]] = key
     return KeyStore({"keys": key_dict})
 
 
@@ -51,17 +51,11 @@ submission: SurveySubmission = {
         "ref_p_start_date": "2019-04-01",
         "ru_ref": "15162882666F",
         "user_id": "UNKNOWN",
-        "ru_name": "Test Name"
+        "ru_name": "Test Name",
     },
-    "data": {
-        "15": "No",
-        "119": "150",
-        "120": "152",
-        "144": "200",
-        "145": "124",
-        "146": "This is a comment"
-    }
+    "data": {"15": "No", "119": "150", "120": "152", "144": "200", "145": "124", "146": "This is a comment"},
 }
+
 
 class MockDecryptionKeys:
     sdx_private_jwt: SECRET
@@ -79,7 +73,6 @@ class MockDecryptionKeys:
 
 
 class TestDecrypt(unittest.TestCase):
-
     def test_decrypt_survey(self):
         encrypted_message = encrypt_survey(submission)
         service = DecryptionService(MockDecryptionKeys())

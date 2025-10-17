@@ -5,8 +5,8 @@ from sdx_base.settings.service import SECRET
 
 
 class Settings(AppSettings):
-    receipt_topic_path: str = 'projects/ons-sdx-sandbox/topics/receipt-topic'
-    srm_receipt_topic_path: str = 'projects/ons-sdx-sandbox/topics/srm-receipt-topic'
+    receipt_topic_path: str = "projects/ons-sdx-sandbox/topics/receipt-topic"
+    srm_receipt_topic_path: str = "projects/ons-sdx-sandbox/topics/srm-receipt-topic"
     subscription_id: str = "survey-trigger-subscription"
     quarantine_topic_id: str = "quarantine-survey-topic"
     deliver_service_url: str = "http://sdx-deliver:80"
@@ -19,7 +19,7 @@ class Settings(AppSettings):
     ftp_path: Annotated[SECRET, "ftp-path"]
 
     def get_bucket_name(self) -> str:
-        return f'{self.project_id}-survey-responses'
+        return f"{self.project_id}-survey-responses"
 
 
 def get_instance() -> Settings:

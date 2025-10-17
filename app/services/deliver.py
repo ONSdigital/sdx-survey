@@ -20,17 +20,17 @@ logger = get_logger()
 
 
 class DeliverHttp(Protocol):
-    def post(self,
-             domain: str,
-             endpoint: str,
-             json_data: str | None = None,
-             params: dict[str, str] | None = None,
-             files: dict[str, bytes] | None = None) -> requests.Response:
-        ...
+    def post(
+        self,
+        domain: str,
+        endpoint: str,
+        json_data: str | None = None,
+        params: dict[str, str] | None = None,
+        files: dict[str, bytes] | None = None,
+    ) -> requests.Response: ...
 
 
 class DeliverService(DeliverBase):
-
     def __init__(self, deliver_url: str, http_service: DeliverHttp):
         self._deliver_url = deliver_url
         self._http_service = http_service
@@ -49,9 +49,11 @@ class DeliverService(DeliverBase):
 
         context_json: str = json.dumps(context)
 
-        self._http_service.post(self._deliver_url,
-                                endpoint,
-                                None,
-                                params={FILE_NAME: filename, TX_ID: tx_id, CONTEXT: context_json},
-                                files={ZIP_FILE: zipped_file})
+        self._http_service.post(
+            self._deliver_url,
+            endpoint,
+            None,
+            params={FILE_NAME: filename, TX_ID: tx_id, CONTEXT: context_json},
+            files={ZIP_FILE: zipped_file},
+        )
         return True

@@ -5,7 +5,6 @@ from tests.integration.test_base import TestBase, get_json
 
 
 class TestEnvironmental(TestBase):
-
     def test_lcree(self):
         submission_json = get_json("007.0009.json")
         tx_id = submission_json["tx_id"]
@@ -14,10 +13,10 @@ class TestEnvironmental(TestBase):
         resp = self.client.post("/", json=self.envelope)
 
         # expected files
-        expected_json_filename = '007_837e9fe2eab84909.json'
-        expected_image_filename = 'S837e9fe2eab84909_1.JPG'
-        expected_index_filename = 'EDC_007_20210203_837e9fe2eab84909.csv'
-        expected_receipt_filename = 'REC0302_837e9fe2eab84909.DAT'
+        expected_json_filename = "007_837e9fe2eab84909.json"
+        expected_image_filename = "S837e9fe2eab84909_1.JPG"
+        expected_index_filename = "EDC_007_20210203_837e9fe2eab84909.csv"
+        expected_receipt_filename = "REC0302_837e9fe2eab84909.DAT"
 
         # actual files
         actual_files = self.get_zip_contents()
@@ -29,17 +28,14 @@ class TestEnvironmental(TestBase):
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "007",
             "period_id": "201605",
-            "ru_ref": "15339216474W"
+            "ru_ref": "15339216474W",
         }
 
         # actual context
         actual_context: Context = self.get_context()
 
         # expected_receipt
-        expected_receipt = {
-                'caseId': "4bc5a896-994f-4c5d-b592-9da04147378a",
-                'partyId': "UNKNOWN"
-            }
+        expected_receipt = {"caseId": "4bc5a896-994f-4c5d-b592-9da04147378a", "partyId": "UNKNOWN"}
 
         # actual receipt
         actual_receipt = self.get_receipt()

@@ -2,7 +2,6 @@ from app.definitions.period import PeriodBase, PeriodFormatError
 
 
 class Period(PeriodBase):
-
     def __init__(self, period_id: str):
         self._period_id = period_id
 
@@ -23,11 +22,7 @@ class Period(PeriodBase):
         period = self._period_id
         current_format = self._period_format
 
-        symbols: dict[str, list[str]] = {
-            "D": [],
-            "M": [],
-            "Y": []
-        }
+        symbols: dict[str, list[str]] = {"D": [], "M": [], "Y": []}
 
         for i in range(0, len(period)):
             k = current_format[i]

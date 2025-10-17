@@ -51,13 +51,13 @@ class Processor(ProcessorBase):
 
 
 class ProcessorV2(Processor):
-
-    def __init__(self,
-                 transformer_service: TransformerBase,
-                 deliver_service: DeliverBase,
-                 receipt_service: ReceiptServiceBase,
-                 comments_service: CommentsBase):
-
+    def __init__(
+        self,
+        transformer_service: TransformerBase,
+        deliver_service: DeliverBase,
+        receipt_service: ReceiptServiceBase,
+        comments_service: CommentsBase,
+    ):
         self._transformer_service = transformer_service
         self._deliver_service = deliver_service
         self._receipt_service = receipt_service
@@ -83,13 +83,11 @@ class ProcessorV2(Processor):
 
 
 class SurveyProcessorV2(ProcessorV2):
-
     def load_actions(self) -> list[Action]:
         return [self._receipt_service.send_receipt, self._comments_service.store_comments]
 
 
 class AdhocProcessorV2(ProcessorV2):
-
     def load_actions(self) -> list[Action]:
         return [self._receipt_service.send_receipt]
 

@@ -18,7 +18,7 @@ def get_contents(response: Response, image_name: str, ftp_path: str) -> bytes:
     submission_date = get_datetime(response.get_submitted_at())
 
     short_time = format_date(submission_date, "%Y%m%d")
-    long_time = format_date(submission_date, '%d/%m/%Y %H:%M:%S')
+    long_time = format_date(submission_date, "%d/%m/%Y %H:%M:%S")
 
     survey_id = response.get_survey_id()
     form_type = response.get_form_type()
@@ -31,12 +31,11 @@ def get_contents(response: Response, image_name: str, ftp_path: str) -> bytes:
 
     return bytes(
         f"{long_time},{image_path}\\{image_name},{short_time},{x},{survey_id},{form_type},{ru_ref},{period},001,0",
-        'utf-8'
+        "utf-8",
     )
 
 
 class IndexTransform(Transform):
-
     def __init__(self, ftp_path: str):
         self._ftp_path = ftp_path
 

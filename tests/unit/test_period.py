@@ -4,7 +4,6 @@ from app.period import Period, PeriodFormatError
 
 
 class ComparePeriodTests(unittest.TestCase):
-
     def test_incompatible_formats_YY_YYMM(self):
         p1 = Period("25")
         p2 = Period("2503")
@@ -54,7 +53,6 @@ class ComparePeriodTests(unittest.TestCase):
 
 
 class GetYYYYMMPeriodTests(unittest.TestCase):
-
     def test_yy_to_yyyymm(self):
         p1 = Period("25")
         actual = p1.convert_to_yyyymm()

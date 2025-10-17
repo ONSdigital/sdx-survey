@@ -7,7 +7,6 @@ from app.services.receipt import ReceiptService
 
 
 class MockReceiptPublisher:
-
     def __init__(self):
         self.receipt: dict[str, str] = {}
         self.receipt_topic: str = ""
@@ -28,9 +27,7 @@ class MockReceiptSettings:
 
 
 class TestReceipt(unittest.TestCase):
-
     def setUp(self):
-
         self.test_submission: SurveySubmission = {
             "tx_id": "1027a13a-c253-4e9d-9e78-d0f0cfdd3988",
             "type": "uk.gov.ons.edc.eq:surveyresponse",
@@ -51,16 +48,9 @@ class TestReceipt(unittest.TestCase):
                 "ref_p_start_date": "2019-04-01",
                 "ru_ref": "15162882666F",
                 "user_id": "123456",
-                "ru_name": "Test Name"
+                "ru_name": "Test Name",
             },
-            "data": {
-                "15": "No",
-                "119": "150",
-                "120": "152",
-                "144": "200",
-                "145": "124",
-                "146": "This is a comment"
-            }
+            "data": {"15": "No", "119": "150", "120": "152", "144": "200", "145": "124", "146": "This is a comment"},
         }
 
     def test_send_receipt(self):
@@ -69,10 +59,7 @@ class TestReceipt(unittest.TestCase):
         rs = ReceiptService(mock_settings, mock_publisher)
         rs.send_receipt(Response(self.test_submission))
 
-        expected_receipt = {
-                'caseId': "bb9eaf11-a729-40b5-8d17-d112e018c0d5",
-                'partyId': "123456"
-            }
+        expected_receipt = {"caseId": "bb9eaf11-a729-40b5-8d17-d112e018c0d5", "partyId": "123456"}
 
         self.assertEqual(expected_receipt, mock_publisher.receipt)
         self.assertEqual(mock_settings.receipt_topic_path, mock_publisher.receipt_topic)
@@ -86,11 +73,7 @@ class TestReceipt(unittest.TestCase):
         submission["survey_metadata"]["qid"] = "0130000001408548"
         rs.send_receipt(Response(self.test_submission))
 
-        expected_receipt = {
-                'data': {
-                    'qid': "0130000001408548"
-                }
-            }
+        expected_receipt = {"data": {"qid": "0130000001408548"}}
 
         self.assertEqual(expected_receipt, mock_publisher.receipt)
         self.assertEqual(mock_settings.srm_receipt_topic_path, mock_publisher.receipt_topic)

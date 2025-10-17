@@ -21,7 +21,6 @@ def get_name(response: Response) -> str:
 
 
 class SPPTransform(Transform):
-
     def __init__(self, transformer_post: TransformPosterBase):
         self._transformer_post = transformer_post
 

@@ -13,12 +13,7 @@ from app.transformation.transforms.v1_json import V1JsonTransform
 
 
 class TransformSelector:
-
-    def __init__(self,
-                 transform_poster: TransformPosterBase,
-                 image_poster: ImagePosterBase,
-                 ftp_path: str):
-
+    def __init__(self, transform_poster: TransformPosterBase, image_poster: ImagePosterBase, ftp_path: str):
         pck_transform: Transform = PCKTransform(transform_poster)
         image_transform: Transform = ImageTransform(image_poster)
         index_transform: Transform = IndexTransform(ftp_path)
@@ -36,7 +31,7 @@ class TransformSelector:
             SurveyType.SPP: [spp_transform, image_transform, index_transform, idbr_transform],
             SurveyType.DAP: [v1_json_transform],
             SurveyType.FEEDBACK: [feedback_transform],
-            SurveyType.ADHOC: [adhoc_transform]
+            SurveyType.ADHOC: [adhoc_transform],
         }
 
     def select(self, survey_type: SurveyType) -> list[Transform]:

@@ -63,16 +63,12 @@ print(f"Main Branch Version: {main_version}")
 # --- Validate version format ---
 version_regex = r"^\d+\.\d+\.\d+$"
 if not re.match(version_regex, pr_version) or not re.match(version_regex, main_version):
-    raise ValueError(
-        "One of the versions does not match the expected format (major.minor.patch)."
-    )
+    raise ValueError("One of the versions does not match the expected format (major.minor.patch).")
 
 # --- Compare ---
 comparison_result = compare_versions(pr_version, main_version)
 
 if comparison_result <= 0:
-    raise ValueError(
-        f"PR version ({pr_version}) must be greater than the main branch version ({main_version})."
-    )
+    raise ValueError(f"PR version ({pr_version}) must be greater than the main branch version ({main_version}).")
 else:
     print(f"✅ PR version {pr_version} is greater than the main branch version {main_version}.")

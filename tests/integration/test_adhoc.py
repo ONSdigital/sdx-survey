@@ -5,7 +5,6 @@ from tests.integration.test_base import TestBase, get_json
 
 
 class TestAdhoc(TestBase):
-
     def test_phm(self):
         submission_json = get_json("740.0001.json")
         tx_id = submission_json["tx_id"]
@@ -14,7 +13,7 @@ class TestAdhoc(TestBase):
         resp = self.client.post("/", json=self.envelope)
 
         # expected files
-        expected_filename = 'cebf9e22-0b78-40d8-872d-ca5fe2507ab1.json'
+        expected_filename = "cebf9e22-0b78-40d8-872d-ca5fe2507ab1.json"
 
         # actual files
         actual_files = self.get_zip_contents()
@@ -31,11 +30,7 @@ class TestAdhoc(TestBase):
         actual_context: Context = self.get_context()
 
         # expected_receipt
-        expected_receipt = {
-                'data': {
-                    'qid': "0130000001408548"
-                }
-            }
+        expected_receipt = {"data": {"qid": "0130000001408548"}}
 
         # actual receipt
         actual_receipt = self.get_receipt()

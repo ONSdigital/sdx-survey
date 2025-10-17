@@ -6,7 +6,6 @@ from app.transformation.transforms import index
 
 
 class TestIndex(unittest.TestCase):
-
     def setUp(self):
         self.submission: SurveySubmission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
@@ -29,17 +28,19 @@ class TestIndex(unittest.TestCase):
                 "period_id": "201605",
                 "ref_p_start_date": "2016-05-01",
                 "ref_p_end_date": "2016-05-31",
-                "form_type": "1801"
+                "form_type": "1801",
             },
-            "data": {'001': 'hi'},
+            "data": {"001": "hi"},
             "started_at": "2023-09-29T09:07:10.640686+00:00",
-            "submission_language_code": "en"
+            "submission_language_code": "en",
         }
 
     def test_index_contents(self):
         image_name = "Sbefa5444749f407ab3a219f1d1c7324b_1.JPG"
-        expected = (b'29/09/2023 09:30:21,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20230929,'
-                    b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,201605,001,0')
+        expected = (
+            b"29/09/2023 09:30:21,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20230929,"
+            b"Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,201605,001,0"
+        )
 
         actual: bytes = index.get_contents(Response(self.submission), image_name, ftp_path="\\")
         self.assertEqual(expected, actual)
@@ -49,8 +50,10 @@ class TestIndex(unittest.TestCase):
         submission: SurveySubmission = self.submission
         submission["survey_metadata"]["period_id"] = "2310"
         actual: bytes = index.get_contents(Response(self.submission), image_name, ftp_path="\\")
-        expected = (b'29/09/2023 09:30:21,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20230929,'
-                    b'Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,202310,001,0')
+        expected = (
+            b"29/09/2023 09:30:21,\\EDC_QImages\\Images\\Sbefa5444749f407ab3a219f1d1c7324b_1.JPG,20230929,"
+            b"Sbefa5444749f407ab3a219f1d1c7324b_1,202,1801,12346789012,202310,001,0"
+        )
         self.assertEqual(expected, actual)
 
     def test_index_name(self):

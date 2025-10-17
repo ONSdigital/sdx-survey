@@ -6,14 +6,13 @@ class PeriodFormatError(Exception):
 
 
 class PeriodBase(ABC):
-
     @abstractmethod
     def get_format(self) -> str:
         pass
 
     @abstractmethod
     def convert_to_format(self, new_format: str) -> str:
-       pass
+        pass
 
     @abstractmethod
     def convert_to_yyyymm(self) -> str:

@@ -18,9 +18,30 @@ in a 'submission type' agnostic way.
 logger = get_logger()
 
 DAP_SURVEY = ["283"]
-LEGACY_SURVEY = ["009", "017", "019", "061", "127", "132", "133", "134",
-                 "139", "144", "156", "160", "165", "169", "171", "182", "183", "184",
-                 "185", "187", "202", "228"]
+LEGACY_SURVEY = [
+    "009",
+    "017",
+    "019",
+    "061",
+    "127",
+    "132",
+    "133",
+    "134",
+    "139",
+    "144",
+    "156",
+    "160",
+    "165",
+    "169",
+    "171",
+    "182",
+    "183",
+    "184",
+    "185",
+    "187",
+    "202",
+    "228",
+]
 DEXTA_SURVEY = ["066", "073", "074", "076"]
 SPP_SURVEY = ["002", "023"]
 ENVIRONMENTAL_SURVEY = ["007", "147"]
@@ -35,7 +56,6 @@ TO_SPP_PERIOD: dict[str, str] = {
 
 
 class Response:
-
     def __init__(self, submission: SurveySubmission):
         self._submission = submission
         self.tx_id = submission["tx_id"]
@@ -107,19 +127,19 @@ class Response:
                 "exercise_sid": submission["collection_exercise_sid"],
                 "schema_name": submission["schema_name"],
                 "period": metadata["period_id"],
-                "instrument_id": metadata["form_type"]
+                "instrument_id": metadata["form_type"],
             },
             "metadata": {
                 "user_id": metadata["user_id"],
                 "ru_ref": metadata["ru_ref"],
                 "ref_period_start_date": metadata["ref_p_start_date"],
-                "ref_period_end_date": metadata["ref_p_end_date"]
+                "ref_period_end_date": metadata["ref_p_end_date"],
             },
             "launch_language_code": submission["launch_language_code"],
             "data": submission["data"],
             "form_type": metadata["form_type"],
             "started_at": submission["started_at"],
-            "submission_language_code": submission["submission_language_code"]
+            "submission_language_code": submission["submission_language_code"],
         }
 
         return json.dumps(v1_template)

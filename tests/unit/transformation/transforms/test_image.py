@@ -6,7 +6,6 @@ from app.transformation.transforms import image
 
 
 class TestImage(unittest.TestCase):
-
     def setUp(self):
         self.submission: SurveySubmission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
@@ -29,11 +28,11 @@ class TestImage(unittest.TestCase):
                 "period_id": "201605",
                 "ref_p_start_date": "2016-05-01",
                 "ref_p_end_date": "2016-05-31",
-                "form_type": "1801"
+                "form_type": "1801",
             },
-            "data": {'001': 'hi'},
+            "data": {"001": "hi"},
             "started_at": "2023-09-29T09:07:10.640686+00:00",
-            "submission_language_code": "en"
+            "submission_language_code": "en",
         }
 
     def test_get_name(self):

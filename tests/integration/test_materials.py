@@ -5,7 +5,6 @@ from tests.integration.test_base import TestBase, get_json
 
 
 class TestMaterials(TestBase):
-
     def test_qfs(self):
         submission_json = get_json("024.0002.json")
         tx_id = submission_json["tx_id"]
@@ -14,10 +13,10 @@ class TestMaterials(TestBase):
         resp = self.client.post("/", json=self.envelope)
 
         # expected files
-        expected_json_filename = '024_08449838140_201605.json'
-        expected_image_filename = 'S0d21ffe7dcb04d4e_1.JPG'
-        expected_index_filename = 'EDC_024_20220315_0d21ffe7dcb04d4e.csv'
-        expected_receipt_filename = 'REC1503_0d21ffe7dcb04d4e.DAT'
+        expected_json_filename = "024_08449838140_201605.json"
+        expected_image_filename = "S0d21ffe7dcb04d4e_1.JPG"
+        expected_index_filename = "EDC_024_20220315_0d21ffe7dcb04d4e.csv"
+        expected_receipt_filename = "REC1503_0d21ffe7dcb04d4e.DAT"
 
         # actual files
         actual_files = self.get_zip_contents()
@@ -29,17 +28,14 @@ class TestMaterials(TestBase):
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "024",
             "period_id": "201605",
-            "ru_ref": "08449838140O"
+            "ru_ref": "08449838140O",
         }
 
         # actual context
         actual_context: Context = self.get_context()
 
         # expected_receipt
-        expected_receipt = {
-                'caseId': "c81d352b-b936-4f03-b5b7-07c6d370050d",
-                'partyId': "UNKNOWN"
-            }
+        expected_receipt = {"caseId": "c81d352b-b936-4f03-b5b7-07c6d370050d", "partyId": "UNKNOWN"}
 
         # actual receipt
         actual_receipt = self.get_receipt()

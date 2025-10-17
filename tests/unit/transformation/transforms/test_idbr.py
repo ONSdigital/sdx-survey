@@ -6,7 +6,6 @@ from app.transformation.transforms import idbr
 
 
 class TestIdbr(unittest.TestCase):
-
     def setUp(self):
         self.submission: SurveySubmission = {
             "case_id": "34d30023-ee05-4f7c-b5a5-12639b4f045e",
@@ -29,30 +28,30 @@ class TestIdbr(unittest.TestCase):
                 "period_id": "201605",
                 "ref_p_start_date": "2016-05-01",
                 "ref_p_end_date": "2016-05-31",
-                "form_type": "1801"
+                "form_type": "1801",
             },
-            "data": {'001': 'hi'},
+            "data": {"001": "hi"},
             "started_at": "2023-09-29T09:07:10.640686+00:00",
-            "submission_language_code": "en"
+            "submission_language_code": "en",
         }
 
     def test_idbr_receipt(self):
         actual: bytes = idbr.get_contents(Response(self.submission))
-        expected: bytes = b'12346789012:A:202:201605'
+        expected: bytes = b"12346789012:A:202:201605"
 
         self.assertEqual(expected, actual)
 
     def test_idbr_receipt_four_digit_period(self):
-        self.submission['survey_metadata']['period_id'] = '1605'
+        self.submission["survey_metadata"]["period_id"] = "1605"
         actual: bytes = idbr.get_contents(Response(self.submission))
-        expected: bytes = b'12346789012:A:202:201605'
+        expected: bytes = b"12346789012:A:202:201605"
 
         self.assertEqual(expected, actual)
 
     def test_idbr_receipt_two_digit_period(self):
-        self.submission['survey_metadata']['period_id'] = '16'
+        self.submission["survey_metadata"]["period_id"] = "16"
         actual: bytes = idbr.get_contents(Response(self.submission))
-        expected: bytes = b'12346789012:A:202:201612'
+        expected: bytes = b"12346789012:A:202:201612"
 
         self.assertEqual(expected, actual)
 

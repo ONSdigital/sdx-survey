@@ -7,7 +7,6 @@ from app.transformation.transforms.v1_json import V1JsonTransform
 
 
 class TestIndex(unittest.TestCase):
-
     def setUp(self):
         self.submission: SurveySubmission = {
             "case_id": "a7b21d95-8e4e-465a-9a9b-2caeefb96265",
@@ -30,7 +29,7 @@ class TestIndex(unittest.TestCase):
                 "ref_p_start_date": "2016-05-01",
                 "trad_as": "ESSENTIAL ENTERPRISE LTD.",
                 "ru_name": "ESSENTIAL ENTERPRISE LTD.",
-                "form_type": "1802"
+                "form_type": "1802",
             },
             "data": {
                 "9999": "Yes, I can report for this period",
@@ -49,10 +48,10 @@ class TestIndex(unittest.TestCase):
                 "15": "No",
                 "16": "No",
                 "9": "No",
-                "146": "hello"
+                "146": "hello",
             },
             "started_at": "2023-05-15T14:04:29.047307+00:00",
-            "submission_language_code": "en"
+            "submission_language_code": "en",
         }
 
     def test_get_filename(self):
@@ -82,13 +81,13 @@ class TestIndex(unittest.TestCase):
                 "exercise_sid": "e71b2cf8-c944-443a-8b62-f327358f49c2",
                 "schema_name": "lcrees_1802",
                 "period": "201605",
-                "instrument_id": "1802"
+                "instrument_id": "1802",
             },
             "metadata": {
                 "user_id": "UNKNOWN",
                 "ru_ref": "12346789012A",
                 "ref_period_start_date": "2016-05-01",
-                "ref_period_end_date": "2016-05-31"
+                "ref_period_end_date": "2016-05-31",
             },
             "launch_language_code": "en",
             "data": {
@@ -108,14 +107,14 @@ class TestIndex(unittest.TestCase):
                 "15": "No",
                 "16": "No",
                 "9": "No",
-                "146": "hello"
+                "146": "hello",
             },
             "form_type": "1802",
             "started_at": "2023-05-15T14:04:29.047307+00:00",
-            "submission_language_code": "en"
+            "submission_language_code": "en",
         }
 
         transformer = V1JsonTransform()
         actual_content: bytes = transformer.get_file_content(Response(self.submission))
-        actual = json.loads(actual_content.decode('utf-8'))
+        actual = json.loads(actual_content.decode("utf-8"))
         self.assertEqual(expected, actual)

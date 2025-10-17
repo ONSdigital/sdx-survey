@@ -6,7 +6,7 @@ from app.response import Response
 from app.transformation.formatter import get_datetime, format_date
 
 
-FEEDBACK_DATA_FORMAT: Final[str] = '%H-%M-%S_%d-%m-%Y'
+FEEDBACK_DATA_FORMAT: Final[str] = "%H-%M-%S_%d-%m-%Y"
 
 
 class FeedbackTransform(Transform):
@@ -14,8 +14,8 @@ class FeedbackTransform(Transform):
         timestamp: datetime = get_datetime(response.get_submitted_at())
         postfix: str = format_date(timestamp, FEEDBACK_DATA_FORMAT)
         tx_id = response.get_tx_id()
-        return f'{tx_id}-fb-{postfix}'
+        return f"{tx_id}-fb-{postfix}"
 
     def get_file_content(self, response: Response) -> bytes:
         r: str = response.to_json()
-        return bytes(r, 'utf-8')
+        return bytes(r, "utf-8")

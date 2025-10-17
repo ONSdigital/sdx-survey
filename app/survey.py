@@ -14,28 +14,26 @@ logger = get_logger()
 
 class SurveySettings(Protocol):
     project_id: str
+
     def get_bucket_name(self) -> str: ...
 
 
 class BucketReader(Protocol):
-    def read(self,
-             filename: str,
-             bucket_name: str,
-             sub_dir: Optional[str] = None,
-             project_id: Optional[str] = None) -> bytes:
-        ...
+    def read(
+        self, filename: str, bucket_name: str, sub_dir: Optional[str] = None, project_id: Optional[str] = None
+    ) -> bytes: ...
 
 
 class Survey:
-
-    def __init__(self,
-                 settings: SurveySettings,
-                 bucket_reader: BucketReader,
-                 decryption_service: DecryptionBase,
-                 survey_processor: ProcessorBase,
-                 adhoc_processor: ProcessorBase,
-                 feedback_processor: ProcessorBase):
-
+    def __init__(
+        self,
+        settings: SurveySettings,
+        bucket_reader: BucketReader,
+        decryption_service: DecryptionBase,
+        survey_processor: ProcessorBase,
+        adhoc_processor: ProcessorBase,
+        feedback_processor: ProcessorBase,
+    ):
         self._settings = settings
         self._bucket_reader = bucket_reader
         self._decryption_service = decryption_service
@@ -59,19 +57,17 @@ class Survey:
 
         logger.info(f"Survey triggered by PubSub with message: {message}")
         attributes = message["attributes"]
-        filename = attributes['objectId']
+        filename = attributes["objectId"]
 
         bucket_name = self._settings.get_bucket_name()
-        data_bytes = self._bucket_reader.read(filename,
-                                              bucket_name=bucket_name,
-                                              project_id=self._settings.project_id)
+        data_bytes = self._bucket_reader.read(filename, bucket_name=bucket_name, project_id=self._settings.project_id)
 
         # Sometimes duplicate messages cause the object to not be found.
         # If this is the case then there is nothing to process
         if data_bytes is None:
             return
 
-        encrypted_message_str = data_bytes.decode('utf-8')
+        encrypted_message_str = data_bytes.decode("utf-8")
 
         submission: SurveySubmission = self._decryption_service.decrypt_survey(encrypted_message_str)
 

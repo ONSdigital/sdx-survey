@@ -5,7 +5,6 @@ from tests.integration.test_base import TestBase, get_json
 
 
 class TestLegacy(TestBase):
-
     def test_mbs(self):
         submission_json = get_json("009.0106.json")
         tx_id = submission_json["tx_id"]
@@ -14,10 +13,10 @@ class TestLegacy(TestBase):
         resp = self.client.post("/", json=self.envelope)
 
         # expected files
-        expected_pck_filename = '009_bddbb41275ea43ce'
-        expected_image_filename = 'Sbddbb41275ea43ce_1.JPG'
-        expected_index_filename = 'EDC_009_20230118_bddbb41275ea43ce.csv'
-        expected_receipt_filename = 'REC1801_bddbb41275ea43ce.DAT'
+        expected_pck_filename = "009_bddbb41275ea43ce"
+        expected_image_filename = "Sbddbb41275ea43ce_1.JPG"
+        expected_index_filename = "EDC_009_20230118_bddbb41275ea43ce.csv"
+        expected_receipt_filename = "REC1801_bddbb41275ea43ce.DAT"
 
         # actual files
         actual_files = self.get_zip_contents()
@@ -29,17 +28,14 @@ class TestLegacy(TestBase):
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "009",
             "period_id": "1605",
-            "ru_ref": "12346789012A"
+            "ru_ref": "12346789012A",
         }
 
         # actual context
         actual_context: Context = self.get_context()
 
         # expected_receipt
-        expected_receipt = {
-                'caseId': "8fc3eb0b-2dd7-4acd-a354-5d4f69503233",
-                'partyId': "UNKNOWN"
-            }
+        expected_receipt = {"caseId": "8fc3eb0b-2dd7-4acd-a354-5d4f69503233", "partyId": "UNKNOWN"}
 
         # actual receipt
         actual_receipt = self.get_receipt()

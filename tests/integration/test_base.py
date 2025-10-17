@@ -22,8 +22,13 @@ from sdx_base.services.storage import StorageService
 from app.definitions.context import Context
 from app.definitions.decrypter import DecryptionBase
 from app.definitions.submission import SurveySubmission
-from app.dependencies import get_http_service, get_pubsub_service, get_storage_service, get_decryption_service, \
-    get_datastore_service
+from app.dependencies import (
+    get_http_service,
+    get_pubsub_service,
+    get_storage_service,
+    get_decryption_service,
+    get_datastore_service,
+)
 from app.routes import router, unrecoverable_error_handler
 from app.services import deliver
 from app.services.deliver import ZIP_FILE, CONTEXT
@@ -31,7 +36,7 @@ from app.settings import Settings
 
 
 def get_json(file_name: str) -> SurveySubmission:
-    path = f'tests/data/{file_name}'
+    path = f"tests/data/{file_name}"
     with open(path) as f:
         data = json.load(f)
 
@@ -50,7 +55,6 @@ def read_zip(zip_bytes: bytes) -> dict[str, bytes]:
 
 
 class MockSecretReader:
-
     _test_comment_key: str = "Pk_eTrrXIaiEv62A6w5qwerYCxR4060Xo1j5pJO_J2c="
 
     def get_secret(self, _project_id: str, secret_id: str) -> str:
@@ -60,54 +64,52 @@ class MockSecretReader:
 
 
 class TestBase(unittest.TestCase):
-
     def setUp(self):
         os.environ["PROJECT_ID"] = "ons-sdx-sandbox"
         proj_root = Path(__file__).parent.parent.parent  # sdx-survey dir
 
-        router_config = RouterConfig(router,
-                                     tx_id_getter=txid_from_pubsub,
-                                     on_unrecoverable_handler=unrecoverable_error_handler)
-        app: FastAPI = run(Settings,
-                           routers=[router_config],
-                           proj_root=proj_root,
-                           secret_reader=MockSecretReader(),
-                           serve=lambda a, b: a
-                           )
+        router_config = RouterConfig(
+            router, tx_id_getter=txid_from_pubsub, on_unrecoverable_handler=unrecoverable_error_handler
+        )
+        app: FastAPI = run(
+            Settings,
+            routers=[router_config],
+            proj_root=proj_root,
+            secret_reader=MockSecretReader(),
+            serve=lambda a, b: a,
+        )
         self.client = TestClient(app)
 
         self.message: Message = {
             "attributes": {"objectId": "to be set in test"},
             "data": "",
             "message_id": "",
-            "publish_time": ""
+            "publish_time": "",
         }
 
-        self.envelope: Envelope = {
-            "message": self.message,
-            "subscription": ""
-        }
+        self.envelope: Envelope = {"message": self.message, "subscription": ""}
 
         # fake bytes returned from sdx-transformer and sdx-image
-        self.pck_contents = b'pck contents'
-        self.spp_contents = b'spp contents'
-        self.image_contents = b'image contents'
+        self.pck_contents = b"pck contents"
+        self.spp_contents = b"spp contents"
+        self.image_contents = b"image contents"
 
         self.deliver_posted_files: dict[str, bytes] = {}
         self.deliver_posted_params: dict[str, str] = {}
 
-        def post_side_effect(_domain: str,
-                             endpoint: str,
-                             _json_data: str | None = None,
-                             params: dict[str, str] | None = None,
-                             files: dict[str, bytes] | None = None) -> requests.Response:
-
+        def post_side_effect(
+            _domain: str,
+            endpoint: str,
+            _json_data: str | None = None,
+            params: dict[str, str] | None = None,
+            files: dict[str, bytes] | None = None,
+        ) -> requests.Response:
             contents: bytes
             if endpoint == deliver.BUSINESS_ENDPOINT or endpoint == deliver.ADHOC_ENDPOINT:
                 # calling deliver so capture the files and params
                 self.deliver_posted_files.update(files)
                 self.deliver_posted_params.update(params)
-                contents = b''
+                contents = b""
             elif endpoint == "spp":
                 contents = self.spp_contents
             elif endpoint == "image":
@@ -133,7 +135,7 @@ class TestBase(unittest.TestCase):
         self.mock_http = Mock(spec=HttpService)
         self.mock_http.post.side_effect = post_side_effect
         self.mock_storage = Mock(spec=StorageService)
-        self.mock_storage.read.return_value = b'submission bytes'
+        self.mock_storage.read.return_value = b"submission bytes"
         self.mock_decryptor = Mock(spec=DecryptionBase)
         self.mock_pubsub = Mock(spec=PubsubService)
         self.mock_pubsub.publish_message = publish_side_effect
@@ -167,21 +169,25 @@ class TestBase(unittest.TestCase):
         return self.receipt_called
 
     def simulate_retryable_error_on_post(self):
-        def retryable_side_effect(domain: str,
-                             endpoint: str,
-                             json_data: str | None = None,
-                             params: dict[str, str] | None = None,
-                             files: dict[str, bytes] | None = None) -> requests.Response:
+        def retryable_side_effect(
+            domain: str,
+            endpoint: str,
+            json_data: str | None = None,
+            params: dict[str, str] | None = None,
+            files: dict[str, bytes] | None = None,
+        ) -> requests.Response:
             raise RetryableError()
 
         self.mock_http.post.side_effect = retryable_side_effect
 
     def simulate_data_error_on_post(self):
-        def data_side_effect(_domain: str,
-                             endpoint: str,
-                             _json_data: str | None = None,
-                             params: dict[str, str] | None = None,
-                             files: dict[str, bytes] | None = None) -> requests.Response:
+        def data_side_effect(
+            _domain: str,
+            endpoint: str,
+            _json_data: str | None = None,
+            params: dict[str, str] | None = None,
+            files: dict[str, bytes] | None = None,
+        ) -> requests.Response:
             response = requests.Response()
             response.status_code = 400
             response._content = b""

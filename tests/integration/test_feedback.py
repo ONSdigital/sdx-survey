@@ -5,7 +5,6 @@ from tests.integration.test_base import TestBase, get_json
 
 
 class TestFeedback(TestBase):
-
     def test_feedback(self):
         submission_json = get_json("139.fb.json")
         tx_id = submission_json["tx_id"]
@@ -14,7 +13,7 @@ class TestFeedback(TestBase):
         resp = self.client.post("/", json=self.envelope)
 
         # expected files
-        expected_filename = 'cc7635a7-f204-4702-88a8-f1814e8d7295-fb-15-02-07_20-04-2021'
+        expected_filename = "cc7635a7-f204-4702-88a8-f1814e8d7295-fb-15-02-07_20-04-2021"
 
         # actual files
         actual_files = self.get_zip_contents()
@@ -25,8 +24,8 @@ class TestFeedback(TestBase):
             "survey_type": SurveyType.FEEDBACK,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "139",
-            'period_id': '1706',
-            'ru_ref': '11110000002H',
+            "period_id": "1706",
+            "ru_ref": "11110000002H",
         }
 
         # actual context
@@ -48,7 +47,7 @@ class TestFeedback(TestBase):
         resp = self.client.post("/", json=self.envelope)
 
         # expected files
-        expected_filename = 'ea82c224-0f80-41cc-b877-8a7804b56c26-fb-16-37-56_21-05-2016'
+        expected_filename = "ea82c224-0f80-41cc-b877-8a7804b56c26-fb-16-37-56_21-05-2016"
 
         # actual files
         actual_files = self.get_zip_contents()

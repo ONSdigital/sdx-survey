@@ -8,10 +8,32 @@ install: ## Install dependencies
 
 
 .PHONY: test
-test:
+test: install
+	@echo "Running tests..."
 	uv run pytest -v --cov-report term-missing --disable-warnings --cov=app tests/
 
 
 .PHONY: lint
 lint:
-	uv run flake8 . --count --statistics
+	@echo "Running Ruff linter..."
+	uv run --only-group lint ruff check --fix
+
+
+.PHONY: format
+format:
+	@echo "Running Ruff formatter..."
+	uv run --only-group lint ruff format
+
+
+.PHONY: dev
+dev:
+	@echo "Starting development server..."
+	uv run run.py
+
+
+.PHONY: bump
+bump:
+	@echo "🔼 Bumping project version..."
+	uv run --only-group version-check python .github/scripts/bump_version.py
+	@echo "🔄 Generating new lock file..."
+	uv lock

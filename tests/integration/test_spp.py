@@ -5,7 +5,6 @@ from tests.integration.test_base import TestBase, get_json
 
 
 class TestSpp(TestBase):
-
     def test_mbs(self):
         submission_json = get_json("009.0106.json")
         submission_json["survey_metadata"]["period_id"] = "2512"
@@ -15,10 +14,10 @@ class TestSpp(TestBase):
         resp = self.client.post("/", json=self.envelope)
 
         # expected files
-        expected_spp_filename = '009_SDC_2023-01-18T13-33-19_bddbb412-75ea-43ce-9efa-0deb07cb8550.json'
-        expected_image_filename = 'Sbddbb41275ea43ce_1.JPG'
-        expected_index_filename = 'EDC_009_20230118_bddbb41275ea43ce.csv'
-        expected_receipt_filename = 'REC1801_bddbb41275ea43ce.DAT'
+        expected_spp_filename = "009_SDC_2023-01-18T13-33-19_bddbb412-75ea-43ce-9efa-0deb07cb8550.json"
+        expected_image_filename = "Sbddbb41275ea43ce_1.JPG"
+        expected_index_filename = "EDC_009_20230118_bddbb41275ea43ce.csv"
+        expected_receipt_filename = "REC1801_bddbb41275ea43ce.DAT"
 
         # actual files
         actual_files = self.get_zip_contents()
@@ -30,17 +29,14 @@ class TestSpp(TestBase):
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "009",
             "period_id": "2512",
-            "ru_ref": "12346789012A"
+            "ru_ref": "12346789012A",
         }
 
         # actual context
         actual_context: Context = self.get_context()
 
         # expected_receipt
-        expected_receipt = {
-                'caseId': "8fc3eb0b-2dd7-4acd-a354-5d4f69503233",
-                'partyId': "UNKNOWN"
-            }
+        expected_receipt = {"caseId": "8fc3eb0b-2dd7-4acd-a354-5d4f69503233", "partyId": "UNKNOWN"}
 
         # actual receipt
         actual_receipt = self.get_receipt()
@@ -64,10 +60,10 @@ class TestSpp(TestBase):
         resp = self.client.post("/", json=self.envelope)
 
         # expected files
-        expected_spp_filename = '023_SDC_2016-03-12T13-01-26_11ed69f5-6c23-40cb-b4c2-70613bfe97fc.json'
-        expected_image_filename = 'S11ed69f56c2340cb_1.JPG'
-        expected_index_filename = 'EDC_023_20160312_11ed69f56c2340cb.csv'
-        expected_receipt_filename = 'REC1203_11ed69f56c2340cb.DAT'
+        expected_spp_filename = "023_SDC_2016-03-12T13-01-26_11ed69f5-6c23-40cb-b4c2-70613bfe97fc.json"
+        expected_image_filename = "S11ed69f56c2340cb_1.JPG"
+        expected_index_filename = "EDC_023_20160312_11ed69f56c2340cb.csv"
+        expected_receipt_filename = "REC1203_11ed69f56c2340cb.DAT"
 
         # actual files
         actual_files = self.get_zip_contents()
@@ -79,17 +75,14 @@ class TestSpp(TestBase):
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "023",
             "period_id": "1604",
-            "ru_ref": "12345678901A"
+            "ru_ref": "12345678901A",
         }
 
         # actual context
         actual_context: Context = self.get_context()
 
         # expected_receipt
-        expected_receipt = {
-            'caseId': "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3",
-            'partyId': "789473423"
-        }
+        expected_receipt = {"caseId": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3", "partyId": "789473423"}
 
         # actual receipt
         actual_receipt = self.get_receipt()

@@ -7,17 +7,17 @@ from app.response import Response
 
 
 class Http(Protocol):
-    def post(self,
-             domain: str,
-             endpoint: str,
-             json_data: str | None = None,
-             params: dict[str, str] | None = None,
-             files: dict[str, bytes] | None = None) -> requests.Response:
-        ...
+    def post(
+        self,
+        domain: str,
+        endpoint: str,
+        json_data: str | None = None,
+        params: dict[str, str] | None = None,
+        files: dict[str, bytes] | None = None,
+    ) -> requests.Response: ...
 
 
 class TransformPosterBase(ABC):
-
     @abstractmethod
     def call_transformer_pck(self, response: Response) -> bytes:
         pass
@@ -28,7 +28,6 @@ class TransformPosterBase(ABC):
 
 
 class ImagePosterBase(ABC):
-
     @abstractmethod
     def call_image(self, response: Response) -> bytes:
         pass

@@ -2,7 +2,6 @@ from tests.integration.test_base import TestBase, get_json
 
 
 class TestRun(TestBase):
-
     def test_run_success(self):
         submission_json = get_json("009.0106.json")
         tx_id = submission_json["tx_id"]

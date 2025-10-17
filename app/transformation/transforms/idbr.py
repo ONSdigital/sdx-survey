@@ -10,8 +10,7 @@ def _idbr_receipt(survey_id, ru_ref, ru_check, period):
 
 def get_contents(response: Response) -> bytes:
     ru_ref, ru_check = split_ru_ref(response.get_ru_ref())
-    return bytes(_idbr_receipt(response.get_survey_id(),
-                               ru_ref, ru_check, response.get_period()), 'utf-8')
+    return bytes(_idbr_receipt(response.get_survey_id(), ru_ref, ru_check, response.get_period()), "utf-8")
 
 
 def get_name(response: Response) -> str:
@@ -20,7 +19,6 @@ def get_name(response: Response) -> str:
 
 
 class IDBRTransform(Transform):
-
     def get_file_name(self, response: Response) -> str:
         return get_name(response)
 

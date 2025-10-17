@@ -4,7 +4,6 @@ from app.response import Response
 
 
 class Transform(ABC):
-
     @abstractmethod
     def get_file_name(self, response: Response) -> str:
         pass

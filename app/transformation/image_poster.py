@@ -12,7 +12,6 @@ IMAGE_END_POINT: Final[str] = "image"
 
 
 class ImagePoster(ImagePosterBase):
-
     def __init__(self, image_url: str, http_service: Http):
         self._image_url = image_url
         self._http_service = http_service

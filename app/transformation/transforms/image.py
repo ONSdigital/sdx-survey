@@ -10,7 +10,6 @@ def get_name(response: Response) -> str:
 
 
 class ImageTransform(Transform):
-
     def __init__(self, image_poster: ImagePosterBase):
         self._image_poster = image_poster
 

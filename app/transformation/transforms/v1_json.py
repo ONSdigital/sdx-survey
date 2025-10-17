@@ -4,7 +4,6 @@ from app.definitions.transform import Transform
 
 
 class V1JsonTransform(Transform):
-
     def get_file_name(self, response: Response) -> str:
         if response.get_survey_id() == "283":
             return f"{response.get_tx_id()}.json"
@@ -14,4 +13,4 @@ class V1JsonTransform(Transform):
 
     def get_file_content(self, response: Response) -> bytes:
         r: str = response.to_v1_json()
-        return bytes(r, 'utf-8')
+        return bytes(r, "utf-8")
