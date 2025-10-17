@@ -27,10 +27,12 @@ class TestDap(TestBase):
 
         expected_receipt = {"caseId": "846b8188-8235-4025-a5ef-5b98c693d6f1", "partyId": "UNKNOWN"}
 
-        expected_comments: CommentData = {'additional': [],
-                                          'boxes_selected': '',
-                                          'comment': 'I am a 283 comment',
-                                          'ru_ref': '11842491738S'}
+        expected_comments: CommentData = {
+            "additional": [],
+            "boxes_selected": "",
+            "comment": "I am a 283 comment",
+            "ru_ref": "11842491738S",
+        }
 
         expected_kind = "283_201605"
 

@@ -16,6 +16,8 @@ class TestLegacy(TestBase):
         expected_index_filename = "EDC_009_20230118_bddbb41275ea43ce.csv"
         expected_receipt_filename = "REC1801_bddbb41275ea43ce.DAT"
 
+        actual_files = self.get_zip_contents()
+
         expected_context: Context = {
             "tx_id": "bddbb412-75ea-43ce-9efa-0deb07cb8550",
             "survey_type": SurveyType.LEGACY,
@@ -28,14 +30,13 @@ class TestLegacy(TestBase):
         expected_receipt = {"caseId": "8fc3eb0b-2dd7-4acd-a354-5d4f69503233", "partyId": "UNKNOWN"}
 
         expected_comments: CommentData = {
-            'ru_ref': '12346789012A',
-            'boxes_selected': '',
-            'comment': 'I am a 009 comment',
-            'additional': []}
+            "ru_ref": "12346789012A",
+            "boxes_selected": "",
+            "comment": "I am a 009 comment",
+            "additional": [],
+        }
 
         expected_kind = "009_1605"
-
-        actual_files = self.get_zip_contents()
 
         self.assertTrue(resp.is_success)
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])

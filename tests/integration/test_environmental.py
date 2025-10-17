@@ -30,10 +30,11 @@ class TestEnvironmental(TestBase):
         expected_receipt = {"caseId": "4bc5a896-994f-4c5d-b592-9da04147378a", "partyId": "UNKNOWN"}
 
         expected_comments: CommentData = {
-            'ru_ref': '15339216474W',
-            'boxes_selected': '',
-            'comment': None,
-            'additional': []}
+            "ru_ref": "15339216474W",
+            "boxes_selected": "",
+            "comment": None,
+            "additional": [],
+        }
 
         expected_kind = "007_201605"
 

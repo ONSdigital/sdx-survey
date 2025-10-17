@@ -66,7 +66,6 @@ def _decrypt_comment(comment_token: str) -> dict:
 
 
 class MockSecretReader:
-
     def get_secret(self, _project_id: str, secret_id: str) -> str:
         if secret_id == "sdx-comment-key":
             return COMMENT_KEY
@@ -142,7 +141,6 @@ class TestBase(unittest.TestCase):
             self.receipt_called = True
             return ""
 
-        self._commit_comments_called: bool = False
         self._data: dict[str, str] = {}
         self._kind: str = ""
 
@@ -151,9 +149,8 @@ class TestBase(unittest.TestCase):
             kind: str,
             tx_id: str,
             project_id: Optional[str] = None,
-            exclude_from_indexes: Optional[str] = None
+            exclude_from_indexes: Optional[str] = None,
         ):
-            self._commit_comments_called = True
             self._data = data
             self._kind = kind
 
@@ -172,13 +169,15 @@ class TestBase(unittest.TestCase):
         app.dependency_overrides[get_http_service] = lambda: self.mock_http
         app.dependency_overrides[get_pubsub_service] = lambda: self.mock_pubsub
         app.dependency_overrides[get_datastore_service] = lambda: self.mock_datastore
+
         self.app = app
+        self.submission_json = {}
 
     def set_survey_submission(self, filename: str):
-        submission_json = _get_json(filename)
-        tx_id = submission_json["tx_id"]
+        self.submission_json = _get_json(filename)
+        tx_id = self.submission_json["tx_id"]
         self.message["attributes"]["objectId"] = tx_id
-        self.mock_decryptor.decrypt_survey.return_value = submission_json
+        self.mock_decryptor.decrypt_survey.return_value = self.submission_json
 
     def get_zip_contents(self) -> dict[str, bytes]:
         actual_zip_file = self.deliver_posted_files[ZIP_FILE]
@@ -201,9 +200,6 @@ class TestBase(unittest.TestCase):
 
     def get_comment_kind(self) -> str:
         return self._kind
-
-    def were_comments_stored(self) -> bool:
-        return self._commit_comments_called
 
     def simulate_retryable_error_on_post(self):
         def retryable_side_effect(
