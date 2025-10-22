@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.13"
 
 [[package]]
@@ -1119,7 +1119,7 @@ wheels = [
 
 [[package]]
 name = "sdx-survey"
-version = "8.0.0"
+version = "8.0.1"
 source = { virtual = "." }
 dependencies = [
     { name = "cryptography" },
