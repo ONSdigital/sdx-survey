@@ -9,7 +9,7 @@ from app.response import Response
 
 logger = get_logger()
 
-PCK_END_POINT: Final[str] = "PCK"
+PCK_END_POINT: Final[str] = "pck"
 SPP_END_POINT: Final[str] = "spp"
 
 
