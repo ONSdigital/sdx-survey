@@ -1,3 +1,5 @@
+from typing import Self
+
 from app.definitions.context import Context
 from app.definitions.context_type import ContextType
 from app.definitions.survey_type import SurveyType
@@ -6,7 +8,7 @@ from tests.integration.test_base import TestBase
 
 
 class TestDap(TestBase):
-    def test_bics(self):
+    def test_bics(self: Self):
         self.set_survey_submission("283.0001.json")
 
         resp = self.client.post("/", json=self.envelope)

@@ -1,3 +1,5 @@
+from typing import Self
+
 from app.definitions.context import Context
 from app.definitions.context_type import ContextType
 from app.definitions.survey_type import SurveyType
@@ -6,7 +8,7 @@ from tests.integration.test_base import TestBase
 
 
 class TestSpp(TestBase):
-    def test_mbs(self):
+    def test_mbs(self: Self):
         self.set_survey_submission("009.0106.json")
         self.submission_json["survey_metadata"]["period_id"] = "2512"
 
@@ -50,7 +52,7 @@ class TestSpp(TestBase):
         self.assertEqual(expected_comments, self.get_comment_data())
         self.assertEqual(expected_kind, self.get_comment_kind())
 
-    def test_rsi(self):
+    def test_rsi(self: Self):
         self.set_survey_submission("023.0102.json")
 
         resp = self.client.post("/", json=self.envelope)

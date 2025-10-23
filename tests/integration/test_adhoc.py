@@ -1,3 +1,5 @@
+from typing import Self
+
 from app.definitions.context import Context
 from app.definitions.context_type import ContextType
 from app.definitions.survey_type import SurveyType
@@ -5,7 +7,7 @@ from tests.integration.test_base import TestBase
 
 
 class TestAdhoc(TestBase):
-    def test_phm(self):
+    def test_phm(self: Self):
         self.set_survey_submission("740.0001.json")
 
         resp = self.client.post("/", json=self.envelope)

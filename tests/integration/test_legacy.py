@@ -1,3 +1,5 @@
+from typing import Self
+
 from app.definitions.context import Context
 from app.definitions.context_type import ContextType
 from app.definitions.survey_type import SurveyType
@@ -6,7 +8,7 @@ from tests.integration.test_base import TestBase
 
 
 class TestLegacy(TestBase):
-    def test_mbs(self):
+    def test_mbs(self: Self):
         self.set_survey_submission("009.0106.json")
 
         resp = self.client.post("/", json=self.envelope)
