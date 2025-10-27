@@ -33,7 +33,7 @@ class TestFeedback(TestBase):
         # check comments were not stored
         self.mock_datastore.commit_entity.assert_not_called()
 
-    def test_adhoc_feedback(self):
+    def test_adhoc_feedback(self: Self):
         self.set_survey_submission("740.fb.json")
 
         resp = self.client.post("/", json=self.envelope)
@@ -47,6 +47,8 @@ class TestFeedback(TestBase):
             "survey_type": SurveyType.FEEDBACK,
             "context_type": ContextType.ADHOC_SURVEY,
             "survey_id": "740",
+            "title": "covid_resp_inf_surv_response",
+            "label": "phm_740_health_insights_2024",
         }
 
         self.assertTrue(resp.is_success)

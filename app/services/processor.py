@@ -75,7 +75,10 @@ class ProcessorV2(Processor):
             "context_type": context_type,
         }
 
-        if response.get_context_type() != ContextType.ADHOC_SURVEY:
+        if response.get_context_type() == ContextType.ADHOC_SURVEY:
+            context["title"] = "covid_resp_inf_surv_response"
+            context["label"] = "phm_740_health_insights_2024"
+        else:
             context["period_id"] = response.get_period()
             context["ru_ref"] = response.get_ru_ref()
 

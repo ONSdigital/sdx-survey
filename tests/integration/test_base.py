@@ -4,7 +4,7 @@ import os
 import unittest
 import zipfile
 from pathlib import Path
-from typing import Final, Optional
+from typing import Final, Optional, Self
 from unittest.mock import Mock
 
 import requests
@@ -73,7 +73,7 @@ class MockSecretReader:
 
 
 class TestBase(unittest.TestCase):
-    def setUp(self):
+    def setUp(self: Self):
         os.environ["PROJECT_ID"] = "ons-sdx-sandbox"
         proj_root = Path(__file__).parent.parent.parent  # sdx-survey dir
 
@@ -105,6 +105,7 @@ class TestBase(unittest.TestCase):
 
         self.deliver_posted_files: dict[str, bytes] = {}
         self.deliver_posted_params: dict[str, str] = {}
+        self.called_sdx_transformer = False
 
         def post_side_effect(
             _domain: str,
@@ -116,15 +117,19 @@ class TestBase(unittest.TestCase):
             contents: bytes
             if endpoint == deliver.BUSINESS_ENDPOINT or endpoint == deliver.ADHOC_ENDPOINT:
                 # calling deliver so capture the files and params
-                self.deliver_posted_files.update(files)
-                self.deliver_posted_params.update(params)
+                if files:
+                    self.deliver_posted_files.update(files)
+                if params:
+                    self.deliver_posted_params.update(params)
                 contents = b""
             elif endpoint == "spp":
                 contents = self.spp_contents
+                self.called_sdx_transformer = True
             elif endpoint == "image":
                 contents = self.image_contents
             else:
                 contents = self.pck_contents
+                self.called_sdx_transformer = True
 
             response = requests.Response()
             response.status_code = 200
@@ -171,7 +176,7 @@ class TestBase(unittest.TestCase):
         app.dependency_overrides[get_datastore_service] = lambda: self.mock_datastore
 
         self.app = app
-        self.submission_json = {}
+        self.submission_json: SurveySubmission
 
     def set_survey_submission(self, filename: str):
         self.submission_json = _get_json(filename)

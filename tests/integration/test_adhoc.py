@@ -21,6 +21,8 @@ class TestAdhoc(TestBase):
             "survey_type": SurveyType.ADHOC,
             "context_type": ContextType.ADHOC_SURVEY,
             "survey_id": "740",
+            "title": "covid_resp_inf_surv_response",
+            "label": "phm_740_health_insights_2024",
         }
 
         expected_receipt = {"data": {"qid": "0130000001408548"}}
@@ -32,3 +34,5 @@ class TestAdhoc(TestBase):
         self.assertEqual(expected_receipt, self.get_receipt())
         # check comments were not stored
         self.mock_datastore.commit_entity.assert_not_called()
+        # check no call to transformer
+        self.assertFalse(self.called_sdx_transformer)

@@ -11,3 +11,5 @@ class Context(TypedDict):
     survey_id: str
     period_id: NotRequired[str]
     ru_ref: NotRequired[str]
+    title: NotRequired[str]
+    label: NotRequired[str]
