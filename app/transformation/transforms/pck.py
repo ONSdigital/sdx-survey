@@ -19,6 +19,9 @@ def get_name(response: Response) -> str:
     if survey_id == "202":
         survey_id = get_abs_survey_id(response.get_form_type())
 
+    if survey_id in ["182", "183", "184", "185"]:
+        survey_id = "181"
+
     return f"{survey_id}_{get_tx_code(tx_id)}"
 
 
