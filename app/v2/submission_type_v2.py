@@ -6,10 +6,10 @@ from app.period import Period
 from app.response import Response, ResponseType
 
 DAP_SURVEY = ["283"]
-LEGACY_SURVEY = ["009", "017", "019", "061", "127", "132", "133", "134",
-                 "139", "144", "156", "160", "165", "169", "171", "182", "183", "184",
+LEGACY_SURVEY = ["009", "017", "019", "061", "132", "133", "134",
+                 "139", "144", "156", "160", "165", "169", "171",
                  "185", "187", "202", "228"]
-DEXTA_SURVEY = ["066", "073", "074", "076"]
+DEXTA_SURVEY = ["066", "073", "074"]
 SPP_SURVEY = ["002", "023"]
 ENVIRONMENTAL_SURVEY = ["007", "147"]
 MATERIALS_SURVEY = ["024", "068", "071", "194"]
