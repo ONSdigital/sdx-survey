@@ -5,4 +5,5 @@ tests/__pycache__/
 __pycache__.dccache
 .dccache
 venv
+.venv
 *.pyc

@@ -21,7 +21,7 @@ def get_json(name: str) -> SurveySubmission:
     file = responseTestDataMap.get(name)
     if not file:
         raise ValueError
-    path = f'tests/submissions/{file}'
+    path = f"tests/submissions/{file}"
     with open(path) as f:
         data = json.load(f)
 
@@ -40,7 +40,7 @@ def unzip(data_bytes: bytes) -> dict[str, bytes]:
     results: dict[str, bytes] = {}
 
     # Open the zip file
-    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+    with zipfile.ZipFile(zip_file, "r") as zip_ref:
         # List the filenames of the zip file
         for name in zip_ref.namelist():
             results[name] = zip_ref.read(name)

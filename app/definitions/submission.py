@@ -1,6 +1,6 @@
-from typing import TypedDict, NotRequired
+from typing import TypedDict, NotRequired, Any
 
-SurveyData = dict[str, str | list[str]]
+SurveyData = dict[str, str | list[Any]]
 
 
 class BusinessSurveyMetadata(TypedDict):

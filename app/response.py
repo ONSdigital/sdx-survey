@@ -1,100 +1,145 @@
 import copy
 import json
-from enum import Enum
+from typing import Any
 
-from sdx_gcp.app import get_logger
-from sdx_gcp.errors import DataError
+from sdx_base.errors.errors import DataError
 
-from app.definitions.submission import SurveySubmission
+from app import get_logger
+from app.definitions.context_type import ContextType
+from app.definitions.submission import SurveySubmission, BusinessSurveyMetadata
+from app.definitions.survey_type import SurveyType
+from app.period import Period
 
 """
-    This file defines a wrapper for the submission.
-    It provides a set of functions for retrieving common survey metadata
-    in a 'submission type' agnostic way.
+This file defines a wrapper for the submission.
+It provides a set of functions for retrieving common survey metadata
+in a 'submission type' agnostic way.
 """
 logger = get_logger()
 
+DAP_SURVEY = ["283"]
+LEGACY_SURVEY = [
+    "009",
+    "017",
+    "019",
+    "061",
+    "127",
+    "132",
+    "133",
+    "134",
+    "139",
+    "144",
+    "156",
+    "160",
+    "165",
+    "169",
+    "171",
+    "182",
+    "183",
+    "184",
+    "185",
+    "187",
+    "202",
+    "228",
+]
+DEXTA_SURVEY = ["066", "073", "074", "076"]
+SPP_SURVEY = ["002", "023"]
+ENVIRONMENTAL_SURVEY = ["007", "147"]
+MATERIALS_SURVEY = ["024", "068", "071", "194"]
+ADHOC_SURVEY = ["740"]
 
-class SurveyType(Enum):
-    BUSINESS = 1
-    ADHOC = 2
-
-
-class ResponseType(Enum):
-    SURVEY = 1
-    FEEDBACK = 2
-
-
-class SchemaVersion(Enum):
-    V1 = 1
-    V2 = 2
-
-
-class DeliverTarget(Enum):
-    LEGACY = 1
-    DAP = 2
-    HYBRID = 3
-    FEEDBACK = 4
-
-
-def get_field(submission: dict, *field_names: str) -> str:
-    current = submission
-    for key in field_names:
-        current = current.get(key)
-        if current is None:
-            logger.error(f'Missing field {key} from submission!', submission=get_safe_submission(submission))
-            raise DataError(f'Missing field {key} from submission!')
-    return current
-
-
-def get_optional(submission: dict, *field_names: str) -> str:
-    try:
-        return get_field(submission, *field_names)
-
-    except DataError as e:
-        logger.warn(str(e))
-        return ""
+TO_SPP_PERIOD: dict[str, str] = {
+    "009": "2510",
+    "139": "2512",
+    "228": "2510",
+}
 
 
 class Response:
-
-    def __init__(self, submission: SurveySubmission, tx_id: str):
+    def __init__(self, submission: SurveySubmission):
         self._submission = submission
-        self.tx_id = tx_id
+        self.tx_id = submission["tx_id"]
 
     def get_submission(self) -> SurveySubmission:
         return copy.deepcopy(self._submission)
 
+    def get_context_type(self) -> ContextType:
+        if self.get_survey_id() in ADHOC_SURVEY:
+            return ContextType.ADHOC_SURVEY
+        else:
+            return ContextType.BUSINESS_SURVEY
+
+    def get_survey_type(self) -> SurveyType:
+        if self.is_feedback():
+            return SurveyType.FEEDBACK
+
+        if self._spp_submission():
+            return SurveyType.SPP
+
+        survey_id = self.get_survey_id()
+
+        if survey_id in DAP_SURVEY:
+            return SurveyType.DAP
+
+        if survey_id in DEXTA_SURVEY:
+            return SurveyType.DEXTA
+
+        if survey_id in LEGACY_SURVEY:
+            return SurveyType.LEGACY
+
+        if survey_id in ENVIRONMENTAL_SURVEY:
+            return SurveyType.ENVIRONMENTAL
+
+        if survey_id in MATERIALS_SURVEY:
+            return SurveyType.MATERIALS
+
+        if survey_id in ADHOC_SURVEY:
+            return SurveyType.ADHOC
+
+        raise DataError(f"Survey id {survey_id} not known!")
+
+    def _spp_submission(self) -> bool:
+        survey_id = self.get_survey_id()
+        if survey_id in TO_SPP_PERIOD.keys():
+            period_to_start = TO_SPP_PERIOD.get(survey_id)
+            if period_to_start is not None:
+                if Period(self.get_period()) >= Period(period_to_start):
+                    return True
+        elif survey_id in SPP_SURVEY:
+            return True
+
+        return False
+
     def to_v1_json(self) -> str:
         logger.info("Retrieving submission as V1")
-
         submission = self._submission
+        metadata: BusinessSurveyMetadata = submission["survey_metadata"]
         v1_template = {
-            "case_id": get_field(submission, "case_id"),
-            "tx_id": get_field(submission, "tx_id"),
-            "type": get_field(submission, "type"),
-            "version": get_field(submission, "data_version"),
-            "origin": get_optional(submission, "origin"),
-            "survey_id": get_field(submission, "survey_metadata", "survey_id"),
-            "flushed": get_optional(submission, "flushed"),
-            "submitted_at": get_field(submission, "submitted_at"),
+            "case_id": submission["case_id"],
+            "tx_id": submission["tx_id"],
+            "type": submission["type"],
+            "version": submission["data_version"],
+            "origin": submission["origin"],
+            "survey_id": metadata["survey_id"],
+            "flushed": submission["flushed"],
+            "submitted_at": submission["submitted_at"],
             "collection": {
-                "exercise_sid": get_field(submission, "collection_exercise_sid"),
-                "schema_name": get_field(submission, "schema_name"),
-                "period": get_field(submission, "survey_metadata", "period_id"),
-                "instrument_id": get_field(submission, "survey_metadata", "form_type")
+                "exercise_sid": submission["collection_exercise_sid"],
+                "schema_name": submission["schema_name"],
+                "period": metadata["period_id"],
+                "instrument_id": metadata["form_type"],
             },
             "metadata": {
-                "user_id": get_field(submission, "survey_metadata", "user_id"),
-                "ru_ref": get_field(submission, "survey_metadata", "ru_ref"),
-                "ref_period_start_date": get_field(submission, "survey_metadata", "ref_p_start_date"),
-                "ref_period_end_date": get_field(submission, "survey_metadata", "ref_p_end_date")
+                "user_id": metadata["user_id"],
+                "ru_ref": metadata["ru_ref"],
+                "ref_period_start_date": metadata["ref_p_start_date"],
+                "ref_period_end_date": metadata["ref_p_end_date"],
             },
-            "launch_language_code": get_optional(submission, "launch_language_code"),
-            "data": get_field(submission, "data"),
-            "form_type": get_field(submission, "survey_metadata", "form_type"),
-            "started_at": get_optional(submission, "started_at"),
-            "submission_language_code": get_optional(submission, "submission_language_code")
+            "launch_language_code": submission["launch_language_code"],
+            "data": submission["data"],
+            "form_type": metadata["form_type"],
+            "started_at": submission["started_at"],
+            "submission_language_code": submission["submission_language_code"],
         }
 
         return json.dumps(v1_template)
@@ -106,87 +151,60 @@ class Response:
         return self.tx_id
 
     def get_form_type(self) -> str:
-        return get_field(self._submission, "survey_metadata", "form_type")
+        return self._submission["survey_metadata"]["form_type"]
 
     def get_period_start_date(self) -> str:
-        if self.get_schema_version() == SchemaVersion.V2:
-            return get_field(self._submission, "survey_metadata", "ref_p_start_date")
-
-        return get_field(self._submission, "metadata", "ref_period_start_date")
+        return self._submission["survey_metadata"]["ref_p_start_date"]
 
     def get_period_end_date(self) -> str:
-        if self.get_schema_version() == SchemaVersion.V2:
-            return get_field(self._submission, "survey_metadata", "ref_p_end_date")
+        return self._submission["survey_metadata"]["ref_p_end_date"]
 
-        return get_field(self._submission, "metadata", "ref_period_end_date")
-
-    def get_response_type(self) -> ResponseType:
+    def is_feedback(self) -> bool:
         survey_type = self._submission.get("type")
         if survey_type:
             if "feedback" in self._submission.get("type"):
-                return ResponseType.FEEDBACK
-        return ResponseType.SURVEY
+                return True
+        return False
 
     def get_submitted_at(self) -> str:
-        return get_field(self._submission, "submitted_at")
+        return self._submission["submitted_at"]
 
-    def get_survey_type(self) -> SurveyType:
+    def is_adhoc(self) -> bool:
         channel = self._submission.get("channel")
         if channel:
             if "RH" in self._submission.get("channel"):
-                return SurveyType.ADHOC
-        return SurveyType.BUSINESS
+                return True
+        return False
 
-    def get_schema_version(self) -> SchemaVersion:
-        version = self._submission.get("version")
-        if version:
-            if self._submission.get("version") == "v2":
-                return SchemaVersion.V2
-        return SchemaVersion.V1
-
-    def get_data(self) -> dict[str, str] | list[any]:
+    def get_data(self) -> dict[str, str] | list[Any]:
         return self._submission["data"]
 
     def get_data_version(self) -> str:
         return self._submission["data_version"]
 
     def get_qid(self) -> str:
-        return get_field(self._submission, "survey_metadata", "qid")
+        return self._submission["survey_metadata"]["qid"]
 
     def get_survey_id(self) -> str:
-        if self.get_schema_version() == SchemaVersion.V2:
-            return get_field(self._submission, "survey_metadata", "survey_id")
-        else:
-            return get_field(self._submission, "survey_id")
+        return self._submission["survey_metadata"]["survey_id"]
 
     def get_ru_ref(self) -> str:
         if self.get_survey_type() == SurveyType.ADHOC:
             raise DataError("Adhoc surveys do not have ru_ref field")
-        if self.get_schema_version() == SchemaVersion.V2:
-            return get_field(self._submission, "survey_metadata", "ru_ref")
-        else:
-            return get_field(self._submission, "metadata", "ru_ref")
+
+        return self._submission["survey_metadata"]["ru_ref"]
 
     def get_period(self) -> str:
-        if self.get_survey_type() == SurveyType.ADHOC:
-            raise DataError("Adhoc surveys do not have period field")
-
-        if self.get_schema_version() == SchemaVersion.V2:
-            return get_field(self._submission, "survey_metadata", "period_id")
-        else:
-            return get_field(self._submission, "collection", "period")
+        return self._submission["survey_metadata"]["period_id"]
 
     def get_case_id(self) -> str:
-        return get_field(self._submission, "case_id")
+        return self._submission["case_id"]
 
     def get_user_id(self) -> str:
         if self.get_survey_type() == SurveyType.ADHOC:
             raise DataError("Adhoc surveys do not have user_id field")
 
-        if self.get_schema_version() == SchemaVersion.V2:
-            return get_field(self._submission, "survey_metadata", "user_id")
-        else:
-            return get_field(self._submission, "metadata", "user_id")
+        return self._submission["survey_metadata"]["user_id"]
 
     def __eq__(self, other):
         """
