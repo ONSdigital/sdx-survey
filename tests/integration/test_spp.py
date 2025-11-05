@@ -1,0 +1,96 @@
+from typing import Self
+
+from app.definitions.context import Context
+from app.definitions.context_type import ContextType
+from app.definitions.survey_type import SurveyType
+from app.services.comments import CommentData
+from tests.integration.test_base import TestBase
+
+
+class TestSpp(TestBase):
+    def test_mbs(self: Self):
+        self.set_survey_submission("009.0106.json")
+        self.submission_json["survey_metadata"]["period_id"] = "2512"
+
+        resp = self.client.post("/", json=self.envelope)
+
+        expected_spp_filename = "009_SDC_2023-01-18T13-33-19_bddbb412-75ea-43ce-9efa-0deb07cb8550.json"
+        expected_image_filename = "Sbddbb41275ea43ce_1.JPG"
+        expected_index_filename = "EDC_009_20230118_bddbb41275ea43ce.csv"
+        expected_receipt_filename = "REC1801_bddbb41275ea43ce.DAT"
+
+        actual_files = self.get_zip_contents()
+
+        expected_context: Context = {
+            "tx_id": "bddbb412-75ea-43ce-9efa-0deb07cb8550",
+            "survey_type": SurveyType.SPP,
+            "context_type": ContextType.BUSINESS_SURVEY,
+            "survey_id": "009",
+            "period_id": "2512",
+            "ru_ref": "12346789012A",
+        }
+
+        expected_receipt = {"caseId": "8fc3eb0b-2dd7-4acd-a354-5d4f69503233", "partyId": "UNKNOWN"}
+
+        expected_comments: CommentData = {
+            "ru_ref": "12346789012A",
+            "boxes_selected": "",
+            "comment": "I am a 009 comment",
+            "additional": [],
+        }
+
+        expected_kind = "009_2512"
+
+        self.assertTrue(resp.is_success)
+        self.assertEqual(self.spp_contents, actual_files[expected_spp_filename])
+        self.assertEqual(self.image_contents, actual_files[expected_image_filename])
+        self.assertTrue(expected_index_filename in actual_files)
+        self.assertTrue(expected_receipt_filename in actual_files)
+        self.assertEqual(4, len(actual_files))
+        self.assertEqual(expected_context, self.get_context())
+        self.assertEqual(expected_receipt, self.get_receipt())
+        self.assertEqual(expected_comments, self.get_comment_data())
+        self.assertEqual(expected_kind, self.get_comment_kind())
+
+    def test_rsi(self: Self):
+        self.set_survey_submission("023.0102.json")
+
+        resp = self.client.post("/", json=self.envelope)
+
+        expected_spp_filename = "023_SDC_2016-03-12T13-01-26_11ed69f5-6c23-40cb-b4c2-70613bfe97fc.json"
+        expected_image_filename = "S11ed69f56c2340cb_1.JPG"
+        expected_index_filename = "EDC_023_20160312_11ed69f56c2340cb.csv"
+        expected_receipt_filename = "REC1203_11ed69f56c2340cb.DAT"
+
+        actual_files = self.get_zip_contents()
+
+        expected_context: Context = {
+            "tx_id": "11ed69f5-6c23-40cb-b4c2-70613bfe97fc",
+            "survey_type": SurveyType.SPP,
+            "context_type": ContextType.BUSINESS_SURVEY,
+            "survey_id": "023",
+            "period_id": "1604",
+            "ru_ref": "12345678901A",
+        }
+
+        expected_receipt = {"caseId": "4c0bc9ec-06d4-4f66-88b6-2e42b79f17b3", "partyId": "789473423"}
+
+        expected_comments: CommentData = {
+            "ru_ref": "12345678901A",
+            "boxes_selected": "",
+            "comment": "Change comments included",
+            "additional": [],
+        }
+
+        expected_kind = "023_1604"
+
+        self.assertTrue(resp.is_success)
+        self.assertEqual(self.spp_contents, actual_files[expected_spp_filename])
+        self.assertEqual(self.image_contents, actual_files[expected_image_filename])
+        self.assertTrue(expected_index_filename in actual_files)
+        self.assertTrue(expected_receipt_filename in actual_files)
+        self.assertEqual(4, len(actual_files))
+        self.assertEqual(expected_context, self.get_context())
+        self.assertEqual(expected_receipt, self.get_receipt())
+        self.assertEqual(expected_comments, self.get_comment_data())
+        self.assertEqual(expected_kind, self.get_comment_kind())

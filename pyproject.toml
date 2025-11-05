@@ -1,0 +1,45 @@
+[project]
+name = "sdx-survey"
+version = "8.0.3"
+description = "Processing EQs for SDX"
+requires-python = ">=3.13"
+dependencies = [
+    "sdx-base==0.2.3",
+    "sdc-cryptography==1.0.0",
+    "cryptography>=43.0.0",
+    "pyyaml>=6.0.0"
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "pytest-xdist>=3.6.1",
+    "mypy>=1.15.0",
+    "flake8>=6.1.0",
+    "jsonschema>=4.23.0",
+]
+
+lint = [
+    "ruff>=0.11.7",
+]
+
+version-check = [
+     "toml>=0.10.2",
+     "tomlkit>=0.13.3",
+]
+
+[tool.uv.sources]
+sdx-base = { index = "sdx-repo" }
+
+[[tool.uv.index]]
+name = "sdx-repo"
+url = "https://europe-west2-python.pkg.dev/ons-sdx-ci/sdx-python-packages/simple/"
+
+[tool.ruff]
+line-length = 121
+exclude = [ "lib", "__pycache__", ".venv",]
+
+[tool.ruff.lint]
+extend-select = [ "E303", "W391", "W292", "E302"]
+preview = true

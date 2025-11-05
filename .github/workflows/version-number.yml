@@ -1,48 +1,24 @@
-name: Version
+name: Check Pyproject Version
 
 on:
-  pull_request:
-    branches:
-      - '*'
+    pull_request:
+        branches:
+            - '*'
 
 jobs:
-  build:
-    name: Checking Version Number
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Read version contents
-        id: new_version
-        run: |
-          echo "NEW_VERSION=$(cat .version)" >> $GITHUB_ENV
+    uv-example:
+        permissions:
+            contents: read
+        name: Python
+        runs-on: ubuntu-latest
 
-      - name: Print Version
-        run: |
-          echo ${{ env.NEW_VERSION }}
+        steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v4
 
-      - name: Checkout to main
-        uses: actions/checkout@v2
-        with:
-          ref: main
-          fetch-depth: 1
+            -   name: Set up UV
+                uses: astral-sh/setup-uv@v6
 
-      - name: Read main version contents
-        id: main_version
-        run: |
-          echo "MAIN_VERSION=$(cat .version)" >> $GITHUB_ENV
-
-
-      - name: Print main version
-        run: |
-          echo ${{ env.MAIN_VERSION }}
-
-
-      - name: Compare versions
-        run: |
-          if [ ${{ env.NEW_VERSION }} != ${{ env.MAIN_VERSION }} ]
-          then
-            echo Version updated!
-          else
-            echo Version not updated!
-            exit 1
-          fi
+            -   name: Check version in pyproject.toml
+                run: |
+                    uv run --only-group version-check python .github/scripts/check_version.py

@@ -4,7 +4,6 @@ from app.response import Response
 
 
 class TransformerBase(ABC):
-
     @abstractmethod
-    def create_zip(self, response: Response) -> bytes:
+    def transform(self, response: Response) -> bytes:
         pass
