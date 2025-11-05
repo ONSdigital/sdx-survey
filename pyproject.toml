@@ -1,6 +1,6 @@
 [project]
 name = "sdx-survey"
-version = "8.0.3"
+version = "8.0.4"
 description = "Processing EQs for SDX"
 requires-python = ">=3.13"
 dependencies = [
