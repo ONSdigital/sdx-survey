@@ -7,6 +7,7 @@ from app.definitions.context_type import ContextType
 from app.definitions.deliver import DeliverBase
 from app.definitions.processor import ProcessorBase
 from app.definitions.receipting import ReceiptServiceBase
+from app.definitions.survey_type import SurveyType
 from app.definitions.transformer import TransformerBase
 from app.response import Response
 
@@ -81,6 +82,10 @@ class ProcessorV2(Processor):
         else:
             context["period_id"] = response.get_period()
             context["ru_ref"] = response.get_ru_ref()
+
+        # PCK_ONLY is a subset of Legacy, so change it to this before sending to deliver
+        if survey_type == SurveyType.PCK_ONLY:
+            context["survey_type"] = SurveyType.LEGACY
 
         self._deliver_service.deliver_zip(response.tx_id, zip_file, context)
 

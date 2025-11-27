@@ -10,3 +10,4 @@ class SurveyType(StrEnum):
     FEEDBACK = "feedback"
     ADHOC = "adhoc"
     DEXTA = "dexta"
+    PCK_ONLY = "pck_only"
