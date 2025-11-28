@@ -83,9 +83,9 @@ class ProcessorV2(Processor):
             context["period_id"] = response.get_period()
             context["ru_ref"] = response.get_ru_ref()
 
-        # PCK_ONLY is a subset of Legacy, so change it to this before sending to deliver
+        # PCK_ONLY is a subset of DEXTA, so change it to this before sending to deliver
         if survey_type == SurveyType.PCK_ONLY:
-            context["survey_type"] = SurveyType.LEGACY
+            context["survey_type"] = SurveyType.DEXTA
 
         self._deliver_service.deliver_zip(response.tx_id, zip_file, context)
 

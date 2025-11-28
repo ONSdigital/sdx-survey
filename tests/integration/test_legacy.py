@@ -63,7 +63,7 @@ class TestLegacy(TestBase):
 
         expected_context: Context = {
             "tx_id": "bddbb412-75ea-43ce-9efa-0deb07cb8550",
-            "survey_type": SurveyType.LEGACY,
+            "survey_type": SurveyType.DEXTA,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "141",
             "period_id": "1605",
