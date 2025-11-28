@@ -83,9 +83,6 @@ class Survey:
         elif v2_survey_type == SurveyType.ADHOC:
             processor = self._adhoc_processor
 
-        elif v2_survey_type == SurveyType.PCK_ONLY:
-            processor = self._adhoc_processor
-
         else:
             processor = self._survey_processor
 

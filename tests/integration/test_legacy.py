@@ -8,6 +8,7 @@ from tests.integration.test_base import TestBase
 
 
 class TestLegacy(TestBase):
+
     def test_mbs(self: Self):
         self.set_survey_submission("009.0106.json")
 
@@ -51,26 +52,3 @@ class TestLegacy(TestBase):
         self.assertEqual(expected_comments, self.get_comment_data())
         self.assertEqual(expected_comments, self.get_comment_data())
         self.assertEqual(expected_kind, self.get_comment_kind())
-
-    def test_ashe(self: Self):
-        self.set_survey_submission("141.0001.json")
-
-        resp = self.client.post("/", json=self.envelope)
-
-        expected_pck_filename = "141_bddbb41275ea43ce"
-
-        actual_files = self.get_zip_contents()
-
-        expected_context: Context = {
-            "tx_id": "bddbb412-75ea-43ce-9efa-0deb07cb8550",
-            "survey_type": SurveyType.DEXTA,
-            "context_type": ContextType.BUSINESS_SURVEY,
-            "survey_id": "141",
-            "period_id": "1605",
-            "ru_ref": "12346789012A",
-        }
-
-        self.assertTrue(resp.is_success)
-        self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
-        self.assertEqual(1, len(actual_files))
-        self.assertEqual(expected_context, self.get_context())
