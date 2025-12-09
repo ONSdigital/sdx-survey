@@ -9,13 +9,13 @@ from tests.integration.test_base import TestBase
 
 class TestLegacy(TestBase):
     def test_mbs(self: Self):
-        self.set_survey_submission("009.0106.json")
+        self.set_survey_submission("061.0001.json")
 
         resp = self.client.post("/", json=self.envelope)
 
-        expected_pck_filename = "009_bddbb41275ea43ce"
+        expected_pck_filename = "061_bddbb41275ea43ce"
         expected_image_filename = "Sbddbb41275ea43ce_1.JPG"
-        expected_index_filename = "EDC_009_20230118_bddbb41275ea43ce.csv"
+        expected_index_filename = "EDC_061_20230118_bddbb41275ea43ce.csv"
         expected_receipt_filename = "REC1801_bddbb41275ea43ce.DAT"
 
         actual_files = self.get_zip_contents()
@@ -24,7 +24,7 @@ class TestLegacy(TestBase):
             "tx_id": "bddbb412-75ea-43ce-9efa-0deb07cb8550",
             "survey_type": SurveyType.LEGACY,
             "context_type": ContextType.BUSINESS_SURVEY,
-            "survey_id": "009",
+            "survey_id": "061",
             "period_id": "1605",
             "ru_ref": "12346789012A",
         }
@@ -34,11 +34,11 @@ class TestLegacy(TestBase):
         expected_comments: CommentData = {
             "ru_ref": "12346789012A",
             "boxes_selected": "",
-            "comment": "I am a 009 comment",
+            "comment": "I am a 061 comment",
             "additional": [],
         }
 
-        expected_kind = "009_1605"
+        expected_kind = "061_1605"
 
         self.assertTrue(resp.is_success)
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
