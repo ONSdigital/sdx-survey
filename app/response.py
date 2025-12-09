@@ -18,17 +18,17 @@ in a 'submission type' agnostic way.
 logger = get_logger()
 
 DAP_SURVEY = ["283"]
-LEGACY_SURVEY = [
+LEGACY_SURVEY = [ "061", "132", "133", "144", "156", "187",]
+DEXTA_SURVEY = [
     "009",
     "017",
     "019",
-    "061",
-    "132",
-    "133",
+    "066",
+    "073",
+    "074",
+    "076",
     "134",
     "139",
-    "144",
-    "156",
     "160",
     "165",
     "169",
@@ -37,11 +37,9 @@ LEGACY_SURVEY = [
     "183",
     "184",
     "185",
-    "187",
     "202",
     "228",
 ]
-DEXTA_SURVEY = ["066", "073", "074", "076"]
 SPP_SURVEY = ["002", "023"]
 ENVIRONMENTAL_SURVEY = ["007", "147"]
 MATERIALS_SURVEY = ["024", "068", "071", "194"]
