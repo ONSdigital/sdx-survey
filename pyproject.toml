@@ -1,6 +1,6 @@
 [project]
 name = "sdx-survey"
-version = "8.0.4"
+version = "8.1.1"
 description = "Processing EQs for SDX"
 requires-python = ">=3.13"
 dependencies = [
@@ -43,3 +43,6 @@ exclude = [ "lib", "__pycache__", ".venv",]
 [tool.ruff.lint]
 extend-select = [ "E303", "W391", "W292", "E302"]
 preview = true
+
+[mypy]
+ignore_missing_imports = true

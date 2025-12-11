@@ -33,6 +33,7 @@ class TransformSelector:
             SurveyType.DAP: [v1_json_transform],
             SurveyType.FEEDBACK: [feedback_transform],
             SurveyType.ADHOC: [adhoc_transform],
+            SurveyType.PCK_ONLY: [pck_transform],
         }
 
     def select(self, survey_type: SurveyType) -> list[Transform]:

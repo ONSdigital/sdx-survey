@@ -19,12 +19,6 @@ lint:
 	uv run --only-group lint ruff check --fix
 
 
-.PHONY: format
-format:
-	@echo "Running Ruff formatter..."
-	uv run --only-group lint ruff format
-
-
 .PHONY: dev
 dev:
 	@echo "Starting development server..."
