@@ -44,6 +44,7 @@ SPP_SURVEY = ["002", "023"]
 ENVIRONMENTAL_SURVEY = ["007", "147"]
 MATERIALS_SURVEY = ["024", "068", "071", "194"]
 ADHOC_SURVEY = ["740"]
+PCK_ONLY_SURVEY = ["141"]
 
 TO_SPP_PERIOD: dict[str, str] = {
     "009": "2510",
@@ -92,6 +93,9 @@ class Response:
 
         if survey_id in ADHOC_SURVEY:
             return SurveyType.ADHOC
+
+        if survey_id in PCK_ONLY_SURVEY:
+            return SurveyType.PCK_ONLY
 
         raise DataError(f"Survey id {survey_id} not known!")
 
