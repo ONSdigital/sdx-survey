@@ -42,7 +42,7 @@ class TestLegacy(TestBase):
         expected_kind = "009_1605"
 
         self.assertTrue(resp.is_success)
-        self.assertEqual("d63e2bba-29a3-46c0-8e7e-6ef1986ff5c9", self.get_zip_name())
+        self.assertEqual("bddbb412-75ea-43ce-9efa-0deb07cb8550", self.get_zip_name())
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
         self.assertEqual(self.image_contents, actual_files[expected_image_filename])
         self.assertTrue(expected_index_filename in actual_files)
