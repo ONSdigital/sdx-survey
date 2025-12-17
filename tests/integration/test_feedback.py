@@ -26,6 +26,7 @@ class TestFeedback(TestBase):
         }
 
         self.assertTrue(resp.is_success)
+        self.assertEqual(expected_filename, self.get_zip_name())
         self.assertTrue(expected_filename in actual_files)
         self.assertEqual(1, len(actual_files))
         self.assertEqual(expected_context, self.get_context())
@@ -52,6 +53,7 @@ class TestFeedback(TestBase):
         }
 
         self.assertTrue(resp.is_success)
+        self.assertEqual(expected_filename, self.get_zip_name())
         self.assertTrue(expected_filename in actual_files)
         self.assertEqual(1, len(actual_files))
         self.assertEqual(expected_context, self.get_context())

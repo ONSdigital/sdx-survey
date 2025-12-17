@@ -33,7 +33,7 @@ from app.dependencies import (
 )
 from app.routes import router, unrecoverable_error_handler
 from app.services import deliver
-from app.services.deliver import ZIP_FILE, CONTEXT
+from app.services.deliver import ZIP_FILE, CONTEXT, FILE_NAME
 from app.settings import Settings
 
 
@@ -190,6 +190,9 @@ class TestBase(unittest.TestCase):
 
     def get_context(self) -> Context:
         return json.loads(self.deliver_posted_params[CONTEXT])
+
+    def get_zip_name(self) -> str:
+        return self.deliver_posted_params[FILE_NAME]
 
     def get_receipt(self) -> dict[str, str]:
         return self.receipt
