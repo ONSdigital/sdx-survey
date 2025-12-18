@@ -11,6 +11,7 @@ class TestLegacy(TestBase):
 
     def test_mbs(self: Self):
         self.set_survey_submission("009.0106.json")
+        tx_id = self.submission_json["tx_id"]
 
         resp = self.client.post("/", json=self.envelope)
 
@@ -22,7 +23,7 @@ class TestLegacy(TestBase):
         actual_files = self.get_zip_contents()
 
         expected_context: Context = {
-            "tx_id": "bddbb412-75ea-43ce-9efa-0deb07cb8550",
+            "tx_id": tx_id,
             "survey_type": SurveyType.LEGACY,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "009",
@@ -42,7 +43,7 @@ class TestLegacy(TestBase):
         expected_kind = "009_1605"
 
         self.assertTrue(resp.is_success)
-        self.assertEqual("bddbb412-75ea-43ce-9efa-0deb07cb8550", self.get_zip_name())
+        self.assertEqual(tx_id, self.get_zip_name())
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
         self.assertEqual(self.image_contents, actual_files[expected_image_filename])
         self.assertTrue(expected_index_filename in actual_files)

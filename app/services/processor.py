@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import Self
 
+from app import get_logger
 from app.definitions.comments import CommentsBase
 from app.definitions.context import Context
 from app.definitions.context_type import ContextType
@@ -10,6 +11,9 @@ from app.definitions.receipting import ReceiptServiceBase
 from app.definitions.survey_type import SurveyType
 from app.definitions.transformer import TransformerBase
 from app.response import Response
+
+
+logger = get_logger()
 
 
 """
@@ -37,7 +41,7 @@ class Processor(ProcessorBase):
     def load_actions(self) -> list[Action]:
         return []
 
-    def run(self: Self, response: Response):
+    def run(self: Self, response: Response, filename: str):
         """
         The method that processes
         the survey, by running the actions
@@ -45,9 +49,9 @@ class Processor(ProcessorBase):
         """
         for action in self._actions:
             action(response)
-        self.deliver(response)
+        self.deliver(response, filename)
 
-    def deliver(self: Self, response: Response):
+    def deliver(self: Self, response: Response, filename: str):
         pass
 
 
@@ -65,10 +69,12 @@ class ProcessorV2(Processor):
         self._comments_service = comments_service
         super().__init__()
 
-    def deliver(self: Self, response: Response):
+    def deliver(self: Self, response: Response, filename: str):
         zip_file = self._transformer_service.transform(response)
         survey_type = response.get_survey_type()
+        logger.info(f"survey type: {survey_type}")
         context_type = response.get_context_type()
+        logger.info(f"context type: {context_type}")
         context: Context = {
             "tx_id": response.tx_id,
             "survey_id": response.get_survey_id(),
@@ -87,7 +93,7 @@ class ProcessorV2(Processor):
         if survey_type == SurveyType.PCK_ONLY:
             context["survey_type"] = SurveyType.DEXTA
 
-        self._deliver_service.deliver_zip(response.tx_id, zip_file, context)
+        self._deliver_service.deliver_zip(response.tx_id, zip_file, context, filename)
 
 
 class SurveyProcessorV2(ProcessorV2):

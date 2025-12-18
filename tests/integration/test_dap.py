@@ -10,16 +10,17 @@ from tests.integration.test_base import TestBase
 class TestDap(TestBase):
     def test_bics(self: Self):
         self.set_survey_submission("283.0001.json")
+        tx_id = self.submission_json["tx_id"]
 
         resp = self.client.post("/", json=self.envelope)
 
-        expected_filename = "c37a3efa-593c-4bab-b49c-bee0613c4fb4.json"
+        expected_filename = f"{tx_id}.json"
 
         actual_files = self.get_zip_contents()
 
         # expected context
         expected_context: Context = {
-            "tx_id": "c37a3efa-593c-4bab-b49c-bee0613c4fb4",
+            "tx_id": tx_id,
             "survey_type": SurveyType.DAP,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "283",
@@ -39,6 +40,7 @@ class TestDap(TestBase):
         expected_kind = "283_201605"
 
         self.assertTrue(resp.is_success)
+        self.assertEqual(tx_id, self.get_zip_name())
         self.assertTrue(expected_filename in actual_files)
         self.assertEqual(1, len(actual_files))
         self.assertEqual(expected_context, self.get_context())

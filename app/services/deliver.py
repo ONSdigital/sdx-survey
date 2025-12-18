@@ -1,6 +1,4 @@
-import io
 import json
-import zipfile
 from typing import Final, Protocol
 
 import requests
@@ -9,7 +7,6 @@ from app import get_logger
 from app.definitions.context import Context
 from app.definitions.context_type import ContextType
 from app.definitions.deliver import DeliverBase
-from app.definitions.survey_type import SurveyType
 
 # Constants used within the http request
 FILE_NAME: Final[str] = "filename"
@@ -38,17 +35,11 @@ class DeliverService(DeliverBase):
         self._deliver_url = deliver_url
         self._http_service = http_service
 
-    def deliver_zip(self, tx_id: str, zipped_file: bytes, context: Context):
+    def deliver_zip(self, tx_id: str, zipped_file: bytes, context: Context, filename: str):
         """
         Calls the sdx-deliver endpoint specified by the output_type parameter.
         Returns True or raises appropriate error on response.
         """
-
-        # filename will always be transaction id unless feedback
-        filename: str = tx_id
-
-        if context["survey_type"] == SurveyType.FEEDBACK:
-            filename = self._get_feedback_filename(zipped_file)
 
         endpoint: str = BUSINESS_ENDPOINT
         if context["context_type"] == ContextType.ADHOC_SURVEY:
@@ -64,7 +55,3 @@ class DeliverService(DeliverBase):
             files={ZIP_FILE: zipped_file},
         )
         return True
-
-    def _get_feedback_filename(self, zip_bytes: bytes) -> str:
-        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
-            return zf.namelist()[0]
