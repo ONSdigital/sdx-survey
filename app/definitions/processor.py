@@ -6,5 +6,5 @@ from app.response import Response
 
 class ProcessorBase(ABC):
     @abstractmethod
-    def run(self: Self, response: Response):
+    def run(self: Self, response: Response, filename: str):
         pass

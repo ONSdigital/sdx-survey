@@ -86,4 +86,4 @@ class Survey:
         else:
             processor = self._survey_processor
 
-        processor.run(response)
+        processor.run(response, filename=filename)

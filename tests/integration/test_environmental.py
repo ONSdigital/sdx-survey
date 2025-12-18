@@ -10,6 +10,7 @@ from tests.integration.test_base import TestBase
 class TestEnvironmental(TestBase):
     def test_lcree(self: Self):
         self.set_survey_submission("007.0009.json")
+        tx_id = self.submission_json["tx_id"]
 
         resp = self.client.post("/", json=self.envelope)
 
@@ -21,7 +22,7 @@ class TestEnvironmental(TestBase):
         actual_files = self.get_zip_contents()
 
         expected_context: Context = {
-            "tx_id": "837e9fe2-eab8-4909-bc20-7fa599bf2210",
+            "tx_id": tx_id,
             "survey_type": SurveyType.ENVIRONMENTAL,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "007",
@@ -41,6 +42,7 @@ class TestEnvironmental(TestBase):
         expected_kind = "007_201605"
 
         self.assertTrue(resp.is_success)
+        self.assertEqual(tx_id, self.get_zip_name())
         self.assertTrue(expected_json_filename in actual_files)
         self.assertEqual(self.image_contents, actual_files[expected_image_filename])
         self.assertTrue(expected_index_filename in actual_files)

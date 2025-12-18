@@ -184,6 +184,11 @@ class TestBase(unittest.TestCase):
         self.message["attributes"]["objectId"] = tx_id
         self.mock_decryptor.decrypt_survey.return_value = self.submission_json
 
+    def set_feedback_submission(self, filename: str, object_id: str):
+        self.submission_json = _get_json(filename)
+        self.message["attributes"]["objectId"] = object_id
+        self.mock_decryptor.decrypt_survey.return_value = self.submission_json
+
     def get_zip_contents(self) -> dict[str, bytes]:
         actual_zip_file = self.deliver_posted_files[ZIP_FILE]
         return _read_zip(actual_zip_file)

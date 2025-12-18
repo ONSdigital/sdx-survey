@@ -8,7 +8,8 @@ from tests.integration.test_base import TestBase
 
 class TestFeedback(TestBase):
     def test_feedback(self: Self):
-        self.set_survey_submission("139.fb.json")
+        object_id = "11111111-2222-3333-4444-55555555"
+        self.set_feedback_submission("139.fb.json", object_id)
 
         resp = self.client.post("/", json=self.envelope)
 
@@ -26,7 +27,7 @@ class TestFeedback(TestBase):
         }
 
         self.assertTrue(resp.is_success)
-        self.assertEqual(expected_filename, self.get_zip_name())
+        self.assertEqual(object_id, self.get_zip_name())
         self.assertTrue(expected_filename in actual_files)
         self.assertEqual(1, len(actual_files))
         self.assertEqual(expected_context, self.get_context())
@@ -35,7 +36,8 @@ class TestFeedback(TestBase):
         self.mock_datastore.commit_entity.assert_not_called()
 
     def test_adhoc_feedback(self: Self):
-        self.set_survey_submission("740.fb.json")
+        object_id = "11111111-2222-3333-4444-55555555"
+        self.set_feedback_submission("740.fb.json", object_id)
 
         resp = self.client.post("/", json=self.envelope)
 
@@ -53,7 +55,7 @@ class TestFeedback(TestBase):
         }
 
         self.assertTrue(resp.is_success)
-        self.assertEqual(expected_filename, self.get_zip_name())
+        self.assertEqual(object_id, self.get_zip_name())
         self.assertTrue(expected_filename in actual_files)
         self.assertEqual(1, len(actual_files))
         self.assertEqual(expected_context, self.get_context())

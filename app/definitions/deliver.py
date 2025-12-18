@@ -5,5 +5,5 @@ from app.definitions.context import Context
 
 class DeliverBase(ABC):
     @abstractmethod
-    def deliver_zip(self, tx_id: str, zipped_file: bytes, context: Context):
+    def deliver_zip(self, tx_id: str, zipped_file: bytes, context: Context, filename: str):
         pass
