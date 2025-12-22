@@ -1,5 +1,7 @@
 # sdx-survey
 
+![Version](https://ons-badges-752336435892.europe-west2.run.app/api/badge/custom?left=Python&right=3.13)
+
 Sdx-survey is a microservice that manages the processing of all survey responses from EQ-runner.
 It is written in Python and deployed to Cloud Run in GCP. 
 
