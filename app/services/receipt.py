@@ -49,7 +49,7 @@ class ReceiptService(ReceiptServiceBase):
         except KeyError as e:
             raise DataError(f"Failed to make receipt: {str(e)}")
 
-        logger.info("Generated receipt", extra={"caseId": receipt_json["caseId"], "partyId": receipt_json["partyId"]})
+        logger.info("Generated receipt", {"caseId": receipt_json["caseId"], "partyId": receipt_json["partyId"]})
         receipt_str = json.dumps(receipt_json)
         return receipt_str
 
@@ -60,6 +60,6 @@ class ReceiptService(ReceiptServiceBase):
         except KeyError as e:
             raise DataError(f"Failed to make receipt: {str(e)}")
 
-        logger.info("Generated SRM receipt", extra={"qid": receipt_json["data"]})
+        logger.info("Generated SRM receipt", {"qid": receipt_json["data"]})
         receipt_str = json.dumps(receipt_json)
         return receipt_str
