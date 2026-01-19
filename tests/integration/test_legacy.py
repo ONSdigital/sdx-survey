@@ -8,7 +8,6 @@ from tests.integration.test_base import TestBase
 
 
 class TestLegacy(TestBase):
-
     def test_mbs(self: Self):
         self.set_survey_submission("009.0106.json")
         tx_id = self.submission_json["tx_id"]

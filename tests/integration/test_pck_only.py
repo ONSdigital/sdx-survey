@@ -7,7 +7,6 @@ from tests.integration.test_base import TestBase
 
 
 class TestPckOnly(TestBase):
-
     def test_ashe(self: Self):
         self.set_survey_submission("141.0001.json")
 
