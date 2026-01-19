@@ -8,41 +8,41 @@ from tests.integration.test_base import TestBase
 
 
 class TestLegacy(TestBase):
-    def test_mbs(self: Self):
-        self.set_survey_submission("009.0106.json")
-        tx_id = self.submission_json["tx_id"]
+
+    def test_des(self: Self):
+        self.set_survey_submission("187.0001.json")
 
         resp = self.client.post("/", json=self.envelope)
 
-        expected_pck_filename = "009_bddbb41275ea43ce"
-        expected_image_filename = "Sbddbb41275ea43ce_1.JPG"
-        expected_index_filename = "EDC_009_20230118_bddbb41275ea43ce.csv"
-        expected_receipt_filename = "REC1801_bddbb41275ea43ce.DAT"
+        expected_pck_filename = "187_d63e2bba29a346c0"
+        expected_image_filename = "Sd63e2bba29a346c0_1.JPG"
+        expected_index_filename = "EDC_187_20221221_d63e2bba29a346c0.csv"
+        expected_receipt_filename = "REC2112_d63e2bba29a346c0.DAT"
 
         actual_files = self.get_zip_contents()
 
         expected_context: Context = {
-            "tx_id": tx_id,
+            "tx_id": "d63e2bba-29a3-46c0-8e7e-6ef1986ff5c9",
             "survey_type": SurveyType.LEGACY,
             "context_type": ContextType.BUSINESS_SURVEY,
-            "survey_id": "009",
-            "period_id": "1605",
+            "survey_id": "187",
+            "period_id": "201605",
             "ru_ref": "12346789012A",
         }
 
-        expected_receipt = {"caseId": "8fc3eb0b-2dd7-4acd-a354-5d4f69503233", "partyId": "UNKNOWN"}
+        expected_receipt = {"caseId": "da18ae74-afe5-4748-a578-459f7bc645a3", "partyId": "UNKNOWN"}
 
         expected_comments: CommentData = {
             "ru_ref": "12346789012A",
             "boxes_selected": "",
-            "comment": "I am a 009 comment",
+            "comment": "I am a 187 comment",
             "additional": [],
         }
 
-        expected_kind = "009_1605"
+        expected_kind = "187_201605"
 
         self.assertTrue(resp.is_success)
-        self.assertEqual(tx_id, self.get_zip_name())
+        self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
         self.assertEqual(self.image_contents, actual_files[expected_image_filename])
         self.assertTrue(expected_index_filename in actual_files)
