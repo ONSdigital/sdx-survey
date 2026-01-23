@@ -18,6 +18,7 @@ in a 'submission type' agnostic way.
 logger = get_logger()
 
 DAP_SURVEY = ["283"]
+LEGACY_SURVEY = []
 DEXTA_SURVEY = [ "009", "017", "019", "061", "066", "073", "074", "076", "132", "133", "134", "139", "144", "156",
                  "160", "165", "169", "171", "182", "183", "184", "185", "187", "202", "228"]
 SPP_SURVEY = ["002", "023"]
@@ -61,6 +62,9 @@ class Response:
 
         if survey_id in DEXTA_SURVEY:
             return SurveyType.DEXTA
+
+        if survey_id in LEGACY_SURVEY:
+            return SurveyType.LEGACY
 
         if survey_id in ENVIRONMENTAL_SURVEY:
             return SurveyType.ENVIRONMENTAL
