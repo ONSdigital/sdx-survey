@@ -7,7 +7,7 @@ from app.services.comments import CommentData
 from tests.integration.test_base import TestBase
 
 
-class TestLegacy(TestBase):
+class TestDexta(TestBase):
 
     def test_des(self: Self):
         self.set_survey_submission("187.0001.json")
@@ -23,7 +23,7 @@ class TestLegacy(TestBase):
 
         expected_context: Context = {
             "tx_id": "d63e2bba-29a3-46c0-8e7e-6ef1986ff5c9",
-            "survey_type": SurveyType.LEGACY,
+            "survey_type": SurveyType.DEXTA,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "187",
             "period_id": "201605",
