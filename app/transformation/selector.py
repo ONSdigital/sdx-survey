@@ -25,7 +25,6 @@ class TransformSelector:
         adhoc_transform: Transform = AdhocTransform()
 
         self._mapping: dict[SurveyType, list[Transform]] = {
-            SurveyType.LEGACY: [pck_transform, image_transform, index_transform, idbr_transform],
             SurveyType.DEXTA: [pck_transform, image_transform, index_transform, idbr_transform],
             SurveyType.MATERIALS: [json_transform, image_transform, index_transform, idbr_transform],
             SurveyType.ENVIRONMENTAL: [v1_json_transform, image_transform, index_transform, idbr_transform],
