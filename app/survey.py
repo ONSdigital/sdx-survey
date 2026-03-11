@@ -73,7 +73,8 @@ class Survey:
 
         response: Response = Response(submission)
 
-        logger.info(f"Processing survey", {"survey_id": response.get_survey_id(), "ru_ref": response.get_identifier()})
+        logger.info("Processing survey", {"survey_id": response.get_survey_id(), "ru_ref": response.get_identifier()})
+        logger.info(f"Survey id: {response.get_survey_id()}")
 
         processor: ProcessorBase
         v2_survey_type = response.get_survey_type()
