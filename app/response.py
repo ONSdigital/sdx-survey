@@ -184,10 +184,11 @@ class Response:
 
         return self._submission["survey_metadata"]["user_id"]
 
-    def get_identifier(self) -> str:
-        if not self.get_context_type() == ContextType.ADHOC_SURVEY:
-            return self.get_ru_ref()
-        return "N/A"
+    def get_identifier(self) -> tuple[str, str]:
+        if self.get_context_type() == ContextType.ADHOC_SURVEY:
+            return "qid", self.get_qid()
+
+        return "ru_ref", self.get_ru_ref()
 
     def __eq__(self, other):
         """
