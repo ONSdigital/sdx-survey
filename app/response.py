@@ -167,7 +167,7 @@ class Response:
         return self._submission["survey_metadata"]["survey_id"]
 
     def get_ru_ref(self) -> str:
-        if self.get_survey_type() == SurveyType.ADHOC:
+        if self.get_context_type() == ContextType.ADHOC_SURVEY:
             raise DataError("Adhoc surveys do not have ru_ref field")
 
         return self._submission["survey_metadata"]["ru_ref"]
@@ -183,6 +183,12 @@ class Response:
             raise DataError("Adhoc surveys do not have user_id field")
 
         return self._submission["survey_metadata"]["user_id"]
+
+    def get_identifier(self) -> tuple[str, str]:
+        if self.get_context_type() == ContextType.ADHOC_SURVEY:
+            return "qid", self.get_qid()
+
+        return "ru_ref", self.get_ru_ref()
 
     def __eq__(self, other):
         """
