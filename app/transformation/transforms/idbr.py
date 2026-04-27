@@ -14,8 +14,13 @@ def get_contents(response: Response) -> bytes:
 
 
 def get_name(response: Response) -> str:
-    d = get_datetime(response.get_submitted_at())
-    return "REC{0}_{1}.DAT".format(format_date(d, "%d%m"), get_tx_code(response.get_tx_id()))
+    ru_ref, ru_check = split_ru_ref(response.get_ru_ref())
+    return "REC_{0}_{1}_{2}_{3}.DAT".format(
+        ru_ref,
+        ru_check,
+        get_tx_code(response.get_survey_id()),
+        get_period(response.get_period())
+    )
 
 
 class IDBRTransform(Transform):
