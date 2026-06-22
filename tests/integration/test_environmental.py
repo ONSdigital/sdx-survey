@@ -17,7 +17,7 @@ class TestEnvironmental(TestBase):
         expected_json_filename = "007_837e9fe2eab84909.json"
         expected_image_filename = "S837e9fe2eab84909_1.JPG"
         expected_index_filename = "EDC_007_20210203_837e9fe2eab84909.csv"
-        expected_receipt_filename = "REC0302_837e9fe2eab84909.DAT"
+        expected_receipt_filename = "REC_15339216474_W_007_201605.DAT"
 
         actual_files = self.get_zip_contents()
 

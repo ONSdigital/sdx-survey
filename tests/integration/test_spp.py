@@ -17,7 +17,7 @@ class TestSpp(TestBase):
         expected_spp_filename = "009_SDC_2023-01-18T13-33-19_bddbb412-75ea-43ce-9efa-0deb07cb8550.json"
         expected_image_filename = "Sbddbb41275ea43ce_1.JPG"
         expected_index_filename = "EDC_009_20230118_bddbb41275ea43ce.csv"
-        expected_receipt_filename = "REC1801_bddbb41275ea43ce.DAT"
+        expected_receipt_filename = "REC_12346789012_A_009_202512.DAT"
 
         actual_files = self.get_zip_contents()
 
@@ -40,6 +40,8 @@ class TestSpp(TestBase):
         }
 
         expected_kind = "009_2512"
+        
+        print(actual_files)
 
         self.assertTrue(resp.is_success)
         self.assertEqual(self.spp_contents, actual_files[expected_spp_filename])
@@ -60,7 +62,7 @@ class TestSpp(TestBase):
         expected_spp_filename = "023_SDC_2016-03-12T13-01-26_11ed69f5-6c23-40cb-b4c2-70613bfe97fc.json"
         expected_image_filename = "S11ed69f56c2340cb_1.JPG"
         expected_index_filename = "EDC_023_20160312_11ed69f56c2340cb.csv"
-        expected_receipt_filename = "REC1203_11ed69f56c2340cb.DAT"
+        expected_receipt_filename = "REC_12345678901_A_023_201604.DAT"
 
         actual_files = self.get_zip_contents()
 

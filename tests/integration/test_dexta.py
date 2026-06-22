@@ -17,7 +17,7 @@ class TestDexta(TestBase):
         expected_pck_filename = "187_d63e2bba29a346c0"
         expected_image_filename = "Sd63e2bba29a346c0_1.JPG"
         expected_index_filename = "EDC_187_20221221_d63e2bba29a346c0.csv"
-        expected_receipt_filename = "REC2112_d63e2bba29a346c0.DAT"
+        expected_receipt_filename = "REC_12346789012_A_187_201605.DAT"
 
         actual_files = self.get_zip_contents()
 
@@ -40,6 +40,8 @@ class TestDexta(TestBase):
         }
 
         expected_kind = "187_201605"
+        
+        print(actual_files)
 
         self.assertTrue(resp.is_success)
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
