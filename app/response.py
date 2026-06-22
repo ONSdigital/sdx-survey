@@ -92,6 +92,17 @@ class Response:
         logger.info("Retrieving submission as V1")
         submission = self._submission
         metadata: BusinessSurveyMetadata = submission["survey_metadata"]
+        
+        if submission["data_version"] == "0.0.3":
+            try:
+                submission_data = self._dv3_data_to_v1()
+                submission["data_version"] = "0.0.1"
+            except ValueError:
+                logger.error("Failed to convert submission data from v3 to v1", exc_info=True)
+                submission_data = submission["data"]
+        else:
+            submission_data = submission["data"]
+        
         v1_template = {
             "case_id": submission["case_id"],
             "tx_id": submission["tx_id"],
@@ -114,14 +125,33 @@ class Response:
                 "ref_period_end_date": metadata["ref_p_end_date"],
             },
             "launch_language_code": submission["launch_language_code"],
-            "data": submission["data"],
+            "data": submission_data,
             "form_type": metadata["form_type"],
             "started_at": submission["started_at"],
             "submission_language_code": submission["submission_language_code"],
         }
 
         return json.dumps(v1_template)
-
+    
+    def _dv3_data_to_v1(self) -> dict[str, str]:
+        submission = self._submission
+        submission_data = submission["data"]
+        v1_data = {}
+        answer_ids: list[dict[str, str]] = submission_data["answers"]
+        answer_values: list[dict[str, str]] = submission_data["answer_codes"]
+        for a_id in answer_ids:
+            answer_id = a_id["answer_id"]
+            answer_value = a_id["value"]
+            for a_code in answer_values:
+                if a_code["answer_id"] == answer_id:
+                    
+                    if a_code["code"] in v1_data:
+                        raise ValueError(f"Submission data contained multiple instances of answer code {a_code['code']}")
+                    
+                    v1_data[a_code["code"]] = str(answer_value)
+                    
+        return v1_data
+        
     def to_json(self) -> str:
         return json.dumps(self._submission)
 
