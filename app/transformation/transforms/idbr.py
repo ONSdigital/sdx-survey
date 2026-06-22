@@ -18,7 +18,7 @@ def get_name(response: Response) -> str:
     return "REC_{0}_{1}_{2}_{3}.DAT".format(
         ru_ref,
         ru_check,
-        get_tx_code(response.get_survey_id()),
+        response.get_survey_id(),
         get_period(response.get_period())
     )
 
