@@ -42,7 +42,6 @@ class TestPrices(TestBase):
 
         self.assertTrue(resp.is_success)
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
-        self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
         self.assertEqual(self.image_contents, actual_files[expected_image_filename])
         self.assertTrue(expected_index_filename in actual_files)
         self.assertEqual(3, len(actual_files))
