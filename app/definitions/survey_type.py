@@ -10,3 +10,4 @@ class SurveyType(StrEnum):
     ADHOC = "adhoc"
     DEXTA = "dexta"
     PCK_ONLY = "pck_only"
+    PRICES = "prices"
