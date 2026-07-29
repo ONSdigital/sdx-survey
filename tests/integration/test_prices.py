@@ -22,7 +22,7 @@ class TestPrices(TestBase):
 
         expected_context: Context = {
             "tx_id": "d63e2bba-29a3-46c0-8e7e-6ef1986ff5c9",
-            "survey_type": SurveyType.PRICES,
+            "survey_type": SurveyType.DEXTA,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "132",
             "period_id": "201605",
