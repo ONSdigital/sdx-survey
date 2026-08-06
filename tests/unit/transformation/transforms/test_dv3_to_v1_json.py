@@ -1,16 +1,32 @@
 import json
 import unittest
 
-from app.definitions.submission import SurveySubmission
+from app.definitions.submission import SurveySubmission, BusinessSurveyMetadata
 from app.response import Response
 
 
 class TestDV3ToV1Json(unittest.TestCase):
     def setUp(self):
+
+        survey_metadata: BusinessSurveyMetadata = {
+            "survey_id": "147",
+            "ru_name": "ESSENTIAL ENTERPRISE LTD.",
+            "trad_as": "ESSENTIAL ENTERPRISE LTD.",
+            "period_id": "201605",
+            "ref_p_start_date": "2022-01-01",
+            "ref_p_end_date": "2022-12-31",
+            "user_id": "A12345678901",
+            "ru_ref": "12346789012A",
+            "form_type": "0003"
+        }
+
         self.valid_submission: SurveySubmission = {
             "case_id": "fcc58801-6a39-11f1-b510-d594994d468c",
             "tx_id": "fcc58804-6a39-11f1-b510-d594994d468c",
             "type": "uk.gov.ons.edc.eq:surveyresponse",
+            "channel": "RH",
+            "schema_url": "",
+            "region_code": "GB-ENG",
             "version": "v2",
             "data_version": "0.0.3",
             "origin": "uk.gov.ons.edc.eq",
@@ -18,17 +34,7 @@ class TestDV3ToV1Json(unittest.TestCase):
             "flushed": False,
             "submitted_at": "2026-06-17T10:50:59+00:00",
             "launch_language_code": "en",
-            "survey_metadata": {
-                "survey_id": "147",
-                "ru_name": "ESSENTIAL ENTERPRISE LTD.",
-                "trad_as": "ESSENTIAL ENTERPRISE LTD.",
-                "period_id": "201605",
-                "ref_p_start_date": "2022-01-01",
-                "ref_p_end_date": "2022-12-31",
-                "user_id": "A12345678901",
-                "ru_ref": "12346789012A",
-                "form_type": "0003"
-            },
+            "survey_metadata": survey_metadata,
             "schema_name": "epe_0003",
             "data": {
                 "answers": [
@@ -79,23 +85,16 @@ class TestDV3ToV1Json(unittest.TestCase):
             "tx_id": "fcc58804-6a39-11f1-b510-d594994d468c",
             "type": "uk.gov.ons.edc.eq:surveyresponse",
             "version": "v2",
+            "channel": "RH",
+            "schema_url": "",
+            "region_code": "GB-ENG",
             "data_version": "0.0.3",
             "origin": "uk.gov.ons.edc.eq",
             "collection_exercise_sid": "fcc58802-6a39-11f1-b510-d594994d468c",
             "flushed": False,
             "submitted_at": "2026-06-17T10:50:59+00:00",
             "launch_language_code": "en",
-            "survey_metadata": {
-                "survey_id": "147",
-                "ru_name": "ESSENTIAL ENTERPRISE LTD.",
-                "trad_as": "ESSENTIAL ENTERPRISE LTD.",
-                "period_id": "201605",
-                "ref_p_start_date": "2022-01-01",
-                "ref_p_end_date": "2022-12-31",
-                "user_id": "A12345678901",
-                "ru_ref": "12346789012A",
-                "form_type": "0003"
-            },
+            "survey_metadata": survey_metadata,
             "schema_name": "epe_0003",
             "data": {
                 "answers": [
@@ -251,7 +250,122 @@ class TestDV3ToV1Json(unittest.TestCase):
             'type': 'uk.gov.ons.edc.eq:surveyresponse',
             'version': '0.0.3'
         }
-        
+
         actual = self.invalid_test_response.to_v1_json()
+        self.maxDiff = None
+        self.assertEqual(expected, json.loads(actual))
+
+    def test_valid_epe_already_in_dv1(self):
+        epe_dv1: SurveySubmission = {
+            "version": "v2",
+            "survey_metadata": {
+                "ru_name": "ESSENTIAL ENTERPRISE LTD.",
+                "ref_p_start_date": "2016-05-01",
+                "ref_p_end_date": "2016-05-31",
+                "user_id": "UNKNOWN",
+                "ru_ref": "12346789012A",
+                "survey_id": "147",
+                "form_type": "0003",
+                "period_id": "201605"
+            },
+            "case_id": "f5715fac-14ac-4c66-9d05-228816f728ff",
+            "tx_id": "4478285e-30e6-4254-807f-42c8c510e782",
+            "schema_name": "epe_0003",
+            "type": "uk.gov.ons.edc.eq:surveyresponse",
+            "data_version": "0.0.1",
+            "origin": "uk.gov.ons.edc.eq",
+            "collection_exercise_sid": "adc370ca-e72b-49bb-be18-e8eed93fabda",
+            "flushed": False,
+            "started_at": "2022-09-20T10:11:18.790218+00:00",
+            "submitted_at": "2022-09-20T10:16:55+00:00",
+            "submission_language_code": "en",
+            "launch_language_code": "en",
+            "data": {
+                "10": "Yes, I can report for these dates",
+                "37": "Yes",
+                "32": "31000",
+                "33": "20000",
+                "34": "10000",
+                "35": "1000",
+                "36": "0",
+                "111": "my comment about external operating expenditure",
+                "30": "Yes",
+                "31": "10000",
+                "41": "5000",
+                "43": "3000",
+                "45": "2000",
+                "47": "0",
+                "112": "my comment about in-house operating expenditure",
+                "50": "Yes",
+                "51": "20000",
+                "61": "2000",
+                "63": "8000",
+                "65": "10000",
+                "67": "0",
+                "70": "No",
+                "113": "my comment for capital expenditure",
+                "105": "No",
+                "114": "Yes",
+                "115": "my comment for adaptions",
+                "110": "great survey!"
+            }
+        }
+
+        expected = {
+            "case_id": "f5715fac-14ac-4c66-9d05-228816f728ff",
+            "tx_id": "4478285e-30e6-4254-807f-42c8c510e782",
+            "type": "uk.gov.ons.edc.eq:surveyresponse",
+            "version": "0.0.1",
+            "origin": "uk.gov.ons.edc.eq",
+            "survey_id": "147",
+            "flushed": False,
+            "submitted_at": "2022-09-20T10:16:55+00:00",
+            "collection": {
+                "exercise_sid": "adc370ca-e72b-49bb-be18-e8eed93fabda",
+                "schema_name": "epe_0003",
+                "period": "201605", "instrument_id": "0003"
+            },
+            "metadata": {
+                "user_id": "UNKNOWN",
+                "ru_ref": "12346789012A",
+                "ref_period_start_date": "2016-05-01",
+                "ref_period_end_date": "2016-05-31"
+            },
+            "launch_language_code": "en",
+            "data": {
+                "10": "Yes, I can report for these dates",
+                "37": "Yes",
+                "32": "31000",
+                "33": "20000",
+                "34": "10000",
+                "35": "1000",
+                "36": "0",
+                "111": "my comment about external operating expenditure",
+                "30": "Yes",
+                "31": "10000",
+                "41": "5000",
+                "43": "3000",
+                "45": "2000",
+                "47": "0",
+                "112": "my comment about in-house operating expenditure",
+                "50": "Yes",
+                "51": "20000",
+                "61": "2000",
+                "63": "8000",
+                "65": "10000",
+                "67": "0",
+                "70": "No",
+                "113": "my comment for capital expenditure",
+                "105": "No",
+                "114": "Yes",
+                "115": "my comment for adaptions",
+                "110": "great survey!"
+            },
+            "form_type": "0003",
+            "started_at": "2022-09-20T10:11:18.790218+00:00",
+            "submission_language_code": "en"
+        }
+
+        actual = Response(epe_dv1).to_v1_json()
         self.maxDiff = None
         self.assertEqual(expected, json.loads(actual))
