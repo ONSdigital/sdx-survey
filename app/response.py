@@ -96,8 +96,11 @@ class Response:
         logger.info("Retrieving submission as V1")
         submission = self._submission
         metadata: BusinessSurveyMetadata = submission["survey_metadata"]
-        
-        if submission["data_version"] == "0.0.3":
+
+        survey_id = self.get_survey_id()
+
+        # Add a check to only limit the dv3 to v1 conversion to EPE as it cause issue with BICS
+        if submission["data_version"] == "0.0.3" and survey_id == "147":
             try:
                 submission_data = self._dv3_data_to_v1()
                 submission["data_version"] = "0.0.1"
