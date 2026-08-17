@@ -12,7 +12,7 @@ class TestPckOnly(TestBase):
 
         resp = self.client.post("/", json=self.envelope)
 
-        expected_pck_filename = "141_bddbb41275ea43ce"
+        expected_pck_filename = "141_1605_12346789012A_bddbb41275ea43ce"
 
         actual_files = self.get_zip_contents()
 
@@ -24,7 +24,7 @@ class TestPckOnly(TestBase):
             "period_id": "1605",
             "ru_ref": "12346789012A",
         }
-
+        
         self.assertTrue(resp.is_success)
         self.assertEqual(self.pck_contents, actual_files[expected_pck_filename])
         self.assertEqual(1, len(actual_files))

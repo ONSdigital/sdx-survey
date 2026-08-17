@@ -9,6 +9,8 @@ logger = get_logger()
 
 def get_name(response: Response) -> str:
     survey_id = response.get_survey_id()
+    period = response.get_period()
+    ru_ref = response.get_ru_ref()
     tx_id = response.get_tx_id()
 
     if survey_id == "202":
@@ -17,7 +19,7 @@ def get_name(response: Response) -> str:
     if survey_id in ["182", "183", "184", "185"]:
         survey_id = "181"
 
-    return f"{survey_id}_{get_tx_code(tx_id)}"
+    return f"{survey_id}_{period}_{ru_ref}_{get_tx_code(tx_id)}"
 
 
 # a dictionary mapping the form type to the sector id required downstream

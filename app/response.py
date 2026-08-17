@@ -18,13 +18,14 @@ in a 'submission type' agnostic way.
 logger = get_logger()
 
 DAP_SURVEY = ["283"]
-DEXTA_SURVEY = ["009", "017", "019", "061", "066", "073", "074", "076", "132", "133", "134", "139", "144", "156",
+DEXTA_SURVEY = ["009", "017", "019", "066", "073", "074", "076", "134", "139", "144",
                  "160", "165", "169", "171", "182", "183", "184", "185", "187", "202", "228"]
 SPP_SURVEY = ["002", "023"]
 ENVIRONMENTAL_SURVEY = ["007", "147"]
 MATERIALS_SURVEY = ["024", "068", "071", "194"]
 ADHOC_SURVEY = ["740"]
 PCK_ONLY_SURVEY = ["141"]
+PRICES = ["061", "132", "133", "156"]
 
 TO_SPP_PERIOD: dict[str, str] = {
     "009": "2510",
@@ -73,6 +74,9 @@ class Response:
 
         if survey_id in PCK_ONLY_SURVEY:
             return SurveyType.PCK_ONLY
+        
+        if survey_id in PRICES:
+            return SurveyType.PRICES
 
         raise DataError(f"Survey id {survey_id} not known!")
 
@@ -92,8 +96,11 @@ class Response:
         logger.info("Retrieving submission as V1")
         submission = self._submission
         metadata: BusinessSurveyMetadata = submission["survey_metadata"]
-        
-        if submission["data_version"] == "0.0.3":
+
+        survey_id = self.get_survey_id()
+
+        # Add a check to only limit the dv3 to v1 conversion to EPE as it cause issue with BICS
+        if submission["data_version"] == "0.0.3" and survey_id == "147":
             try:
                 submission_data = self._dv3_data_to_v1()
                 submission["data_version"] = "0.0.1"
