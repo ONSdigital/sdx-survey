@@ -57,5 +57,5 @@ class TestIdbr(unittest.TestCase):
 
     def test_get_idbr_name(self):
         actual: str = idbr.get_name(Response(self.submission))
-        expected = "REC2909_befa5444749f407a.DAT"
+        expected = "REC_12346789012_A_202_201605.DAT"
         self.assertEqual(expected, actual)

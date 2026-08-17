@@ -18,13 +18,14 @@ in a 'submission type' agnostic way.
 logger = get_logger()
 
 DAP_SURVEY = ["283"]
-DEXTA_SURVEY = ["009", "017", "019", "061", "066", "073", "074", "076", "132", "133", "134", "139", "144", "156",
+DEXTA_SURVEY = ["009", "017", "019", "066", "073", "074", "076", "134", "139", "144",
                  "160", "165", "169", "171", "182", "183", "184", "185", "187", "202", "228"]
 SPP_SURVEY = ["002", "023"]
 ENVIRONMENTAL_SURVEY = ["007", "147"]
 MATERIALS_SURVEY = ["024", "068", "071", "194"]
 ADHOC_SURVEY = ["740"]
 PCK_ONLY_SURVEY = ["141"]
+PRICES = ["061", "132", "133", "156"]
 
 TO_SPP_PERIOD: dict[str, str] = {
     "009": "2510",
@@ -73,6 +74,9 @@ class Response:
 
         if survey_id in PCK_ONLY_SURVEY:
             return SurveyType.PCK_ONLY
+        
+        if survey_id in PRICES:
+            return SurveyType.PRICES
 
         raise DataError(f"Survey id {survey_id} not known!")
 
@@ -92,6 +96,20 @@ class Response:
         logger.info("Retrieving submission as V1")
         submission = self._submission
         metadata: BusinessSurveyMetadata = submission["survey_metadata"]
+
+        survey_id = self.get_survey_id()
+
+        # Add a check to only limit the dv3 to v1 conversion to EPE as it cause issue with BICS
+        if submission["data_version"] == "0.0.3" and survey_id == "147":
+            try:
+                submission_data = self._dv3_data_to_v1()
+                submission["data_version"] = "0.0.1"
+            except ValueError:
+                logger.error("Failed to convert submission data from v3 to v1", exc_info=True)
+                submission_data = submission["data"]
+        else:
+            submission_data = submission["data"]
+        
         v1_template = {
             "case_id": submission["case_id"],
             "tx_id": submission["tx_id"],
@@ -114,14 +132,33 @@ class Response:
                 "ref_period_end_date": metadata["ref_p_end_date"],
             },
             "launch_language_code": submission["launch_language_code"],
-            "data": submission["data"],
+            "data": submission_data,
             "form_type": metadata["form_type"],
             "started_at": submission["started_at"],
             "submission_language_code": submission["submission_language_code"],
         }
 
         return json.dumps(v1_template)
-
+    
+    def _dv3_data_to_v1(self) -> dict[str, str]:
+        submission = self._submission
+        submission_data = submission["data"]
+        v1_data = {}
+        answer_ids: list[dict[str, str]] = submission_data["answers"]
+        answer_values: list[dict[str, str]] = submission_data["answer_codes"]
+        for a_id in answer_ids:
+            answer_id = a_id["answer_id"]
+            answer_value = a_id["value"]
+            for a_code in answer_values:
+                if a_code["answer_id"] == answer_id:
+                    
+                    if a_code["code"] in v1_data:
+                        raise ValueError(f"Submission data contained multiple instances of answer code {a_code['code']}")
+                    
+                    v1_data[a_code["code"]] = str(answer_value)
+                    
+        return v1_data
+        
     def to_json(self) -> str:
         return json.dumps(self._submission)
 

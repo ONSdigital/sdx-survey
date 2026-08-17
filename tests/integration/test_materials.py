@@ -16,7 +16,7 @@ class TestMaterials(TestBase):
         expected_json_filename = "024_08449838140_201605.json"
         expected_image_filename = "S0d21ffe7dcb04d4e_1.JPG"
         expected_index_filename = "EDC_024_20220315_0d21ffe7dcb04d4e.csv"
-        expected_receipt_filename = "REC1503_0d21ffe7dcb04d4e.DAT"
+        expected_receipt_filename = "REC_08449838140_O_024_201605.DAT"
 
         actual_files = self.get_zip_contents()
 
