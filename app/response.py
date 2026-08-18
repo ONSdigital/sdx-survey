@@ -121,7 +121,7 @@ class Response:
             "submitted_at": submission["submitted_at"],
             "collection": {
                 "exercise_sid": submission["collection_exercise_sid"],
-                "schema_name": submission["schema_name"],
+                "schema_name": submission.get("schema_name", "NA"),
                 "period": metadata["period_id"],
                 "instrument_id": metadata["form_type"],
             },

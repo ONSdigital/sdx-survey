@@ -1,0 +1,263 @@
+{
+  "case_id": "814a55b6-cec1-43a4-b8ce-d02bdf7e1914",
+  "tx_id": "fc669fe6-8f27-41c9-afbe-5f244b57af1b",
+  "type": "uk.gov.ons.edc.eq:surveyresponse",
+  "version": "v2",
+  "data_version": "0.0.3",
+  "origin": "uk.gov.ons.edc.eq",
+  "collection_exercise_sid": "e6f26da0-f603-47f9-8c1f-d79d2242b899",
+  "flushed": false,
+  "submitted_at": "2026-08-07T13:40:33+00:00",
+  "launch_language_code": "en",
+  "cir_instrument_id": "c7b0cfa8-147d-4345-8948-813dcbc1539f",
+  "survey_metadata": {
+    "survey_id": "283",
+    "ru_ref": "12345678901A",
+    "ru_name": "ESSENTIAL ENTERPRISE LTD.",
+    "trad_as": "ESSENTIAL ENTERPRISE LTD.",
+    "period_id": "201605",
+    "user_id": "UNKNOWN",
+    "ref_p_start_date": "2016-05-01",
+    "ref_p_end_date": "2016-05-31",
+    "form_type": "0001"
+  },
+  "data": {
+    "answers": [
+      {
+        "answer_id": "answerea6a30d1-d902-4e0f-af1a-cb94c1ec2184",
+        "value": "32_1"
+      },
+      {
+        "answer_id": "answer8a1a9238-20d6-44b7-8e8f-91563033b58d",
+        "value": "48_1"
+      },
+      {
+        "answer_id": "answer95e47771-6f95-4747-90f2-0bba7b754d6e",
+        "value": "266_2"
+      },
+      {
+        "answer_id": "answer2bbebe96-03bb-4ca2-bffa-ae51b6146a38",
+        "value": "200072_2"
+      },
+      {
+        "answer_id": "answerd803f7cd-0aa1-4877-ac19-0ad684b892de",
+        "value": "129_4"
+      },
+      {
+        "answer_id": "answerbb3384b7-8303-4d7e-b033-dd2336238cb8",
+        "value": "325_3"
+      },
+      {
+        "answer_id": "answer5eb9feb3-3577-4106-95db-88be467bd5e0",
+        "value": "326_4"
+      },
+      {
+        "answer_id": "answer2eac5cfa-f6b5-4f93-996d-aa6fa619fab0",
+        "value": [
+          "1610_1"
+        ]
+      },
+      {
+        "answer_id": "answerf76bbf66-e399-41b4-9656-d385922cfb28",
+        "value": "200080_5"
+      },
+      {
+        "answer_id": "answereb62dd64-43e4-4a50-9e8e-93586ec8eb1e",
+        "value": "57_4"
+      },
+      {
+        "answer_id": "answerca35a552-1269-412c-a0c3-f47bb8caa295",
+        "value": [
+          "420_1"
+        ]
+      },
+      {
+        "answer_id": "answer50612efe-36b8-4c51-8e6c-d342eb06e361",
+        "value": [
+          "200099_1"
+        ]
+      },
+      {
+        "answer_id": "answer31a96530-2829-46bd-9c8d-b86e8c6f047d",
+        "value": [
+          "200116_1"
+        ]
+      },
+      {
+        "answer_id": "answerbfb14c98-4f87-4e1e-880a-192cb689a58c",
+        "value": [
+          "200126_1"
+        ]
+      },
+      {
+        "answer_id": "answerf547830e-21e0-4274-934f-e91f3b31f67d",
+        "value": "2232_4"
+      },
+      {
+        "answer_id": "answer97bef599-2c67-48bf-8c3a-f3dd6948c077",
+        "value": "12811_4"
+      },
+      {
+        "answer_id": "answerc7aad0fd-8ad1-44f6-b719-bf711adf9d96",
+        "value": "200059_3"
+      },
+      {
+        "answer_id": "answerd6950b65-1f16-4215-b841-dd3a0e8e311f",
+        "value": "1688_3"
+      },
+      {
+        "answer_id": "answer572dd526-a09a-4336-b427-a9ecd7fba262",
+        "value": "238_3"
+      },
+      {
+        "answer_id": "answer1dcaecee-20c7-4a8f-9d38-b693e3ea83e9",
+        "value": "181_3"
+      },
+      {
+        "answer_id": "answer230c1ba1-85c3-41d0-a93b-df21b180bc0a",
+        "value": "734_4"
+      },
+      {
+        "answer_id": "answer05533baf-e041-4708-99ed-32801e7b5d37",
+        "value": "25_3"
+      },
+      {
+        "answer_id": "answer7e403e79-a3ba-4f4c-8c62-d6acbcb5fc54",
+        "value": "769_4"
+      },
+      {
+        "answer_id": "answerb6e84a70-d29b-473c-9cc8-c5f22240da40",
+        "value": "66_3"
+      },
+      {
+        "answer_id": "answer2f67e0da-c310-4c4c-b288-cecf8900fd26",
+        "value": [
+          "1660_1"
+        ]
+      },
+      {
+        "answer_id": "answere4c8ed1e-e9d4-4511-8bda-520583ef4c04",
+        "value": [
+          "1671_1"
+        ]
+      },
+      {
+        "answer_id": "answerac7aaa2d-2713-4d1b-83ad-e62cd1f74032",
+        "value": "my comment"
+      }
+    ],
+    "lists": [],
+    "answer_codes": [
+      {
+        "answer_id": "answerea6a30d1-d902-4e0f-af1a-cb94c1ec2184",
+        "code": "32"
+      },
+      {
+        "answer_id": "answer8a1a9238-20d6-44b7-8e8f-91563033b58d",
+        "code": "48"
+      },
+      {
+        "answer_id": "answer95e47771-6f95-4747-90f2-0bba7b754d6e",
+        "code": "266"
+      },
+      {
+        "answer_id": "answer2bbebe96-03bb-4ca2-bffa-ae51b6146a38",
+        "code": "200072"
+      },
+      {
+        "answer_id": "answerd803f7cd-0aa1-4877-ac19-0ad684b892de",
+        "code": "129"
+      },
+      {
+        "answer_id": "answerbb3384b7-8303-4d7e-b033-dd2336238cb8",
+        "code": "325"
+      },
+      {
+        "answer_id": "answer5eb9feb3-3577-4106-95db-88be467bd5e0",
+        "code": "326"
+      },
+      {
+        "answer_id": "answer2eac5cfa-f6b5-4f93-996d-aa6fa619fab0",
+        "code": "1610"
+      },
+      {
+        "answer_id": "answerf76bbf66-e399-41b4-9656-d385922cfb28",
+        "code": "200080"
+      },
+      {
+        "answer_id": "answereb62dd64-43e4-4a50-9e8e-93586ec8eb1e",
+        "code": "57"
+      },
+      {
+        "answer_id": "answerca35a552-1269-412c-a0c3-f47bb8caa295",
+        "code": "420"
+      },
+      {
+        "answer_id": "answer50612efe-36b8-4c51-8e6c-d342eb06e361",
+        "code": "200099"
+      },
+      {
+        "answer_id": "answer31a96530-2829-46bd-9c8d-b86e8c6f047d",
+        "code": "200116"
+      },
+      {
+        "answer_id": "answerbfb14c98-4f87-4e1e-880a-192cb689a58c",
+        "code": "200126"
+      },
+      {
+        "answer_id": "answerf547830e-21e0-4274-934f-e91f3b31f67d",
+        "code": "2232"
+      },
+      {
+        "answer_id": "answer97bef599-2c67-48bf-8c3a-f3dd6948c077",
+        "code": "12811"
+      },
+      {
+        "answer_id": "answerc7aad0fd-8ad1-44f6-b719-bf711adf9d96",
+        "code": "200059"
+      },
+      {
+        "answer_id": "answerd6950b65-1f16-4215-b841-dd3a0e8e311f",
+        "code": "1688"
+      },
+      {
+        "answer_id": "answer572dd526-a09a-4336-b427-a9ecd7fba262",
+        "code": "238"
+      },
+      {
+        "answer_id": "answer1dcaecee-20c7-4a8f-9d38-b693e3ea83e9",
+        "code": "181"
+      },
+      {
+        "answer_id": "answer230c1ba1-85c3-41d0-a93b-df21b180bc0a",
+        "code": "734"
+      },
+      {
+        "answer_id": "answer05533baf-e041-4708-99ed-32801e7b5d37",
+        "code": "25"
+      },
+      {
+        "answer_id": "answer7e403e79-a3ba-4f4c-8c62-d6acbcb5fc54",
+        "code": "769"
+      },
+      {
+        "answer_id": "answerb6e84a70-d29b-473c-9cc8-c5f22240da40",
+        "code": "66"
+      },
+      {
+        "answer_id": "answer2f67e0da-c310-4c4c-b288-cecf8900fd26",
+        "code": "1660"
+      },
+      {
+        "answer_id": "answere4c8ed1e-e9d4-4511-8bda-520583ef4c04",
+        "code": "1671"
+      },
+      {
+        "answer_id": "answerac7aaa2d-2713-4d1b-83ad-e62cd1f74032",
+        "code": "146"
+      }
+    ]
+  },
+  "started_at": "2026-08-07T13:21:25.887661+00:00",
+  "submission_language_code": "en"
+}
