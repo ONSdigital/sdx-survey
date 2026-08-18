@@ -47,3 +47,43 @@ class TestDap(TestBase):
         self.assertEqual(expected_receipt, self.get_receipt())
         self.assertEqual(expected_comments, self.get_comment_data())
         self.assertEqual(expected_kind, self.get_comment_kind())
+
+    def test_bics_dv3(self: Self):
+        self.set_survey_submission("283.0002.json")
+        tx_id = self.submission_json["tx_id"]
+
+        resp = self.client.post("/", json=self.envelope)
+
+        expected_filename = f"{tx_id}.json"
+
+        actual_files = self.get_zip_contents()
+
+        # expected context
+        expected_context: Context = {
+            "tx_id": tx_id,
+            "survey_type": SurveyType.DAP,
+            "context_type": ContextType.BUSINESS_SURVEY,
+            "survey_id": "283",
+            "period_id": "201605",
+            "ru_ref": "12345678901A",
+        }
+
+        expected_receipt = {"caseId": "814a55b6-cec1-43a4-b8ce-d02bdf7e1914", "partyId": "UNKNOWN"}
+
+        # expected_comments: CommentData = {
+        #     "additional": [],
+        #     "boxes_selected": "",
+        #     "comment": "my comment",
+        #     "ru_ref": "12345678901A",
+        # }
+        #
+        # expected_kind = "283_201605"
+
+        self.assertTrue(resp.is_success)
+        self.assertEqual(tx_id, self.get_zip_name())
+        self.assertTrue(expected_filename in actual_files)
+        self.assertEqual(1, len(actual_files))
+        self.assertEqual(expected_context, self.get_context())
+        self.assertEqual(expected_receipt, self.get_receipt())
+        # self.assertEqual(expected_comments, self.get_comment_data())
+        # self.assertEqual(expected_kind, self.get_comment_kind())
