@@ -37,7 +37,7 @@ class TestPCK(unittest.TestCase):
 
     def test_get_name(self):
         actual: str = pck.get_name(Response(self.submission))
-        expected = "144_befa5444749f407a"
+        expected = "144_201605_12346789012A_befa5444749f407a"
         self.assertEqual(expected, actual)
 
     def test_get_abs_name(self):
@@ -46,5 +46,5 @@ class TestPCK(unittest.TestCase):
         submission["survey_metadata"]["form_type"] = "1802"
 
         actual = pck.get_name(Response(submission))
-        expected = "053_befa5444749f407a"
+        expected = "053_201605_12346789012A_befa5444749f407a"
         self.assertEqual(expected, actual)

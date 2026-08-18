@@ -14,7 +14,7 @@ class TestPrices(TestBase):
 
         resp = self.client.post("/", json=self.envelope)
 
-        expected_pck_filename = "132_d63e2bba29a346c0"
+        expected_pck_filename = "132_201605_12345678901A_d63e2bba29a346c0"
         expected_image_filename = "Sd63e2bba29a346c0_1.JPG"
         expected_index_filename = "EDC_132_20250423_d63e2bba29a346c0.csv"
 
