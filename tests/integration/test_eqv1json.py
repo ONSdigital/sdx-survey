@@ -7,7 +7,7 @@ from app.services.comments import CommentData
 from tests.integration.test_base import TestBase
 
 
-class TestDap(TestBase):
+class TestEqv1json(TestBase):
     def test_bics(self: Self):
         self.set_survey_submission("283.0001.json")
         tx_id = self.submission_json["tx_id"]
@@ -21,7 +21,7 @@ class TestDap(TestBase):
         # expected context
         expected_context: Context = {
             "tx_id": tx_id,
-            "survey_type": SurveyType.DAP,
+            "survey_type": SurveyType.EQV1JSON,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "283",
             "period_id": "201605",
@@ -61,7 +61,7 @@ class TestDap(TestBase):
         # expected context
         expected_context: Context = {
             "tx_id": tx_id,
-            "survey_type": SurveyType.DAP,
+            "survey_type": SurveyType.EQV1JSON,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "283",
             "period_id": "201605",

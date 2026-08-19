@@ -81,7 +81,7 @@ class Survey:
         if v2_survey_type == SurveyType.FEEDBACK:
             processor = self._feedback_processor
 
-        elif v2_survey_type == SurveyType.ADHOC:
+        elif v2_survey_type == SurveyType.EQV2JSON:
             processor = self._adhoc_processor
 
         else:

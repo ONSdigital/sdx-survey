@@ -6,7 +6,7 @@ from app.definitions.survey_type import SurveyType
 from tests.integration.test_base import TestBase
 
 
-class TestAdhoc(TestBase):
+class TestEqv2json(TestBase):
     def test_phm(self: Self):
         self.set_survey_submission("740.0001.json")
 
@@ -18,7 +18,7 @@ class TestAdhoc(TestBase):
 
         expected_context: Context = {
             "tx_id": "cebf9e22-0b78-40d8-872d-ca5fe2507ab1",
-            "survey_type": SurveyType.ADHOC,
+            "survey_type": SurveyType.EQV2JSON,
             "context_type": ContextType.ADHOC_SURVEY,
             "survey_id": "740",
             "title": "covid_resp_inf_surv_response",

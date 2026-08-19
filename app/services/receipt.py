@@ -32,7 +32,7 @@ class ReceiptService(ReceiptServiceBase):
 
         receipt_str: str
         topic_path: str
-        if response.get_survey_type() == SurveyType.ADHOC:
+        if response.get_survey_type() == SurveyType.EQV2JSON:
             receipt_str = self._make_srm_receipt(response)
             topic_path = self._settings.srm_receipt_topic_path
         else:

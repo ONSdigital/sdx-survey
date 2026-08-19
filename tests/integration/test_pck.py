@@ -6,7 +6,7 @@ from app.definitions.survey_type import SurveyType
 from tests.integration.test_base import TestBase
 
 
-class TestPckOnly(TestBase):
+class TestPck(TestBase):
     def test_ashe(self: Self):
         self.set_survey_submission("141.0001.json")
 
@@ -18,7 +18,7 @@ class TestPckOnly(TestBase):
 
         expected_context: Context = {
             "tx_id": "bddbb412-75ea-43ce-9efa-0deb07cb8550",
-            "survey_type": SurveyType.DEXTA,
+            "survey_type": SurveyType.PCK_IMG_RCPT,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "141",
             "period_id": "1605",
