@@ -37,5 +37,5 @@ class TestSPP(unittest.TestCase):
 
     def test_get_name(self):
         actual: str = spp.get_name(Response(self.submission))
-        expected = "144_SDC_2023-09-29T09-30-21_befa5444-749f-407a-b3a2-19f1d1c7324b.json"
+        expected = "144_SDC_2023-09-29T09-30-21_12346789012.json"
         self.assertEqual(expected, actual)
