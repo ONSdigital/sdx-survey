@@ -17,15 +17,15 @@ in a 'submission type' agnostic way.
 """
 logger = get_logger()
 
-DAP_SURVEY = ["283"]
-DEXTA_SURVEY = ["009", "017", "019", "066", "073", "074", "076", "134", "139", "144",
+EQV1JSON = ["283"]
+PCK_IMG_RCPT = ["009", "017", "019", "066", "073", "074", "076", "134", "139", "144",
                  "160", "165", "169", "171", "182", "183", "184", "185", "187", "202", "228"]
-SPP_SURVEY = ["002", "023"]
-ENVIRONMENTAL_SURVEY = ["007", "147"]
-MATERIALS_SURVEY = ["024", "068", "071", "194"]
-ADHOC_SURVEY = ["740"]
-PCK_ONLY_SURVEY = ["141"]
-PRICES = ["061", "132", "133", "156"]
+SPPJSON_IMG_RCPT = ["002", "023"]
+EQV1JSON_IMG_RCPT = ["007", "147"]
+EQV2JSON_IMG_RCPT = ["024", "068", "071", "194"]
+EQV2JSON = ["740"]
+PCK = ["141"]
+PCK_IMG = ["061", "132", "133", "156"]
 
 TO_SPP_PERIOD: dict[str, str] = {
     "009": "2510",
@@ -43,7 +43,7 @@ class Response:
         return copy.deepcopy(self._submission)
 
     def get_context_type(self) -> ContextType:
-        if self.get_survey_id() in ADHOC_SURVEY:
+        if self.get_survey_id() in EQV2JSON:
             return ContextType.ADHOC_SURVEY
         else:
             return ContextType.BUSINESS_SURVEY
@@ -53,30 +53,30 @@ class Response:
             return SurveyType.FEEDBACK
 
         if self._spp_submission():
-            return SurveyType.SPP
+            return SurveyType.SPPJSON_IMG_RCPT
 
         survey_id = self.get_survey_id()
 
-        if survey_id in DAP_SURVEY:
-            return SurveyType.DAP
+        if survey_id in EQV1JSON:
+            return SurveyType.EQV1JSON
 
-        if survey_id in DEXTA_SURVEY:
-            return SurveyType.DEXTA
+        if survey_id in PCK_IMG_RCPT:
+            return SurveyType.PCK_IMG_RCPT
 
-        if survey_id in ENVIRONMENTAL_SURVEY:
-            return SurveyType.ENVIRONMENTAL
+        if survey_id in EQV1JSON_IMG_RCPT:
+            return SurveyType.EQV1JSON_IMG_RCPT
 
-        if survey_id in MATERIALS_SURVEY:
-            return SurveyType.MATERIALS
+        if survey_id in EQV2JSON_IMG_RCPT:
+            return SurveyType.EQV2JSON_IMG_RCPT
 
-        if survey_id in ADHOC_SURVEY:
-            return SurveyType.ADHOC
+        if survey_id in EQV2JSON:
+            return SurveyType.EQV2JSON
 
-        if survey_id in PCK_ONLY_SURVEY:
-            return SurveyType.PCK_ONLY
+        if survey_id in PCK:
+            return SurveyType.PCK
         
-        if survey_id in PRICES:
-            return SurveyType.PRICES
+        if survey_id in PCK_IMG:
+            return SurveyType.PCK_IMG
 
         raise DataError(f"Survey id {survey_id} not known!")
 
@@ -87,7 +87,7 @@ class Response:
             if period_to_start is not None:
                 if Period(self.get_period()) >= Period(period_to_start):
                     return True
-        elif survey_id in SPP_SURVEY:
+        elif survey_id in SPPJSON_IMG_RCPT:
             return True
 
         return False
@@ -216,7 +216,7 @@ class Response:
         return self._submission["case_id"]
 
     def get_user_id(self) -> str:
-        if self.get_survey_type() == SurveyType.ADHOC:
+        if self.get_survey_type() == SurveyType.EQV2JSON:
             raise DataError("Adhoc surveys do not have user_id field")
 
         return self._submission["survey_metadata"]["user_id"]

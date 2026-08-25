@@ -7,7 +7,7 @@ from app.services.comments import CommentData
 from tests.integration.test_base import TestBase
 
 
-class TestEnvironmental(TestBase):
+class TestEqv1jsonImgRcpt(TestBase):
     def test_lcree(self: Self):
         self.set_survey_submission("007.0009.json")
         tx_id = self.submission_json["tx_id"]
@@ -23,7 +23,7 @@ class TestEnvironmental(TestBase):
 
         expected_context: Context = {
             "tx_id": tx_id,
-            "survey_type": SurveyType.ENVIRONMENTAL,
+            "survey_type": SurveyType.EQV1JSON_IMG_RCPT,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "007",
             "period_id": "201605",

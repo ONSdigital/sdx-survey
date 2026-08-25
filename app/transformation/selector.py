@@ -25,15 +25,15 @@ class TransformSelector:
         adhoc_transform: Transform = AdhocTransform()
 
         self._mapping: dict[SurveyType, list[Transform]] = {
-            SurveyType.DEXTA: [pck_transform, image_transform, index_transform, idbr_transform],
-            SurveyType.MATERIALS: [json_transform, image_transform, index_transform, idbr_transform],
-            SurveyType.ENVIRONMENTAL: [v1_json_transform, image_transform, index_transform, idbr_transform],
-            SurveyType.SPP: [spp_transform, image_transform, index_transform, idbr_transform],
-            SurveyType.DAP: [v1_json_transform],
+            SurveyType.PCK_IMG_RCPT: [pck_transform, image_transform, index_transform, idbr_transform],
+            SurveyType.EQV2JSON_IMG_RCPT: [json_transform, image_transform, index_transform, idbr_transform],
+            SurveyType.EQV1JSON_IMG_RCPT: [v1_json_transform, image_transform, index_transform, idbr_transform],
+            SurveyType.SPPJSON_IMG_RCPT: [spp_transform, image_transform, index_transform, idbr_transform],
+            SurveyType.EQV1JSON: [v1_json_transform],
             SurveyType.FEEDBACK: [feedback_transform],
-            SurveyType.ADHOC: [adhoc_transform],
-            SurveyType.PCK_ONLY: [pck_transform],
-            SurveyType.PRICES: [pck_transform, image_transform, index_transform],
+            SurveyType.EQV2JSON: [adhoc_transform],
+            SurveyType.PCK: [pck_transform],
+            SurveyType.PCK_IMG: [pck_transform, image_transform, index_transform],
         }
 
     def select(self, survey_type: SurveyType) -> list[Transform]:

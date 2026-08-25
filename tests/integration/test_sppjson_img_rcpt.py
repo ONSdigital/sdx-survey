@@ -23,7 +23,7 @@ class TestSpp(TestBase):
 
         expected_context: Context = {
             "tx_id": "bddbb412-75ea-43ce-9efa-0deb07cb8550",
-            "survey_type": SurveyType.SPP,
+            "survey_type": SurveyType.SPPJSON_IMG_RCPT,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "009",
             "period_id": "2512",
@@ -68,7 +68,7 @@ class TestSpp(TestBase):
 
         expected_context: Context = {
             "tx_id": "11ed69f5-6c23-40cb-b4c2-70613bfe97fc",
-            "survey_type": SurveyType.SPP,
+            "survey_type": SurveyType.SPPJSON_IMG_RCPT,
             "context_type": ContextType.BUSINESS_SURVEY,
             "survey_id": "023",
             "period_id": "1604",
